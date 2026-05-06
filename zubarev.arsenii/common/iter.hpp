@@ -18,6 +18,7 @@ namespace zubarev
 
   public:
     T& operator*();
+    T& operator*() const;
     LIter< T > operator++();
     bool operator!=(const LIter&) const;
     bool operator==(const LIter&) const;
@@ -29,6 +30,11 @@ namespace zubarev
 
   template < class T >
   T& LIter< T >::operator*()
+  {
+    return ptr->val;
+  }
+    template < class T >
+  T& LIter< T >::operator*() const
   {
     return ptr->val;
   }
