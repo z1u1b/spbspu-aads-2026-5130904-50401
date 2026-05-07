@@ -17,7 +17,7 @@ namespace zubarev
   {
     friend class IterHashTable< Key, Value, Hash, Equal >;
     friend class CIterHashTable< Key, Value, Hash, Equal >;
-
+    // friend class GraphTable;
   private:
     using Node = NodeHashTable< Key, Value >;
     using OverflowList = List< Node >;
@@ -41,6 +41,24 @@ namespace zubarev
       return static_cast< size_t >(hasher_(k)) % bucket_count_;
     }
 
+    Node* find_el(const Key& k) noexcept
+    {
+      for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
+        if (equaler_(k, (*it).key_) && (*it).is_val_) {
+          return std::addressof(*it);
+        }
+      }
+      size_t buc_idx = getBucketIndex(k);
+      for (size_t i = 0; i < bucket_capacity_; ++i) {
+        size_t idx = bucket_capacity_ * buc_idx + i;
+        if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
+
+          return &data_[idx];
+        }
+      }
+      return nullptr;
+    }
+
   public:
     HashTable();
     HashTable(size_t, size_t, Node*, size_t*, OverflowList, Hash, Equal);
@@ -49,6 +67,12 @@ namespace zubarev
     HashTable(HashTable&& table) noexcept;
     HashTable& operator=(const HashTable& other);
     HashTable& operator=(HashTable&& other) noexcept;
+
+    Value& operator[](Key k) noexcept;
+    const Value& operator[](Key id) const noexcept;
+    Value& at(Key id);
+    const Value& at(Key id) const;
+
     void swap(Table& rhs) noexcept;
 
     void add(Key k, Value v);
@@ -164,6 +188,41 @@ namespace zubarev
     Table cpy(std::move(rhs));
     swap(cpy);
     return *this;
+  }
+
+  template < class Key, class Value, class Hash, class Equal >
+  Value& HashTable< Key, Value, Hash, Equal >::operator[](Key k) noexcept
+  {
+    Node* el = find_el(k);
+    if (el) {
+      return el->val_;
+    } else {
+      add(k, 0);
+      return find_el(k)->val_;
+    }
+  }
+  // template < class Key, class Value, class Hash, class Equal >
+  // const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
+  // {}
+  template < class Key, class Value, class Hash, class Equal >
+  Value& HashTable< Key, Value, Hash, Equal >::at(Key id)
+  {
+    Node* el = find_el(id);
+    if (el) {
+      return el->val_;
+    } else {
+      throw("Index out of range");
+    }
+  }
+  template < class Key, class Value, class Hash, class Equal >
+  const Value& HashTable< Key, Value, Hash, Equal >::at(Key id) const
+  {
+    Node* el = find_el(id);
+    if (el) {
+      return el->val_;
+    } else {
+      throw("Index out of range");
+    }
   }
 
   template < class Key, class Value, class Hash, class Equal >

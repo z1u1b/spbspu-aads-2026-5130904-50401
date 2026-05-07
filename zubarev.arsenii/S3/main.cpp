@@ -1,139 +1,62 @@
+#include "../common/top-it-vector.hpp"
+#include "commands.hpp"
+#include "graph.hpp"
+#include "my_equal.hpp"
 #include "my_hashtable.hpp"
+#include "my_siphash.hpp"
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 
+// using zub=zub;
 int main()
 {
-  using Table = zubarev::HashTable< std::string, int, std::hash< std::string >, std::equal_to< std::string > >;
+  namespace zub = zubarev;
+  using Hash = zub::SipHash;
+  using Equal = zub::Equaler< std::string >;
+  // using Graph = zub::HashTable<
+  //     std::string,
+  //     zub::HashTable< std::string, zub::HashTable< std::string, topit::Vector< size_t >, Hash, Equal >, Hash, Equal
+  //     >, Hash, Equal >;
+  using cmd_t = void (*)(std::istream&, std::ostream&, zub::GraphTable&);
 
-  Table table;
+  // using Table = zub::HashTable< std::pair<>, std::pair<>, std::hash< std::string >, std::equal_to< std::string >
+  // >
 
-  std::cout << "=== ADD TEST ===\n";
-  table.add("apple", 1);
-  table.add("banana", 2);
-  table.add("cherry", 3);
-  table.add("date", 4);
-  table.add("elderberry", 5);
+  // std::unordered_map< std::string, cmd_t > cmds;
 
-  std::cout << "Elements added\n\n";
+  zub::HashTable< std::string, cmd_t, Hash, Equal > cmds;
 
-  // -----------------------------
+  cmds["graphs"] = zub::cmd_graphs;
+  cmds["vertexes"] = zub::cmd_vertexes;
+  cmds["outbound"] = zub::cmd_outbound;
+  cmds["inbound"] = zub::cmd_inbound;
+  cmds["bind"] = zub::cmd_bind;
+  cmds["cut"] = zub::cmd_cut;
+  cmds["create"] = zub::cmd_create;
+  cmds["merge"] = zub::cmd_merge;
+  cmds["extract"] = zub::cmd_extract;
 
-  std::cout << "=== HAS TEST ===\n";
-  std::cout << "apple: " << table.has("apple") << "\n";
-  std::cout << "banana: " << table.has("banana") << "\n";
-  std::cout << "grape: " << table.has("grape") << "\n\n";
-
-  // -----------------------------
-
-  std::cout << "=== ITERATOR TEST ===\n";
-  for (auto it = table.begin(); it != table.end(); ++it) {
-    std::cout << it->key_ << " : " << it->val_ << "\n";
+  std::string cmd;
+  // zub::NoteBook notebook;
+  zub::GraphTable graph;
+  while (std::cin >> cmd) {
+    try {
+      if (!cmds.has(cmd)) {
+        throw std::out_of_range("unknown command");
+      }
+      cmds.at(cmd)(std::cin, std::cout, graph);
+    } catch (const std::out_of_range&) {
+      std::cout << "<INVALID COMMAND>\n";
+      auto toignore = std::numeric_limits< std::streamsize >::max();
+      std::cin.ignore(toignore, '\n');
+    } catch (const std::logic_error& e) {
+      std::cout << "<INVALID COMMAND: " << e.what() << '\n';
+    }
   }
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== CONST ITERATOR TEST ===\n";
-  const Table& const_ref = table;
-  for (auto it = const_ref.cbegin(); it != const_ref.cend(); ++it) {
-    std::cout << it->key_ << " : " << it->val_ << "\n";
+  if (!std::cin.eof()) {
+    std::cerr << "Bad input";
+    return 1;
   }
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== DROP TEST ===\n";
-  try {
-    int val = table.drop("banana");
-    std::cout << "Dropped banana = " << val << "\n";
-  } catch (...) {
-    std::cout << "Error dropping banana\n";
-  }
-
-  std::cout << "banana exists? " << table.has("banana") << "\n\n";
-
-  // -----------------------------
-
-  std::cout << "=== ITER AFTER DROP ===\n";
-  for (auto it = table.begin(); it != table.end(); ++it) {
-    std::cout << it->key_ << " : " << it->val_ << "\n";
-  }
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== COPY TEST ===\n";
-  Table copy_table = table;
-
-  for (auto it = copy_table.begin(); it != copy_table.end(); ++it) {
-    std::cout << it->key_ << " : " << it->val_ << "\n";
-  }
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== MOVE TEST ===\n";
-  Table moved_table = std::move(copy_table);
-
-  std::cout << "Moved table:\n";
-  for (auto it = moved_table.begin(); it != moved_table.end(); ++it) {
-    std::cout << it->key_ << " : " << it->val_ << "\n";
-  }
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== EDGE CASES ===\n";
-
-  try {
-    table.drop("not_exist");
-  } catch (...) {
-    std::cout << "Correctly handled drop of non-existing key\n";
-  }
-
-  std::cout << "\n";
-
-  // -----------------------------
-
-  std::cout << "=== LARGE INSERT TEST ===\n";
-  for (int i = 0; i < 50; ++i) {
-    table.add("key" + std::to_string(i), i);
-  }
-
-  std::cout << "Inserted 50 elements\n";
-
-  int count = 0;
-  for (auto it = table.begin(); it != table.end(); ++it) {
-    count++;
-  }
-
-  std::cout << "Total elements counted by iterator: " << count << "\n";
-
-  std::cout << "\n=== DONE ===\n";
-
-  return 0;
 }
-// // main.cpp
-// #include "my_hashtable.hpp"
-// #include <iostream>
-
-// int main()
-// {
-//   zubarev::HashTable< std::string, int, std::hash< std::string >, std::equal_to< std::string > > table;
-//   table.add("apple", 1);
-//   table.add("banana", 2);
-
-//   // Тест mutable-итератора
-//   for (auto it = table.begin(); it != table.end(); ++it) {
-//     std::cout << it->key_ << " : " << it->val_ << "\n";
-//     it->val_ *= 2; // Должно компилироваться
-//   }
-
-//   // // Тест const-итератора
-//   // const auto& ctable = table;
-//   // for (auto it = ctable.cbegin(); it != ctable.cend(); ++it) {
-//   //   std::cout << it->key_ << " : " << it->val_ << "\n";
-//   //   // it->val_ = 10; // Не должно компилироваться
-//   // }
-// }

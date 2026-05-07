@@ -5,7 +5,7 @@ namespace zubarev
   template < class T >
   struct Equaler
   {
-    bool operator()(T& a, T& b) noexcept const
+    bool operator()(const T& a, const T& b) const noexcept
     {
       return a == b;
     }
