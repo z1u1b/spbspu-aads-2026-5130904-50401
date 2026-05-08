@@ -12,11 +12,21 @@ namespace zubarev
 {
   class GraphTable
   {
-  private:
-    using innerTable = HashTable< std::string, topit::Vector< size_t >, SipHash, Equaler< std::string > >;
-    using vertexTable = HashTable< std::string, innerTable, SipHash, Equaler< std::string > >;
+    // private:
+    //   using innerTable = HashTable< std::string, topit::Vector< size_t >, SipHash, Equaler< std::string > >;
+    //   using vertexTable = HashTable< std::string, innerTable, SipHash, Equaler< std::string > >;
 
-    using Table = HashTable< std::string, vertexTable, SipHash, Equaler< std::string > >;
+    //   using Table = HashTable< std::string, vertexTable, SipHash, Equaler< std::string > >;
+    //   Table data_;
+
+  private:
+    using EdgeKey = std::pair< std::string, std::string >;
+    using Weights = topit::Vector< size_t >;
+
+    using Table = HashTable< std::string,
+                             HashTable< EdgeKey, Weights, SipHash, Equaler< std::pair< std::string, std::string > > >,
+                             SipHash,
+                             Equaler< std::string > >;
     Table data_;
 
   public:
@@ -36,19 +46,73 @@ namespace zubarev
 
   void GraphTable::graphs(std::ostream& out) const
   {
-    for (auto it=data_.begin();it!=data_.end();++it) {
-      out<<it->key_;
+    topit::Vector< std::string > names;
+
+    for (auto it = data_.begin(); it != data_.end(); ++it) {
+      names.pushBack(it->key_);
+    }
+    std::sort(names.begin(), names.end());
+    for (auto it = names.begin(); it != names.end(); ++it) {
+      out << *it << '\n';
     }
   }
 
   void GraphTable::vertexes(const std::string& graph_name, std::ostream& out) const
-  {}
+  {
+    const auto& graph = data_.at(graph_name);
+    topit::Vector< std::string > verts;
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      verts.pushBack(it->key_.first);
+    }
+    std::sort(verts.begin(), verts.end());
+    for (auto it = verts.begin(); it != verts.end(); ++it) {
+      out << *it << '\n';
+    }
+  }
 
   void GraphTable::outbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
-  {}
+  {
+    const auto& graph = data_.at(graph_name);
+    const auto& vertsTo = graph.at(vertex);
+    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
 
+    for (auto it = vertsTo.begin(); it != vertsTo.end(); ++it) {
+      out << it->key_;
+      for (auto vit = it->val_.cbegin(); vit != it->val_.cend(); ++vit) {
+        out << " ";
+        out << *vit;
+      }
+      out << '\n';
+    }
+  }
+
+  bool compare(const auto& a, const auto& b)
+  {
+    return a.first < b.first;
+  }
   void GraphTable::inbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
-  {}
+  {
+    const auto& graph = data_.at(graph_name);
+    graph.at(vertex);
+    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      for (auto it2 = it->val_.begin(); it2 != it->val_.end(); ++it2) {
+        if (Equaler< std::string >{}(it2->key_, vertex)) {
+          std::pair< std::string, topit::Vector< size_t > > tmp;
+          tmp.first = it->key_;
+
+          for (auto vit = it2->val_.cbegin(); vit != it2->val_.cend(); ++vit) {
+            tmp.second.pushBack(*vit);
+          }
+          results.pushBack(tmp);
+        }
+      }
+    }
+    std::sort(results.begin(), results.end(), compare);
+    for (auto it = results.begin(); it != results.end(); ++it) {
+      out << (*it).first << '\n';
+    }
+  }
 
   void GraphTable::bind(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
   {}

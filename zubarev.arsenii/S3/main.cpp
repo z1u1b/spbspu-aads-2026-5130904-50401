@@ -4,28 +4,36 @@
 #include "my_equal.hpp"
 #include "my_hashtable.hpp"
 #include "my_siphash.hpp"
+#include <fstream>
+#include <input.hpp>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
 
 // using zub=zub;
-int main()
+
+int main(int argc, char* argv[])
+
 {
+
   namespace zub = zubarev;
+
+  if (argc != 2) {
+    std::cerr << "Wrong arguments\n";
+    return 1;
+  }
+
+  std::ifstream input(argv[1]);
+
+  if (!input) {
+    std::cerr << "Cannot open file\n";
+    return 1;
+  }
+
   using Hash = zub::SipHash;
   using Equal = zub::Equaler< std::string >;
-  // using Graph = zub::HashTable<
-  //     std::string,
-  //     zub::HashTable< std::string, zub::HashTable< std::string, topit::Vector< size_t >, Hash, Equal >, Hash, Equal
-  //     >, Hash, Equal >;
   using cmd_t = void (*)(std::istream&, std::ostream&, zub::GraphTable&);
-
-  // using Table = zub::HashTable< std::pair<>, std::pair<>, std::hash< std::string >, std::equal_to< std::string >
-  // >
-
-  // std::unordered_map< std::string, cmd_t > cmds;
-
   zub::HashTable< std::string, cmd_t, Hash, Equal > cmds;
 
   cmds["graphs"] = zub::cmd_graphs;
@@ -38,9 +46,19 @@ int main()
   cmds["merge"] = zub::cmd_merge;
   cmds["extract"] = zub::cmd_extract;
 
+  zub::GraphTable graph;
+
+  try {
+    zub::inputGraphs(input, graph);
+  }
+
+  catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
+
   std::string cmd;
   // zub::NoteBook notebook;
-  zub::GraphTable graph;
   while (std::cin >> cmd) {
     try {
       if (!cmds.has(cmd)) {

@@ -32,6 +32,22 @@ namespace zubarev
     {
       return (*this)(s.data(), s.size());
     }
+
+    uint64_t operator()(const std::pair< std::string, std::string >& p) const
+    {
+      auto h = hasher_template_;
+
+      size_t s1 = p.first.size();
+      size_t s2 = p.second.size();
+
+      h.update(&s1, sizeof(s1));
+      h.update(p.first.data(), p.first.size());
+
+      h.update(&s2, sizeof(s2));
+      h.update(p.second.data(), p.second.size());
+
+      return boost::hash2::get_integral_result< uint64_t >(h);
+    }
   };
 }
 
