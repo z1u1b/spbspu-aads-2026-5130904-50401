@@ -46,8 +46,6 @@ namespace zubarev
     void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&);
   };
 
-  // void GraphTable::graphs()
-  // {}
 
   void GraphTable::graphs(std::ostream& out) const
   {
@@ -156,42 +154,69 @@ namespace zubarev
 
   void GraphTable::cut(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
   {
-        auto& graph = data_.at(graph_name);
+    auto& graph = data_.at(graph_name);
     graph[edge].erase(weight);
   }
 
   void GraphTable::create(const std::string& graph_name, size_t count, const topit::Vector< std::string >& vertices)
   {
     if (data_.has(graph_name)) {
-      std::cout<<"<INVALID COMMAND>" <<"\n";
+      std::cout << "<INVALID COMMAND>" << "\n";
       return;
     }
     if (count != vertices.getSize()) {
-        std::cout << "<INVALID COMMAND>" << "\n";
-        return;
+      std::cout << "<INVALID COMMAND>" << "\n";
+      return;
     }
 
-
-    using EdgeTable = HashTable<EdgeKey, Weights, SipHash, Equaler<EdgeKey>>;
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
     EdgeTable new_table;
 
-    for (size_t i=0;i<count;++i) {
-      new_table.add({vertices[0],vertices[i]},Weights{});
+    for (size_t i = 0; i < count; ++i) {
+      new_table.add({vertices[0], vertices[i]}, Weights{});
     }
 
-
     data_.add(graph_name, new_table);
-
   }
 
   void GraphTable::merge(const std::string& new_name, const std::string& source1, const std::string& source2)
-  {}
+  {
+    if (data_.has(new_name)) {
+      std::cout << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+    if (!(data_.has(source1) && data_.has(source2))) {
+      std::cout << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
+    EdgeTable new_table;
+    EdgeTable source1_table = data_[source1];
+    EdgeTable source2_table = data_[source2];
+
+    for (auto it = source1_table.begin(); it != source1_table.end(); ++it) {
+      Weights weights(it->val_);
+      for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
+        new_table[it->key_].pushBack(*vit);
+      }
+    }
+
+    for (auto it = source2_table.begin(); it != source2_table.end(); ++it) {
+      Weights weights(it->val_);
+      for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
+        new_table[it->key_].pushBack(*vit);
+      }
+    }
+    data_.add(new_name,new_table);
+  }
 
   void GraphTable::extract(const std::string& new_name,
                            const std::string& source,
                            size_t count,
                            const topit::Vector< std::string >& vertices)
-  {}
+  {
+
+  }
 
 }
 
