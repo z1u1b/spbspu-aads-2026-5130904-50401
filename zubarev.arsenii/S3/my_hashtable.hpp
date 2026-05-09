@@ -197,7 +197,7 @@ namespace zubarev
     if (el) {
       return el->val_;
     } else {
-      add(k, 0);
+      add(k, Value{});
       return find_el(k)->val_;
     }
   }

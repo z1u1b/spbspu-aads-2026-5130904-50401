@@ -29,7 +29,10 @@ namespace zubarev
                              Equaler< std::string > >;
     Table data_;
 
-static bool compare(const EdgeKey& a, const EdgeKey& b) { return a.first < b.first; }
+    static bool compare(const EdgeKey& a, const EdgeKey& b)
+    {
+      return a.first < b.first;
+    }
 
   public:
     void graphs(std::ostream&) const;
@@ -147,7 +150,8 @@ static bool compare(const EdgeKey& a, const EdgeKey& b) { return a.first < b.fir
 
   void GraphTable::bind(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
   {
-    
+    auto& graph = data_.at(graph_name);
+    graph[edge].pushBack(weight);
   }
 
   void GraphTable::cut(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
