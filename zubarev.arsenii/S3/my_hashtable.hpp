@@ -8,6 +8,7 @@
 #include "my_node_hashtable.hpp"
 // #include "my_siphash.hpp"
 #include <iostream>
+#include <stdexcept>
 #include <utility>
 namespace zubarev
 {
@@ -42,6 +43,24 @@ namespace zubarev
     }
 
     Node* find_el(const Key& k) noexcept
+    {
+      for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
+        if (equaler_(k, (*it).key_) && (*it).is_val_) {
+          return std::addressof(*it);
+        }
+      }
+      size_t buc_idx = getBucketIndex(k);
+      for (size_t i = 0; i < bucket_capacity_; ++i) {
+        size_t idx = bucket_capacity_ * buc_idx + i;
+        if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
+
+          return &data_[idx];
+        }
+      }
+      return nullptr;
+    }
+
+    const Node* find_el(const Key& k) const noexcept
     {
       for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
         if (equaler_(k, (*it).key_) && (*it).is_val_) {
@@ -211,17 +230,17 @@ namespace zubarev
     if (el) {
       return el->val_;
     } else {
-      throw("Index out of range");
+      throw std::out_of_range("HashTable: index out of range");
     }
   }
   template < class Key, class Value, class Hash, class Equal >
   const Value& HashTable< Key, Value, Hash, Equal >::at(Key id) const
   {
-    Node* el = find_el(id);
+    const Node* el = find_el(id);
     if (el) {
       return el->val_;
     } else {
-      throw("Index out of range");
+      throw std::out_of_range("HashTable: index out of range");
     }
   }
 

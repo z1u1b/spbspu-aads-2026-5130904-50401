@@ -23,7 +23,7 @@ namespace topit
     CVectIter< T > operator+(int);
 
     size_t operator-(const CVectIter< T >&) const;
-
+    CVectIter< T > operator-(const size_t& other) const;
     bool operator!=(const CVectIter< T >&) const;
     bool operator==(const CVectIter< T >&) const;
 
@@ -61,6 +61,12 @@ namespace topit
   size_t topit::CVectIter< T >::operator-(const CVectIter< T >& other) const
   {
     return static_cast< size_t >(ptr_ - other.ptr_);
+  }
+    template < class T >
+    CVectIter< T > topit::CVectIter< T >::operator-(const size_t& other) const
+  {
+
+    return (ptr_ - other);
   }
   template < class T >
   bool topit::CVectIter< T >::operator!=(const CVectIter< T >& other) const

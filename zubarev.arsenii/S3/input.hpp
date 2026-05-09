@@ -1,3 +1,6 @@
+#ifndef INPUT_HPP
+#define INPUT_HPP
+
 #include "graph.hpp"
 #include <fstream>
 #include <iomanip>
@@ -9,3 +12,5 @@ namespace zubarev
 {
   void inputGraphs(std::istream& in, GraphTable& graphs);
 }
+
+#endif

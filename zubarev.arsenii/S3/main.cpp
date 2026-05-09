@@ -1,11 +1,11 @@
 #include "../common/top-it-vector.hpp"
 #include "commands.hpp"
 #include "graph.hpp"
+#include "input.hpp"
 #include "my_equal.hpp"
 #include "my_hashtable.hpp"
 #include "my_siphash.hpp"
 #include <fstream>
-#include <input.hpp>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
   zub::GraphTable graph;
 
   try {
+    std::cout << "input";
     zub::inputGraphs(input, graph);
   }
 

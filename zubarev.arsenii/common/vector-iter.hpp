@@ -25,6 +25,7 @@ namespace topit
     VectIter< T >& operator--();
     VectIter< T > operator--(int);
     size_t operator-(const VectIter< T >&) const;
+    VectIter< T > operator-(const size_t& other) const;
     bool operator!=(const VectIter< T >&) const;
     bool operator==(const VectIter< T >&) const;
 
@@ -75,6 +76,12 @@ namespace topit
   size_t topit::VectIter< T >::operator-(const VectIter< T >& other) const
   {
     return static_cast< size_t >(ptr_ - other.ptr_);
+  }
+    template < class T >
+  VectIter< T > topit::VectIter< T >::operator-(const size_t& other) const
+  {
+
+    return (ptr_ - other);
   }
   template < class T >
   bool topit::VectIter< T >::operator!=(const VectIter< T >& other) const

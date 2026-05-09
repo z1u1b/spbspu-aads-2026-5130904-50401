@@ -1,6 +1,6 @@
 #include "commands.hpp"
+#include "../common/top-it-vector.hpp"
 #include "graph.hpp"
-#include "top-it-vector.hpp"
 #include <iostream>
 
 namespace zubarev

@@ -19,6 +19,7 @@ namespace zubarev
         in >> from >> to >> weight;
 
         const std::pair< std::string, std::string > edge(from, to);
+        std::cout << "before bind";
         graphs.bind(graphName, edge, weight);
       }
     }

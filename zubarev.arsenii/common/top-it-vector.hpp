@@ -628,10 +628,7 @@ void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
   size_t e = last - cbegin();
   erase(b, e);
 }
-template < class T >
-void topit::Vector< T >::erase(VectIter<T> first, VectIter<T> last) {
-    erase(CVectIter<T>(first), CVectIter<T>(last));
-}
+
 // --- Оператор сравнения ---
 
 template < class T >

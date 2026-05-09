@@ -8,7 +8,7 @@ namespace zubarev
     for (auto it = data_.begin(); it != data_.end(); ++it) {
       names.pushBack(it->key_);
     }
-    std::sort(names.begin(), names.end());
+    zubarev::sort(names.begin(), names.end(), [](const std::string& a, const std::string& b) { return a < b; });
     for (auto it = names.begin(); it != names.end(); ++it) {
       out << *it << '\n';
     }
@@ -23,9 +23,13 @@ namespace zubarev
       verts.pushBack(it->key_.first);
       verts.pushBack(it->key_.second);
     }
-    std::sort(verts.begin(), verts.end());
-    auto last = std::unique(verts.begin(), verts.end());
-    verts.erase(last, verts.end());
+    zubarev::sort(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a < b; });
+    auto last =
+        zubarev::unique(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a == b; });
+    // verts.erase(last, verts.end());
+    while (last != verts.end()) {
+      verts.popBack();
+    }
 
     for (auto it = verts.begin(); it != verts.end(); ++it) {
       out << *it << '\n';
@@ -45,7 +49,7 @@ namespace zubarev
         results.pushBack(tmp);
       }
     }
-    std::sort(results.begin(), results.end(), compare);
+    zubarev::sort(results.begin(), results.end(), compare);
     for (auto it = results.begin(); it != results.end(); ++it) {
       out << (*it).first;
       for (auto w = (*it).second.begin(); w != (*it).second.end(); ++w) {
@@ -69,7 +73,7 @@ namespace zubarev
         results.pushBack(tmp);
       }
     }
-    std::sort(results.begin(), results.end(), compare);
+    zubarev::sort(results.begin(), results.end(), compare);
     for (auto it = results.begin(); it != results.end(); ++it) {
       out << (*it).first;
       for (auto w = (*it).second.begin(); w != (*it).second.end(); ++w) {
@@ -82,8 +86,12 @@ namespace zubarev
 
   void GraphTable::bind(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
   {
+    if (!data_.has(graph_name)) {
+      create(graph_name, 0, {});
+    }
     auto& graph = data_.at(graph_name);
     graph[edge].pushBack(weight);
+    std::cout << "bind";
   }
 
   void GraphTable::cut(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
