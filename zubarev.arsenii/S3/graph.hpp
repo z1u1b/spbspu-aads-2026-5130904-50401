@@ -155,10 +155,34 @@ namespace zubarev
   }
 
   void GraphTable::cut(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
-  {}
+  {
+        auto& graph = data_.at(graph_name);
+    graph[edge].erase(weight);
+  }
 
   void GraphTable::create(const std::string& graph_name, size_t count, const topit::Vector< std::string >& vertices)
-  {}
+  {
+    if (data_.has(graph_name)) {
+      std::cout<<"<INVALID COMMAND>" <<"\n";
+      return;
+    }
+    if (count != vertices.getSize()) {
+        std::cout << "<INVALID COMMAND>" << "\n";
+        return;
+    }
+
+
+    using EdgeTable = HashTable<EdgeKey, Weights, SipHash, Equaler<EdgeKey>>;
+    EdgeTable new_table;
+
+    for (size_t i=0;i<count;++i) {
+      new_table.add({vertices[0],vertices[i]},Weights{});
+    }
+
+
+    data_.add(graph_name, new_table);
+
+  }
 
   void GraphTable::merge(const std::string& new_name, const std::string& source1, const std::string& source2)
   {}
