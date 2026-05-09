@@ -100,56 +100,53 @@ namespace zubarev
     graph[edge].erase(weight);
   }
 
-  void GraphTable::create(const std::string& graph_name, size_t count, const topit::Vector< std::string >& vertices)
+  bool GraphTable::create(const std::string& graph_name, size_t count, const topit::Vector< std::string >& vertices)
   {
     if (data_.has(graph_name)) {
       std::cout << "<INVALID COMMAND>" << "\n";
-      return;
+      return false;
     }
     if (count != vertices.getSize()) {
       std::cout << "<INVALID COMMAND>" << "\n";
-      return;
+      return false;
     }
 
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
     EdgeTable new_table;
 
-    for (size_t i = 0; i < count; ++i) {
-      new_table.add({vertices[0], vertices[i]}, Weights{});
-    }
-
     data_.add(graph_name, new_table);
+    return true;
   }
 
   void GraphTable::merge(const std::string& new_name, const std::string& source1, const std::string& source2)
   {
-    if (data_.has(new_name)) {
-      std::cout << "<INVALID COMMAND>" << "\n";
-      return;
-    }
+
     if (!(data_.has(source1) && data_.has(source2))) {
       std::cout << "<INVALID COMMAND>" << "\n";
       return;
     }
+    if (!create(new_name, 0, {})) {
+      return;
+    }
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
-    EdgeTable new_table;
+
+    EdgeTable new_table = data_.at(new_name);
     const EdgeTable& source1_table = data_[source1];
     const EdgeTable& source2_table = data_[source2];
 
     for (auto it = source1_table.begin(); it != source1_table.end(); ++it) {
       Weights weights(it->val_);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        new_table[it->key_].pushBack(*vit);
+        data_.at(new_name)[it->key_].pushBack(*vit);
       }
     }
 
     for (auto it = source2_table.begin(); it != source2_table.end(); ++it) {
       Weights weights(it->val_);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        new_table[it->key_].pushBack(*vit);
+        data_.at(new_name)[it->key_].pushBack(*vit);
       }
     }
-    data_.add(new_name, new_table);
   }
 
   void GraphTable::extract(const std::string& new_name,
@@ -157,10 +154,7 @@ namespace zubarev
                            size_t count,
                            const topit::Vector< std::string >& vertices)
   {
-    if (data_.has(new_name)) {
-      std::cout << "<INVALID COMMAND>" << "\n";
-      return;
-    }
+
     if (!data_.has(source)) {
       std::cout << "<INVALID COMMAND>" << "\n";
       return;
@@ -169,21 +163,21 @@ namespace zubarev
       std::cout << "<INVALID COMMAND>" << "\n";
       return;
     }
+    if (!create(new_name, count, vertices)) {
+      return;
+    }
     Equaler< std::string > eq_;
     const auto& graph = data_.at(source);
-    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
-    EdgeTable new_table;
     for (size_t i = 0; i < count; ++i) {
       for (auto it = graph.begin(); it != graph.end(); ++it) {
         if (eq_(it->key_.first, vertices[i])) {
           Weights weights(it->val_);
           for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-            new_table[it->key_].pushBack(*vit);
+            data_.at(new_name)[it->key_].pushBack(*vit);
           }
         }
       }
     }
-    data_.add(new_name, new_table);
   }
 
 }

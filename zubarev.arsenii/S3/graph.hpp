@@ -41,7 +41,7 @@ namespace zubarev
     void inbound(const std::string&, const std::string&, std::ostream&) const;
     void bind(const std::string&, const std::pair< std::string, std::string >&, size_t);
     void cut(const std::string&, const std::pair< std::string, std::string >&, size_t);
-    void create(const std::string&, size_t, const topit::Vector< std::string >&);
+    bool create(const std::string&, size_t, const topit::Vector< std::string >&);
     void merge(const std::string&, const std::string&, const std::string&);
     void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&);
   };
