@@ -133,8 +133,7 @@ namespace zubarev
                         std::ostream& out)
   {
     if (!data_.has(graph_name)) {
-      create(graph_name, 0, {}, out);
-    } else {
+
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -147,7 +146,7 @@ namespace zubarev
                        size_t weight,
                        std::ostream& out)
   {
-    if (data_.has(graph_name)) {
+    if (!data_.has(graph_name)) {
 
       out << "<INVALID COMMAND>" << "\n";
       return;
@@ -186,6 +185,16 @@ namespace zubarev
     if (count != vertices.getSize()) {
       out << "<INVALID COMMAND>" << "\n";
       return false;
+    }
+
+    Equaler< std::string > eq;
+    for (size_t i = 0; i < count; ++i) {
+      for (size_t j = i + 1; j < count; ++j) {
+        if (eq(vertices[i], vertices[j])) {
+          out << "<INVALID COMMAND>\n";
+          return false;
+        }
+      }
     }
 
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
