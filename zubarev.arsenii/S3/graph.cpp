@@ -179,7 +179,7 @@ namespace zubarev
       if (weights[i] == weight) {
         weights.erase(i);
         find = true;
-        return;
+        break;
       }
     }
     if (!find) {
