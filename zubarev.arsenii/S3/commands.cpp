@@ -48,7 +48,7 @@ namespace zubarev
     std::string name;
     topit::Vector< std::string > vertexes;
     size_t count;
-    size_t weight;
+
     in >> name >> count;
     for (size_t i = 0; i < count; ++i) {
       std::string str;
