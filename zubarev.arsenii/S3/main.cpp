@@ -1,4 +1,3 @@
-#include "../common/top-it-vector.hpp"
 #include "commands.hpp"
 #include "graph.hpp"
 #include "input.hpp"
@@ -10,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <top-it-vector.hpp>
 
 // using zub=zub;
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
   try {
     std::cout << "input";
-    zub::inputGraphs(input, graph);
+    zub::inputGraphs(input, std::cout, graph);
   }
 
   catch (const std::exception& e) {

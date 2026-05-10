@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#include "../common/top-it-vector.hpp"
+#include <top-it-vector.hpp>
 namespace zubarev
 {
   class GraphTable
@@ -41,11 +41,11 @@ namespace zubarev
     void vertexes(const std::string&, std::ostream&) const;
     void outbound(const std::string&, const std::string&, std::ostream&) const;
     void inbound(const std::string&, const std::string&, std::ostream&) const;
-    void bind(const std::string&, const std::pair< std::string, std::string >&, size_t);
-    void cut(const std::string&, const std::pair< std::string, std::string >&, size_t);
-    bool create(const std::string&, size_t, const topit::Vector< std::string >&);
-    void merge(const std::string&, const std::string&, const std::string&);
-    void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&);
+    void bind(const std::string&, const std::pair< std::string, std::string >&, size_t, std::ostream&);
+    void cut(const std::string&, const std::pair< std::string, std::string >&, size_t, std::ostream&);
+    bool create(const std::string&, size_t, const topit::Vector< std::string >&, std::ostream&);
+    void merge(const std::string&, const std::string&, const std::string&, std::ostream&);
+    void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&, std::ostream&);
   };
 
   template < class T, class Compare >

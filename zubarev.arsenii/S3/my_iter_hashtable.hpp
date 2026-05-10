@@ -1,8 +1,8 @@
 #ifndef MY_ITER_HPP
 #define MY_ITER_HPP
 
-#include "../common/iter.hpp"
 #include "my_node_hashtable.hpp"
+#include <iter.hpp>
 
 #include <iostream>
 namespace zubarev

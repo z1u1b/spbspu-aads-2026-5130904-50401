@@ -2,7 +2,7 @@
 #include <iostream>
 namespace zubarev
 {
-  void inputGraphs(std::istream& in, GraphTable& graphs)
+  void inputGraphs(std::istream& in, std::ostream& out, GraphTable& graphs)
   {
     std::string graphName;
 
@@ -19,8 +19,8 @@ namespace zubarev
         in >> from >> to >> weight;
 
         const std::pair< std::string, std::string > edge(from, to);
-        std::cout << "before bind";
-        graphs.bind(graphName, edge, weight);
+
+        graphs.bind(graphName, edge, weight, out);
       }
     }
   }

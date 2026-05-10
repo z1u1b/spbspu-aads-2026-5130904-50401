@@ -1,11 +1,11 @@
 #include "commands.hpp"
-#include "../common/top-it-vector.hpp"
 #include "graph.hpp"
 #include <iostream>
+#include <top-it-vector.hpp>
 
 namespace zubarev
 {
-  void cmd_graphs(std::istream& in, std::ostream& out, GraphTable& graph)
+  void cmd_graphs(std::istream&, std::ostream& out, GraphTable& graph)
   {
     graph.graphs(out);
   }
@@ -33,7 +33,7 @@ namespace zubarev
     std::pair< std::string, std::string > vertexes;
     size_t weight;
     in >> name >> vertexes.first >> vertexes.second >> weight;
-    graph.bind(name, vertexes, weight);
+    graph.bind(name, vertexes, weight, out);
   }
   void cmd_cut(std::istream& in, std::ostream& out, GraphTable& graph)
   {
@@ -41,7 +41,7 @@ namespace zubarev
     std::pair< std::string, std::string > vertexes;
     size_t weight;
     in >> name >> vertexes.first >> vertexes.second >> weight;
-    graph.cut(name, vertexes, weight);
+    graph.cut(name, vertexes, weight, out);
   }
   void cmd_create(std::istream& in, std::ostream& out, GraphTable& graph)
   {
@@ -56,13 +56,13 @@ namespace zubarev
       vertexes.pushBack(str);
     }
 
-    graph.create(name, count, vertexes);
+    graph.create(name, count, vertexes, out);
   }
   void cmd_merge(std::istream& in, std::ostream& out, GraphTable& graph)
   {
     std::string name1, name2, name3;
     in >> name1 >> name2 >> name3;
-    graph.merge(name1, name2, name3);
+    graph.merge(name1, name2, name3, out);
   }
   void cmd_extract(std::istream& in, std::ostream& out, GraphTable& graph)
   {
@@ -75,7 +75,7 @@ namespace zubarev
       in >> str;
       vertexes.pushBack(str);
     }
-    graph.extract(name1, name2, count, vertexes);
+    graph.extract(name1, name2, count, vertexes, out);
   }
 
 }

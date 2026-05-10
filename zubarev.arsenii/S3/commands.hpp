@@ -14,7 +14,7 @@ namespace zubarev
   //     std::string,
   //     zub::HashTable< std::string, zub::HashTable< std::string, topit::Vector< size_t >, Hash, Equal >, Hash, Equal
   //     >, Hash, Equal >;
-  void cmd_graphs(std::istream& in, std::ostream& out, GraphTable& graph);
+  void cmd_graphs(std::istream&, std::ostream& out, GraphTable& graph);
   void cmd_vertexes(std::istream& in, std::ostream& out, GraphTable& graph);
   void cmd_outbound(std::istream& in, std::ostream& out, GraphTable& graph);
   void cmd_inbound(std::istream& in, std::ostream& out, GraphTable& graph);

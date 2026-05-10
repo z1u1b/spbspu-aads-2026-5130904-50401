@@ -10,7 +10,7 @@
 
 namespace zubarev
 {
-  void inputGraphs(std::istream& in, GraphTable& graphs);
+  void inputGraphs(std::istream& in, std::ostream& out, GraphTable& graphs);
 }
 
 #endif

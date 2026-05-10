@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <memory>
 #include <stdexcept>
+#include <limits>
 // Классная работа
 // СТРОГАЯ ГАРАНТИЯ!!!
 // Тестирование для копирования и перемещения

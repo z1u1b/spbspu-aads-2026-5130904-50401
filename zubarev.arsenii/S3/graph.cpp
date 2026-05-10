@@ -16,6 +16,12 @@ namespace zubarev
 
   void GraphTable::vertexes(const std::string& graph_name, std::ostream& out) const
   {
+
+    if (!data_.has(graph_name)) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+
     const auto& graph = data_.at(graph_name);
     topit::Vector< std::string > verts;
 
@@ -38,9 +44,27 @@ namespace zubarev
 
   void GraphTable::outbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    const auto& graph = data_.at(graph_name);
-    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+    if (!data_.has(graph_name)) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
     Equaler< std::string > eq;
+
+    const auto& graph = data_.at(graph_name);
+    bool find = false;
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      if (eq(it->key_.first, vertex)) {
+        find = true;
+        break;
+      }
+    }
+
+    if (!find) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       if (eq(it->key_.first, vertex)) {
         std::pair< std::string, topit::Vector< size_t > > tmp;
@@ -62,9 +86,28 @@ namespace zubarev
 
   void GraphTable::inbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    const auto& graph = data_.at(graph_name);
-    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+    if (!data_.has(graph_name)) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
     Equaler< std::string > eq;
+
+    const auto& graph = data_.at(graph_name);
+    bool find = false;
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      if (eq(it->key_.second, vertex)) {
+        find = true;
+        break;
+      }
+    }
+
+    if (!find) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+
+    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       if (eq(it->key_.second, vertex)) {
         std::pair< std::string, topit::Vector< size_t > > tmp;
@@ -84,38 +127,64 @@ namespace zubarev
     }
   }
 
-  void GraphTable::bind(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
+  void GraphTable::bind(const std::string& graph_name,
+                        const std::pair< std::string, std::string >& edge,
+                        size_t weight,
+                        std::ostream& out)
   {
     if (!data_.has(graph_name)) {
-      create(graph_name, 0, {});
+      create(graph_name, 0, {}, out);
+    } else {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
     }
     auto& graph = data_.at(graph_name);
     graph[edge].pushBack(weight);
-    std::cout << "bind";
   }
 
-  void GraphTable::cut(const std::string& graph_name, const std::pair< std::string, std::string >& edge, size_t weight)
+  void GraphTable::cut(const std::string& graph_name,
+                       const std::pair< std::string, std::string >& edge,
+                       size_t weight,
+                       std::ostream& out)
   {
+    if (data_.has(graph_name)) {
+
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
     auto& graph = data_.at(graph_name);
-    auto& weights = graph[edge];
+    if (!graph.has(edge)) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+    auto& weights = graph.at(edge);
+    bool find = false;
 
     for (size_t i = 0; i < weights.getSize(); ++i) {
       if (weights[i] == weight) {
         weights.erase(i);
+        find = true;
         return;
       }
     }
-    graph[edge].erase(weight);
+    if (!find) {
+      out << "<INVALID COMMAND>" << "\n";
+      return;
+    }
+    // graph[edge].erase(weight);
   }
 
-  bool GraphTable::create(const std::string& graph_name, size_t count, const topit::Vector< std::string >& vertices)
+  bool GraphTable::create(const std::string& graph_name,
+                          size_t count,
+                          const topit::Vector< std::string >& vertices,
+                          std::ostream& out)
   {
     if (data_.has(graph_name)) {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      out << "<INVALID COMMAND>" << "\n";
       return false;
     }
     if (count != vertices.getSize()) {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      out << "<INVALID COMMAND>" << "\n";
       return false;
     }
 
@@ -126,14 +195,17 @@ namespace zubarev
     return true;
   }
 
-  void GraphTable::merge(const std::string& new_name, const std::string& source1, const std::string& source2)
+  void GraphTable::merge(const std::string& new_name,
+                         const std::string& source1,
+                         const std::string& source2,
+                         std::ostream& out)
   {
 
     if (!(data_.has(source1) && data_.has(source2))) {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    if (!create(new_name, 0, {})) {
+    if (!create(new_name, 0, {}, out)) {
       return;
     }
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
@@ -160,22 +232,37 @@ namespace zubarev
   void GraphTable::extract(const std::string& new_name,
                            const std::string& source,
                            size_t count,
-                           const topit::Vector< std::string >& vertices)
+                           const topit::Vector< std::string >& vertices,
+                           std::ostream& out)
   {
 
     if (!data_.has(source)) {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      out << "<INVALID COMMAND>" << "\n";
       return;
     }
     if (count != vertices.getSize()) {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    if (!create(new_name, count, vertices)) {
+    if (!create(new_name, count, vertices, out)) {
       return;
     }
+
     Equaler< std::string > eq_;
     const auto& graph = data_.at(source);
+    for (size_t i = 0; i < count; ++i) {
+      bool found = false;
+      for (auto it = graph.begin(); it != graph.end(); ++it) {
+        if (eq_(it->key_.first, vertices[i]) || eq_(it->key_.second, vertices[i])) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        out << "<INVALID COMMAND>\n";
+        return;
+      }
+    }
     for (size_t i = 0; i < count; ++i) {
       for (auto it = graph.begin(); it != graph.end(); ++it) {
         if (eq_(it->key_.first, vertices[i])) {

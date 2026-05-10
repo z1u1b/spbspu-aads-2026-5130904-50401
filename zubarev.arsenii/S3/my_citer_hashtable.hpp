@@ -1,8 +1,8 @@
 #ifndef MY_CITER_HPP
 #define MY_CITER_HPP
 
-#include "../common/c-iter.hpp"
 #include "my_node_hashtable.hpp"
+#include <c-iter.hpp>
 #include <iostream>
 namespace zubarev
 {
