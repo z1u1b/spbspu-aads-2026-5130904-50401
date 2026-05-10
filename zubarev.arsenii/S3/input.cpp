@@ -10,7 +10,7 @@ namespace zubarev
 
       size_t edges = 0;
       in >> edges;
-
+      graphs.create(graphName, 0, {}, out);
       for (size_t i = 0; i < edges; ++i) {
         std::string from;
         std::string to;
