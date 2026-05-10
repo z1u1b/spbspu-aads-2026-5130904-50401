@@ -1,7 +1,7 @@
 #include "commands.hpp"
 #include "graph.hpp"
 #include <iostream>
-#include <top-it-vector.hpp>
+#include "../common/top-it-vector.hpp"
 
 namespace zubarev
 {

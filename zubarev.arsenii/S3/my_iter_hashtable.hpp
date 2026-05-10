@@ -2,7 +2,7 @@
 #define MY_ITER_HPP
 
 #include "my_node_hashtable.hpp"
-#include <iter.hpp>
+#include "../common/iter.hpp"
 
 #include <iostream>
 namespace zubarev
