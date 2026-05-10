@@ -8,6 +8,10 @@ namespace zubarev
     for (auto it = data_.begin(); it != data_.end(); ++it) {
       names.pushBack(it->key_);
     }
+    if (names.getSize() == 0) {
+      out << '\n';
+      return;
+    }
     zubarev::sort(names.begin(), names.end(), [](const std::string& a, const std::string& b) { return a < b; });
     for (auto it = names.begin(); it != names.end(); ++it) {
       out << *it << '\n';
@@ -37,6 +41,10 @@ namespace zubarev
       verts.popBack();
     }
 
+    if (verts.getSize() == 0) {
+      out << '\n';
+      return;
+    }
     for (auto it = verts.begin(); it != verts.end(); ++it) {
       out << *it << '\n';
     }
@@ -74,6 +82,10 @@ namespace zubarev
       }
     }
     zubarev::sort(results.begin(), results.end(), compare);
+    if (results.getSize() == 0) {
+      out << '\n';
+      return;
+    }
     for (auto it = results.begin(); it != results.end(); ++it) {
       out << (*it).first;
       for (auto w = (*it).second.begin(); w != (*it).second.end(); ++w) {
@@ -117,6 +129,10 @@ namespace zubarev
       }
     }
     zubarev::sort(results.begin(), results.end(), compare);
+    if (results.getSize() == 0) {
+      out << '\n';
+      return;
+    }
     for (auto it = results.begin(); it != results.end(); ++it) {
       out << (*it).first;
       for (auto w = (*it).second.begin(); w != (*it).second.end(); ++w) {
@@ -170,7 +186,9 @@ namespace zubarev
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    // graph[edge].erase(weight);
+    if (weights.getSize() == 0) {
+      graph.drop(edge);
+    }
   }
 
   bool GraphTable::create(const std::string& graph_name,
@@ -272,13 +290,23 @@ namespace zubarev
         return;
       }
     }
-    for (size_t i = 0; i < count; ++i) {
-      for (auto it = graph.begin(); it != graph.end(); ++it) {
-        if (eq_(it->key_.first, vertices[i])) {
-          Weights weights(it->val_);
-          for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-            data_.at(new_name)[it->key_].pushBack(*vit);
-          }
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      const auto& from = it->key_.first;
+      const auto& to = it->key_.second;
+      bool flag_from = false;
+      bool flag_to = false;
+      for (size_t i = 0; i < count; ++i) {
+        if (eq_(from, vertices[i])) {
+          flag_from = true;
+        }
+        if (eq_(to, vertices[i])) {
+          flag_to = true;
+        }
+      }
+      if (flag_from && flag_to) {
+        Weights weights(it->val_);
+        for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
+          data_.at(new_name)[it->key_].pushBack(*vit);
         }
       }
     }
