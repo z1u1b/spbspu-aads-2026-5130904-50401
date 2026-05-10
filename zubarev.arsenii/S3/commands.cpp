@@ -46,10 +46,18 @@ namespace zubarev
   void cmd_create(std::istream& in, std::ostream& out, GraphTable& graph)
   {
     std::string name;
-    topit::Vector< std::string > vertexes;
-    size_t count;
+    in >> name;
 
-    in >> name >> count;
+    size_t count = 0;
+
+    if (!(in >> count)) {
+      in.clear();
+      graph.create(name, 0, {}, out);
+      return;
+    }
+
+    topit::Vector< std::string > vertexes;
+
     for (size_t i = 0; i < count; ++i) {
       std::string str;
       in >> str;

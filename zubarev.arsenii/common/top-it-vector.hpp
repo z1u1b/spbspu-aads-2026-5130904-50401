@@ -50,6 +50,9 @@ namespace topit
     VectIter< T > begin();
     VectIter< T > end();
 
+        CVectIter< T > begin() const;
+    CVectIter< T > end() const;
+
     CVectIter< T > cbegin() const;
     CVectIter< T > cend() const;
 
@@ -358,6 +361,20 @@ topit::VectIter< T > topit::Vector< T >::end()
 {
   return VectIter< T >(data_ + size_);
 }
+
+
+template < class T >
+topit::CVectIter< T > topit::Vector< T >::begin() const
+{
+  return CVectIter< T >(data_);
+}
+
+template < class T >
+topit::CVectIter< T > topit::Vector< T >::end() const
+{
+  return CVectIter< T >(data_ + size_);
+}
+
 
 template < class T >
 topit::CVectIter< T > topit::Vector< T >::cbegin() const

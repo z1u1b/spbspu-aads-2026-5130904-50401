@@ -5,7 +5,7 @@ namespace zubarev
   {
     topit::Vector< std::string > names;
 
-    for (auto it = data_.begin(); it != data_.end(); ++it) {
+    for (auto it = edge_data_.begin(); it != edge_data_.end(); ++it) {
       names.pushBack(it->key_);
     }
     if (names.getSize() == 0) {
@@ -21,30 +21,20 @@ namespace zubarev
   void GraphTable::vertexes(const std::string& graph_name, std::ostream& out) const
   {
 
-    if (!data_.has(graph_name)) {
-      out << "<INVALID COMMAND>" << "\n";
+    if (!vertex_data_.has(graph_name)) {
+      out << "<INVALID COMMAND>\n";
       return;
     }
 
-    const auto& graph = data_.at(graph_name);
-    topit::Vector< std::string > verts;
-
-    for (auto it = graph.begin(); it != graph.end(); ++it) {
-      verts.pushBack(it->key_.first);
-      verts.pushBack(it->key_.second);
-    }
-    zubarev::sort(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a < b; });
-    auto last =
-        zubarev::unique(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a == b; });
-    // verts.erase(last, verts.end());
-    while (last != verts.end()) {
-      verts.popBack();
-    }
+    VertexList verts = vertex_data_.at(graph_name);
 
     if (verts.getSize() == 0) {
       out << '\n';
       return;
     }
+
+    zubarev::sort(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a < b; });
+
     for (auto it = verts.begin(); it != verts.end(); ++it) {
       out << *it << '\n';
     }
@@ -52,16 +42,17 @@ namespace zubarev
 
   void GraphTable::outbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    if (!data_.has(graph_name)) {
+    if (!edge_data_.has(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
     Equaler< std::string > eq;
 
-    const auto& graph = data_.at(graph_name);
+    const auto& graph = edge_data_.at(graph_name);
+    const auto& verts = vertex_data_.at(graph_name);
     bool find = false;
-    for (auto it = graph.begin(); it != graph.end(); ++it) {
-      if (eq(it->key_.first, vertex)) {
+    for (auto it = verts.begin(); it != verts.end(); ++it) {
+      if (eq(*it, vertex)) {
         find = true;
         break;
       }
@@ -98,16 +89,17 @@ namespace zubarev
 
   void GraphTable::inbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    if (!data_.has(graph_name)) {
+    if (!edge_data_.has(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
     Equaler< std::string > eq;
 
-    const auto& graph = data_.at(graph_name);
+    const auto& graph = edge_data_.at(graph_name);
+    const auto& verts = vertex_data_.at(graph_name);
     bool find = false;
-    for (auto it = graph.begin(); it != graph.end(); ++it) {
-      if (eq(it->key_.second, vertex)) {
+    for (auto it = verts.begin(); it != verts.end(); ++it) {
+      if (eq(*it, vertex)) {
         find = true;
         break;
       }
@@ -148,13 +140,33 @@ namespace zubarev
                         size_t weight,
                         std::ostream& out)
   {
-    if (!data_.has(graph_name)) {
+    if (!vertex_data_.has(graph_name)) {
 
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    auto& graph = data_.at(graph_name);
-    graph[edge].pushBack(weight);
+    Equaler< std::string > eq_;
+    auto& edges = edge_data_.at(graph_name);
+    auto& verts = vertex_data_.at(graph_name);
+
+    bool flag_from = false;
+    bool flag_to = false;
+    for (auto it = verts.begin(); it != verts.end(); ++it) {
+      if (eq_(*it, edge.first)) {
+        flag_from = true;
+      }
+      if (eq_(*it, edge.second)) {
+        flag_to = true;
+      }
+    }
+    if (!flag_from) {
+      verts.pushBack(edge.first);
+    }
+    if (!flag_to) {
+      verts.pushBack(edge.second);
+    }
+
+    edges[edge].pushBack(weight);
   }
 
   void GraphTable::cut(const std::string& graph_name,
@@ -162,12 +174,12 @@ namespace zubarev
                        size_t weight,
                        std::ostream& out)
   {
-    if (!data_.has(graph_name)) {
+    if (!edge_data_.has(graph_name)) {
 
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    auto& graph = data_.at(graph_name);
+    auto& graph = edge_data_.at(graph_name);
     if (!graph.has(edge)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
@@ -196,7 +208,7 @@ namespace zubarev
                           const topit::Vector< std::string >& vertices,
                           std::ostream& out)
   {
-    if (data_.has(graph_name)) {
+    if (edge_data_.has(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return false;
     }
@@ -218,7 +230,13 @@ namespace zubarev
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
     EdgeTable new_table;
 
-    data_.add(graph_name, new_table);
+    edge_data_.add(graph_name, new_table);
+
+    VertexList new_vertices;
+    for (size_t i = 0; i < count; ++i) {
+      new_vertices.pushBack(vertices[i]);
+    }
+    vertex_data_.add(graph_name, new_vertices);
     return true;
   }
 
@@ -228,7 +246,7 @@ namespace zubarev
                          std::ostream& out)
   {
 
-    if (!(data_.has(source1) && data_.has(source2))) {
+    if (!(edge_data_.has(source1) && edge_data_.has(source2))) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -237,21 +255,58 @@ namespace zubarev
     }
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
 
-    EdgeTable new_table = data_.at(new_name);
-    const EdgeTable& source1_table = data_[source1];
-    const EdgeTable& source2_table = data_[source2];
+    EdgeTable new_table = edge_data_.at(new_name);
+    const EdgeTable& source1_table = edge_data_[source1];
+    const EdgeTable& source2_table = edge_data_[source2];
 
     for (auto it = source1_table.begin(); it != source1_table.end(); ++it) {
       Weights weights(it->val_);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        data_.at(new_name)[it->key_].pushBack(*vit);
+        edge_data_.at(new_name)[it->key_].pushBack(*vit);
       }
     }
 
     for (auto it = source2_table.begin(); it != source2_table.end(); ++it) {
       Weights weights(it->val_);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        data_.at(new_name)[it->key_].pushBack(*vit);
+        edge_data_.at(new_name)[it->key_].pushBack(*vit);
+      }
+    }
+
+    auto& new_verts = vertex_data_.at(new_name);
+
+    const auto& verts1 = vertex_data_.at(source1);
+    const auto& verts2 = vertex_data_.at(source2);
+
+    Equaler< std::string > eq;
+
+    for (auto it = verts1.begin(); it != verts1.end(); ++it) {
+      bool found = false;
+
+      for (auto jt = new_verts.begin(); jt != new_verts.end(); ++jt) {
+        if (eq(*it, *jt)) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        new_verts.pushBack(*it);
+      }
+    }
+
+    for (auto it = verts2.begin(); it != verts2.end(); ++it) {
+      bool found = false;
+
+      for (auto jt = new_verts.begin(); jt != new_verts.end(); ++jt) {
+        if (eq(*it, *jt)) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        new_verts.pushBack(*it);
       }
     }
   }
@@ -262,54 +317,66 @@ namespace zubarev
                            const topit::Vector< std::string >& vertices,
                            std::ostream& out)
   {
+    if (!edge_data_.has(source)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
 
-    if (!data_.has(source)) {
-      out << "<INVALID COMMAND>" << "\n";
-      return;
-    }
     if (count != vertices.getSize()) {
-      out << "<INVALID COMMAND>" << "\n";
-      return;
-    }
-    if (!create(new_name, count, vertices, out)) {
+      out << "<INVALID COMMAND>\n";
       return;
     }
 
     Equaler< std::string > eq_;
-    const auto& graph = data_.at(source);
+
+    const auto& source_verts = vertex_data_.at(source);
+
     for (size_t i = 0; i < count; ++i) {
-      bool found = false;
-      for (auto it = graph.begin(); it != graph.end(); ++it) {
-        if (eq_(it->key_.first, vertices[i]) || eq_(it->key_.second, vertices[i])) {
-          found = true;
+      bool find = false;
+
+      for (auto it = source_verts.begin(); it != source_verts.end(); ++it) {
+        if (eq_(*it, vertices[i])) {
+          find = true;
           break;
         }
       }
-      if (!found) {
+
+      if (!find) {
         out << "<INVALID COMMAND>\n";
         return;
       }
     }
+
+    if (!create(new_name, count, vertices, out)) {
+      return;
+    }
+
+    const auto& graph = edge_data_.at(source);
+
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       const auto& from = it->key_.first;
       const auto& to = it->key_.second;
+
       bool flag_from = false;
       bool flag_to = false;
+
       for (size_t i = 0; i < count; ++i) {
         if (eq_(from, vertices[i])) {
           flag_from = true;
         }
+
         if (eq_(to, vertices[i])) {
           flag_to = true;
         }
       }
+
       if (flag_from && flag_to) {
         Weights weights(it->val_);
+
         for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-          data_.at(new_name)[it->key_].pushBack(*vit);
+          edge_data_.at(new_name)[it->key_].pushBack(*vit);
         }
       }
     }
   }
-
 }

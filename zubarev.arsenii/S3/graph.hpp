@@ -23,14 +23,17 @@ namespace zubarev
     using EdgeKey = std::pair< std::string, std::string >;
     using Weights = topit::Vector< size_t >;
 
-    using Table = HashTable< std::string,
-                             HashTable< EdgeKey, Weights, SipHash, Equaler< std::pair< std::string, std::string > > >,
-                             SipHash,
-                             Equaler< std::string > >;
-    Table data_;
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
+    using GraphEdgeTable = HashTable< std::string, EdgeTable, SipHash, Equaler< std::string > >;
+
+    GraphEdgeTable edge_data_;
+
+    using VertexList = topit::Vector< std::string >;
+    using GraphVertexTable = HashTable< std::string, VertexList, SipHash, Equaler< std::string > >;
+
+    GraphVertexTable vertex_data_;
 
     static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-
                         const std::pair< std::string, topit::Vector< size_t > >& b)
     {
       return a.first < b.first;
