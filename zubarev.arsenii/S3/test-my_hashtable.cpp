@@ -1,120 +1,204 @@
+#include "my_equal.hpp"
 #include "my_hashtable.hpp"
-#include <iostream>
-#include <string>
+#include "my_node_hashtable.hpp"
+#include "my_siphash.hpp"
+#include <boost/test/unit_test.hpp>
 
-namespace zubarev
+BOOST_AUTO_TEST_SUITE(my_hashtable_tests)
+
+using Table = zubarev::HashTable< std::string, size_t, zubarev::SipHash, zubarev::Equaler< std::string > >;
+using Node = zubarev::NodeHashTable< std::string, size_t >;
+using Hash = zubarev::SipHash;
+using Equal = zubarev::Equaler< std::string >;
+BOOST_AUTO_TEST_CASE(default_constructor)
 {
-  int test()
-  {
-    using Table = zubarev::HashTable< std::string, int, std::hash< std::string >, std::equal_to< std::string > >;
+  Table h;
 
-    Table table;
-
-    std::cout << "=== ADD TEST ===\n";
-    table.add("apple", 1);
-    table.add("banana", 2);
-    table.add("cherry", 3);
-    table.add("date", 4);
-    table.add("elderberry", 5);
-
-    std::cout << "Elements added\n\n";
-
-    // -----------------------------
-
-    std::cout << "=== HAS TEST ===\n";
-    std::cout << "apple: " << table.has("apple") << "\n";
-    std::cout << "banana: " << table.has("banana") << "\n";
-    std::cout << "grape: " << table.has("grape") << "\n\n";
-
-    // -----------------------------
-
-    std::cout << "=== ITERATOR TEST ===\n";
-    for (auto it = table.begin(); it != table.end(); ++it) {
-      std::cout << it->key_ << " : " << it->val_ << "\n";
-    }
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== CONST ITERATOR TEST ===\n";
-    const Table& const_ref = table;
-    for (auto it = const_ref.cbegin(); it != const_ref.cend(); ++it) {
-      std::cout << it->key_ << " : " << it->val_ << "\n";
-    }
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== DROP TEST ===\n";
-    try {
-      int val = table.drop("banana");
-      std::cout << "Dropped banana = " << val << "\n";
-    } catch (...) {
-      std::cout << "Error dropping banana\n";
-    }
-
-    std::cout << "banana exists? " << table.has("banana") << "\n\n";
-
-    // -----------------------------
-
-    std::cout << "=== ITER AFTER DROP ===\n";
-    for (auto it = table.begin(); it != table.end(); ++it) {
-      std::cout << it->key_ << " : " << it->val_ << "\n";
-    }
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== COPY TEST ===\n";
-    Table copy_table = table;
-
-    for (auto it = copy_table.begin(); it != copy_table.end(); ++it) {
-      std::cout << it->key_ << " : " << it->val_ << "\n";
-    }
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== MOVE TEST ===\n";
-    Table moved_table = std::move(copy_table);
-
-    std::cout << "Moved table:\n";
-    for (auto it = moved_table.begin(); it != moved_table.end(); ++it) {
-      std::cout << it->key_ << " : " << it->val_ << "\n";
-    }
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== EDGE CASES ===\n";
-
-    try {
-      table.drop("not_exist");
-    } catch (...) {
-      std::cout << "Correctly handled drop of non-existing key\n";
-    }
-
-    std::cout << "\n";
-
-    // -----------------------------
-
-    std::cout << "=== LARGE INSERT TEST ===\n";
-    for (int i = 0; i < 50; ++i) {
-      table.add("key" + std::to_string(i), i);
-    }
-
-    std::cout << "Inserted 50 elements\n";
-
-    int count = 0;
-    for (auto it = table.begin(); it != table.end(); ++it) {
-      count++;
-    }
-
-    std::cout << "Total elements counted by iterator: " << count << "\n";
-
-    std::cout << "\n=== DONE ===\n";
-
-    return 0;
-  }
-
+  BOOST_CHECK(h.begin() == h.end());
 }
+
+BOOST_AUTO_TEST_CASE(default_constructor_arg)
+{
+  Table h(3, 8, nullptr, nullptr, zubarev::List< Node >(), Hash(), Equal());
+
+  BOOST_CHECK(h.begin() == h.end());
+}
+
+BOOST_AUTO_TEST_CASE(copy_constructor)
+{
+  Table a;
+  a.add("apple", 1);
+  a.add("banana", 2);
+
+  Table copy(a);
+
+  BOOST_CHECK(copy.has("apple"));
+  BOOST_CHECK(copy.has("banana"));
+  BOOST_CHECK(copy.at("apple") == 1);
+  BOOST_CHECK(copy.at("banana") == 2);
+}
+
+BOOST_AUTO_TEST_CASE(move_constructor)
+{
+  Table a;
+  a.add("apple", 1);
+  a.add("banana", 2);
+
+  Table move(std::move(a));
+
+  BOOST_CHECK(move.has("apple"));
+  BOOST_CHECK(move.has("banana"));
+  BOOST_CHECK(move.at("apple") == 1);
+  BOOST_CHECK(move.at("banana") == 2);
+  BOOST_CHECK(a.begin() == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(copy_assigment)
+{
+  Table a;
+  a.add("apple", 1);
+  a.add("banana", 2);
+
+  Table copy;
+  copy = a;
+  BOOST_CHECK(copy.has("apple"));
+  BOOST_CHECK(copy.has("banana"));
+  BOOST_CHECK(copy.at("apple") == 1);
+  BOOST_CHECK(copy.at("banana") == 2);
+}
+
+BOOST_AUTO_TEST_CASE(move_assigment)
+{
+  Table a;
+  a.add("apple", 1);
+  a.add("banana", 2);
+
+  Table move;
+
+  move = std::move(a);
+
+  BOOST_CHECK(move.has("apple"));
+  BOOST_CHECK(move.has("banana"));
+  BOOST_CHECK(move.at("apple") == 1);
+  BOOST_CHECK(move.at("banana") == 2);
+  BOOST_CHECK(a.begin() == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(operator_square_brackets_insert)
+{
+  Table a;
+  a["apple"] = 123;
+
+  BOOST_CHECK(a.has("apple"));
+  BOOST_CHECK(a["apple"] == 123);
+}
+
+BOOST_AUTO_TEST_CASE(operator_square_brackets_const)
+{
+  Table h;
+  h.add("apple", 123);
+  const Table& h_const = h;
+  BOOST_CHECK(h_const["apple"] == 123);
+}
+
+BOOST_AUTO_TEST_CASE(at_non_const)
+{
+  Table a;
+  a["apple"] = 123;
+
+  BOOST_CHECK(a.has("apple"));
+  BOOST_CHECK(a.at("apple") == 123);
+}
+
+BOOST_AUTO_TEST_CASE(at_const)
+{
+  Table h;
+  h.add("apple", 123);
+  const Table& h_const = h;
+  BOOST_CHECK(h_const.at("apple") == 123);
+}
+
+BOOST_AUTO_TEST_CASE(add)
+{
+  Table a;
+  a.add("apple", 123);
+
+  BOOST_CHECK(a.has("apple"));
+  BOOST_CHECK(a.at("apple") == 123);
+}
+BOOST_AUTO_TEST_CASE(drop)
+{
+  Table a;
+  a.add("apple", 123);
+
+  BOOST_CHECK(a.drop("apple") == 123);
+  BOOST_CHECK(!a.has("apple"));
+}
+
+BOOST_AUTO_TEST_CASE(has)
+{
+  Table a;
+  a.add("apple", 123);
+
+  BOOST_CHECK(a.has("apple"));
+  BOOST_CHECK(!a.has("banana"));
+}
+
+BOOST_AUTO_TEST_CASE(rehash)
+
+{
+  Table h;
+  h.add("a", 1);
+  h.add("b", 2);
+  h.add("c", 3);
+  h.rehash(128);
+
+  BOOST_CHECK(h.has("a"));
+  BOOST_CHECK(h.has("b"));
+  BOOST_CHECK(h.has("c"));
+
+  BOOST_CHECK(h.at("a") == 1);
+  BOOST_CHECK(h.at("b") == 2);
+  BOOST_CHECK(h.at("c") == 3);
+}
+
+BOOST_AUTO_TEST_CASE(begin_end_non_empty)
+{
+  Table h;
+  h.add("a", 1);
+
+  BOOST_CHECK(h.begin() != h.end());
+}
+
+BOOST_AUTO_TEST_CASE(const_begin_end_non_empty)
+{
+  Table h;
+  h.add("a", 1);
+  const Table& h_const = h;
+
+  BOOST_CHECK(h_const.begin() != h_const.end());
+}
+
+BOOST_AUTO_TEST_CASE(cbegin_cend)
+{
+  Table h;
+  h.add("a", 1);
+  const Table& h_const = h;
+
+  BOOST_CHECK(h_const.cbegin() != h_const.cend());
+}
+
+BOOST_AUTO_TEST_CASE(swap)
+{
+  Table h;
+  h.add("a", 1);
+  h.add("b", 2);
+  Table h_empty;
+  h.swap(h_empty);
+
+  BOOST_CHECK(h_empty.has("a"));
+  BOOST_CHECK(h_empty.at("a") == 1);
+  BOOST_CHECK(h.begin() == h.end());
+}
+
+BOOST_AUTO_TEST_SUITE_END()

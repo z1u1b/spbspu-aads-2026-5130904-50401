@@ -129,12 +129,23 @@ namespace zubarev
                                                   Equal equaler):
     bucket_count_(bucket_count),
     bucket_capacity_(bucket_capacity),
-    data_(data),
-    sizes_(sizes),
+    data_(nullptr),
+    sizes_(nullptr),
     overflow_bucket_(overflow_bucket),
     hasher_(hasher),
     equaler_(equaler)
-  {}
+  {
+    if (data) {
+      data_ = data;
+    } else {
+      data_ = new Node[bucket_count_ * bucket_capacity_]();
+    }
+    if (sizes) {
+      sizes_ = sizes;
+    } else {
+      sizes_ = new size_t[bucket_count_]();
+    }
+  }
 
   template < class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::~HashTable()
@@ -219,6 +230,11 @@ namespace zubarev
       add(k, Value{});
       return find_el(k)->val_;
     }
+  }
+  template < class Key, class Value, class Hash, class Equal >
+  const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
+  {
+    return at(id);
   }
   // template < class Key, class Value, class Hash, class Equal >
   // const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
