@@ -6,7 +6,6 @@
 #include "my_iter_hashtable.hpp"
 
 #include "my_node_hashtable.hpp"
-// #include "my_siphash.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -18,7 +17,6 @@ namespace zubarev
   {
     friend class IterHashTable< Key, Value, Hash, Equal >;
     friend class CIterHashTable< Key, Value, Hash, Equal >;
-    // friend class GraphTable;
   private:
     using Node = NodeHashTable< Key, Value >;
     using OverflowList = List< Node >;
@@ -152,9 +150,6 @@ namespace zubarev
   {
     delete[] data_;
     delete[] sizes_;
-    // for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-    //   delete *it;
-    // }
   }
   template < class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& table):
@@ -175,9 +170,7 @@ namespace zubarev
       }
     }
     overflow_bucket_ = table.overflow_bucket_;
-    // for (auto it = table.overflow_bucket_.begin(); it != table.overflow_bucket_.end(); ++it) {
-    //   overflow_bucket_.push_back(*it);
-    // }
+
   }
   template < class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& table) noexcept:
@@ -193,8 +186,6 @@ namespace zubarev
     table.bucket_capacity_ = 0;
     table.data_ = nullptr;
     table.sizes_ = nullptr;
-    // table.hasher_=
-    // table.equaler_=
   }
   template < class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs)
@@ -236,9 +227,7 @@ namespace zubarev
   {
     return at(id);
   }
-  // template < class Key, class Value, class Hash, class Equal >
-  // const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
-  // {}
+
   template < class Key, class Value, class Hash, class Equal >
   Value& HashTable< Key, Value, Hash, Equal >::at(Key id)
   {
@@ -318,12 +307,6 @@ namespace zubarev
   {
     return CIter(0, bucket_count_, overflow_bucket_.end(), this);
   }
-
-  // template < class Key, class Value, class Hash, class Equal >
-  // IterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
-  // {
-  //   return Iter(0, bucket_count_, overflow_bucket_.end(), this);
-  // }
 
   template < class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin() const
@@ -434,9 +417,6 @@ namespace zubarev
   template < class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
-    // Table tmp(*this);
-    // Node* new_data= new Node[slots*bucket_capacity_];
-    // size_t new_sizes=new size_t[slots];
     Table tmp(slots,
               bucket_capacity_,
               new Node[slots * bucket_capacity_],

@@ -14,7 +14,6 @@ namespace zubarev
     boost::hash2::siphash_64 hasher_template_;
 
   public:
-    // Конструктор с ключами
     SipHash(uint64_t k0 = 0x0706050403020100ULL, uint64_t k1 = 0x0F0E0D0C0B0A0908ULL)
     {
       uint64_t keys[2] = {k0, k1};

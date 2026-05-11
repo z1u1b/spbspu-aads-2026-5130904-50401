@@ -11,7 +11,6 @@
 #include <limits>
 #include <string>
 
-// using zub=zub;
 
 int main(int argc, char* argv[])
 
@@ -59,7 +58,6 @@ int main(int argc, char* argv[])
   }
 
   std::string cmd;
-  // zub::NoteBook notebook;
   while (std::cin >> cmd) {
     try {
       if (!cmds.has(cmd)) {

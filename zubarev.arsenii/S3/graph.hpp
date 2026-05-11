@@ -12,12 +12,6 @@ namespace zubarev
 {
   class GraphTable
   {
-    // private:
-    //   using innerTable = HashTable< std::string, topit::Vector< size_t >, SipHash, Equaler< std::string > >;
-    //   using vertexTable = HashTable< std::string, innerTable, SipHash, Equaler< std::string > >;
-
-    //   using Table = HashTable< std::string, vertexTable, SipHash, Equaler< std::string > >;
-    //   Table data_;
 
   private:
     using EdgeKey = std::pair< std::string, std::string >;

@@ -9,18 +9,7 @@
 #include <memory>
 #include <stdexcept>
 #include <limits>
-// Классная работа
-// СТРОГАЯ ГАРАНТИЯ!!!
-// Тестирование для копирования и перемещения
-// insert (x2)
-// erase (x2)
-// + тесты
-// pushBack/popBack
-// Домашнее задание
-// СТРОГАЯ ГАРАНТИЯ! ! !!
-// Итераторы для вектора
-// Придумать несколько insert/erase с итераторами
-// По 3 штуки + тесты
+
 namespace topit
 {
   template < class T >
@@ -92,7 +81,6 @@ namespace topit
   bool operator==(const Vector< T >& lhs, const Vector< T >& rhs);
 }
 
-// --- Конструкторы и деструктор (в порядке объявления) ---
 
 template < class T >
 topit::Vector< T >::~Vector()
@@ -167,7 +155,6 @@ topit::Vector< T >::Vector(size_t size):
   capacity_(size)
 {}
 
-// --- Операторы присваивания ---
 
 template < class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
@@ -193,7 +180,6 @@ topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
   return *this;
 }
 
-// --- Геттеры состояния ---
 
 template < class T >
 bool topit::Vector< T >::isEmpty() const noexcept
@@ -213,7 +199,6 @@ size_t topit::Vector< T >::getCapacity() const noexcept
   return capacity_;
 }
 
-// --- Управление памятью (внутренние) ---
 
 template < class T >
 void topit::Vector< T >::reserve(size_t n)
@@ -308,7 +293,6 @@ size_t topit::Vector< T >::calcCap(size_t curr, size_t needed)
   return curr;
 }
 
-// --- Доступ к элементам ---
 
 template < class T >
 T& topit::Vector< T >::operator[](size_t id) noexcept
@@ -340,7 +324,6 @@ const T& topit::Vector< T >::at(size_t id) const
   throw std::out_of_range("bad id");
 }
 
-// --- Swap и итераторы ---
 
 template < class T >
 void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
@@ -387,7 +370,6 @@ topit::CVectIter< T > topit::Vector< T >::cend() const
   return CVectIter< T >(data_ + size_);
 }
 
-// --- Push/Pop операции ---
 
 template < class T >
 void topit::Vector< T >::pushBack(const T& v)
@@ -460,7 +442,6 @@ void topit::Vector< T >::popBack()
   data_[size_].~T();
 }
 
-// --- Insert операции ---
 
 template < class T >
 void topit::Vector< T >::insert(size_t index, const T& v)
@@ -519,7 +500,6 @@ void topit::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, si
   }
 }
 
-// --- Erase операции (индексные) ---
 
 template < class T >
 void topit::Vector< T >::erase(size_t index)
@@ -540,15 +520,11 @@ void topit::Vector< T >::erase(size_t beg, size_t end)
     data_[i - count].~T();
     new (data_ + i - count) T(std::move(data_[i]));
   }
-  // for (size_t i = size_ - count; i < size_; ++i) {
-  //   data_[i].~T();
-  // }
   destroy_range(data_, size_ - count, size_);
 
   size_ -= count;
 }
 
-// --- Insert операции (итераторные) ---
 
 template < class T >
 topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, const T& v)
@@ -622,7 +598,6 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, VectIter< T 
   }
 }
 
-// --- Erase операции (итераторные) ---
 
 template < class T >
 void topit::Vector< T >::erase(CVectIter< T > pos)
@@ -647,7 +622,6 @@ void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
   erase(b, e);
 }
 
-// --- Оператор сравнения ---
 
 template < class T >
 bool topit::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
