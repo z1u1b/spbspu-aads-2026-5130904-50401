@@ -3,11 +3,11 @@
 namespace zubarev
 {
   template < class T >
-  struct Equaler
+  struct Comparator
   {
-    bool operator()(const T& a, const T& b) const noexcept
+    bool operator()(const T& a, const T& b)
     {
-      return a == b;
+      return a < b;
     }
   };
 }

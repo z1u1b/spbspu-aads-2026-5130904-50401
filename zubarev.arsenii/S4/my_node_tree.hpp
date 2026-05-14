@@ -8,6 +8,7 @@ namespace zubarev
   struct BSTreeNode
   {
     using Node = BSTreeNode< Key, Value >;
+
     BSTreeNode();
     BSTreeNode(Key, Value, Node*, Node*, Node*);
 

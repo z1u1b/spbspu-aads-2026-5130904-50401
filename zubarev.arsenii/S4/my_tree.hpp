@@ -12,8 +12,8 @@ namespace zubarev
   template < class Key, class Value, class Compare >
   class BSTree
   {
-    friend class BSTIterator< Key, Value, Compare >;
-    friend class BSTConstIterator< Key, Value, Compare >;
+    friend class BSTIterator< Key, Value >;
+    friend class BSTConstIterator< Key, Value >;
 
   private:
     BSTreeNode< Key, Value > fake_root_;
@@ -27,8 +27,8 @@ namespace zubarev
     BSTree& operator=(const BSTree& other);
     BSTree& operator=(BSTree&& other) noexcept;
 
-    Value& operator[](Key k) noexcept;
-    const Value& operator[](Key id) const noexcept;
+    Value& operator[](Key k);
+    const Value& operator[](Key id) const;
     Value& at(Key id);
     const Value& at(Key id) const;
 
