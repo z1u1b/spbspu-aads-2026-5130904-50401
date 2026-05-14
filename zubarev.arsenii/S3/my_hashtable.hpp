@@ -85,8 +85,8 @@ namespace zubarev
     HashTable& operator=(const HashTable& other);
     HashTable& operator=(HashTable&& other) noexcept;
 
-    Value& operator[](Key k) noexcept;
-    const Value& operator[](Key id) const noexcept;
+    Value& operator[](Key k);
+    const Value& operator[](Key id) const;
     Value& at(Key id);
     const Value& at(Key id) const;
 
@@ -212,7 +212,7 @@ namespace zubarev
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  Value& HashTable< Key, Value, Hash, Equal >::operator[](Key k) noexcept
+  Value& HashTable< Key, Value, Hash, Equal >::operator[](Key k)
   {
     Node* el = find_el(k);
     if (el) {
@@ -223,7 +223,7 @@ namespace zubarev
     }
   }
   template < class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
+  const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const
   {
     return at(id);
   }
