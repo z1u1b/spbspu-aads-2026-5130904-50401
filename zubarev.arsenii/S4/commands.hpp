@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef DATASET_COMMANDS_HPP
+#define DATASET_COMMANDS_HPP
 
 #include "dataset.hpp"
 #include <iomanip>

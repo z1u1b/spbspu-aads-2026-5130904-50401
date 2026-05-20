@@ -17,7 +17,7 @@ namespace zubarev
     const Node* ptr_;
 
   public:
-    BSTConstIterator() = default;
+    BSTConstIterator() noexcept;
     BSTConstIterator(const BSTIterator< Key, Value >& other) noexcept;
     BSTConstIterator(const Node*);
 

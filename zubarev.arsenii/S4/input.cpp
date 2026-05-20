@@ -1,27 +1,27 @@
 #include "input.hpp"
+
 #include <iostream>
+
 namespace zubarev
 {
-  void inputDataset(std::istream& in, std::ostream& out, GraphTable& graphs)
+  void inputDataset(std::istream& in, std::ostream&, DatasetTable& datasets)
   {
-    std::string graphName;
+    std::string dataset_name;
+    while (in >> dataset_name) {
+      BSTree< size_t, std::string, Comparator< size_t > > dataset;
+      size_t key = 0;
+      std::string value;
 
-    while (in >> graphName) {
+      while (in >> key >> value) {
 
-      size_t edges = 0;
-      in >> edges;
-      graphs.create(graphName, 0, {}, out);
-      for (size_t i = 0; i < edges; ++i) {
-        std::string from;
-        std::string to;
-        size_t weight = 0;
-
-        in >> from >> to >> weight;
-
-        const std::pair< std::string, std::string > edge(from, to);
-
-        graphs.bind(graphName, edge, weight, out);
+        dataset.push(key, value);
+        if (in.peek() == '\n') {
+          in.get();
+          break;
+        }
       }
+
+      datasets.insertDataset(dataset_name, dataset);
     }
   }
 }

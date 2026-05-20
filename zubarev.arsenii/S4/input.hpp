@@ -1,7 +1,7 @@
-#ifndef INPUT_HPP
-#define INPUT_HPP
+#ifndef DATASET_INPUT_HPP
+#define DATASET_INPUT_HPP
 
-#include "graph.hpp"
+#include "dataset.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -10,7 +10,7 @@
 
 namespace zubarev
 {
-  void inputDataset(std::istream& in, std::ostream& out, GraphTable& graphs);
+  void inputDataset(std::istream& in, std::ostream& out, DatasetTable& dataset);
 }
 
 #endif

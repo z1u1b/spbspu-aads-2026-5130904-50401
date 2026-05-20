@@ -5,8 +5,8 @@
 #include "my_node_tree.hpp"
 namespace zubarev
 {
-  template < class Key, class Value, class Compare >
-  class HashTable;
+  template < class Key, class Value >
+  class BSTConstIterator;
 
   template < class Key, class Value >
   class BSTIterator
@@ -18,7 +18,7 @@ namespace zubarev
     Node* ptr_;
 
   public:
-    BSTIterator() = default;
+    BSTIterator() noexcept;
     BSTIterator(Node*);
 
     std::pair< Key, Value >& operator*() const;

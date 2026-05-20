@@ -1,6 +1,6 @@
 #ifndef MY_NODE_TREE_HPP
 #define MY_NODE_TREE_HPP
-
+#include <iostream>
 namespace zubarev
 {
 
@@ -17,13 +17,21 @@ namespace zubarev
     BSTreeNode< Key, Value >* right_;
     BSTreeNode< Key, Value >* parent_;
   };
+
   template < class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode():
-
+    data_(std::make_pair(Key{}, Value{})),
+    left_(nullptr),
+    right_(nullptr),
+    parent_(nullptr)
   {}
+
   template < class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode(Key key, Value val):
-    data_(std::make_pair(key, val))
+    data_(std::make_pair(key, val)),
+    left_(nullptr),
+    right_(nullptr),
+    parent_(nullptr)
   {}
 
 };

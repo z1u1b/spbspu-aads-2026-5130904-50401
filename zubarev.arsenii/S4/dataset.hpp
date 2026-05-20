@@ -1,5 +1,5 @@
-#ifndef GRAPH_TABLE_HPP
-#define GRAPH_TABLE_HPP
+#ifndef DATASET_TABLE_HPP
+#define DATASET_TABLE_HPP
 
 #include "my_compare.hpp"
 #include "my_tree.hpp"
@@ -28,6 +28,7 @@ namespace zubarev
     void complement(const std::string&, const std::string&, const std::string&, std::ostream&);
     void intersect(const std::string&, const std::string&, const std::string&, std::ostream&);
     void union_fun(const std::string&, const std::string&, const std::string&, std::ostream&);
+    void insertDataset(const std::string& name, const BSTree< size_t, std::string, Comparator< size_t > >& dataset);
   };
 
 }
