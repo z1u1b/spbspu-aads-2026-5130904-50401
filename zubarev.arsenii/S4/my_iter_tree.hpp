@@ -20,8 +20,8 @@ namespace zubarev
     BSTIterator() = default;
     BSTIterator(Node*);
 
-    Node& operator*() const;
-    Node* operator->() const noexcept;
+    std::pair< Key, Value >& operator*() const;
+    std::pair< Key, Value >* operator->() const;
     BSTIterator& operator++();
     bool operator!=(const BSTIterator&) const;
     bool operator==(const BSTIterator&) const;
@@ -32,19 +32,41 @@ namespace zubarev
   {}
 
   template < class Key, class Value >
-  BSTreeNode< Key, Value >& BSTIterator< Key, Value >::operator*() const
+  std::pair< Key, Value >& BSTIterator< Key, Value >::operator*() const
   {
-    return ptr_;
+    if (!ptr_) {
+      throw std::out_of_range("Dereference or increment of end() iterator");
+    }
+    return ptr_->data_;
   }
 
   template < class Key, class Value >
-  BSTreeNode< Key, Value >* BSTIterator< Key, Value >::operator->() const noexcept
+  std::pair< Key, Value >* BSTIterator< Key, Value >::operator->() const
   {
-    return std::addressof(operator*());
+    if (!ptr_) {
+      throw std::out_of_range("Dereference or increment of end() iterator");
+    }
+    return &ptr_->data_;
   }
   template < class Key, class Value >
   BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator++()
-  {}
+  {
+    if (!ptr_) {
+      throw std::out_of_range("Dereference or increment of end() iterator");
+    }
+    if (ptr_->right_) {
+      ptr_ = ptr_->right_;
+      while (ptr_->left != nullptr) {
+        ptr_ = ptr_->left_;
+      }
+    } else {
+      while (ptr_->parent_ && ptr_->parent_->right_ == ptr_) {
+        ptr_ = ptr_->parent_;
+      }
+      ptr_ = ptr_->parent_;
+    }
+    return *this;
+  }
   template < class Key, class Value >
   bool BSTIterator< Key, Value >::operator!=(const BSTIterator& rhs) const
   {
@@ -52,7 +74,9 @@ namespace zubarev
   }
   template < class Key, class Value >
   bool BSTIterator< Key, Value >::operator==(const BSTIterator& rhs) const
-  {}
+  {
+    return ptr_ == rhs.ptr_;
+  }
 
 }
 
