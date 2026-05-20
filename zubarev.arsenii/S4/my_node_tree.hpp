@@ -10,21 +10,31 @@ namespace zubarev
     using Node = BSTreeNode< Key, Value >;
 
     BSTreeNode();
-    BSTreeNode(Key, Value, Node*, Node*, Node*);
+    BSTreeNode(Key, Value);
 
     std::pair< Key, Value > data_;
     BSTreeNode< Key, Value >* left_;
     BSTreeNode< Key, Value >* right_;
     BSTreeNode< Key, Value >* parent_;
+
+    void swap(BSTreeNode& rhs) noexcept;
   };
   template < class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode():
 
   {}
   template < class Key, class Value >
-  BSTreeNode< Key, Value >::BSTreeNode(Key key, Value val, Node* left, Node* right, Node* parent):
-
+  BSTreeNode< Key, Value >::BSTreeNode(Key key, Value val):
+    data_(std::make_pair(key, val))
   {}
+  template < class Key, class Value >
+  void BSTreeNode< Key, Value >::swap(BSTreeNode& rhs) noexcept
+  {
+    std::swap(data_, rhs.data_);
+    std::swap(left_, rhs.left_);
+    std::swap(right_, rhs.right_);
+    std::swap(parent_, rhs.parent_);
+  }
 };
 
 #endif

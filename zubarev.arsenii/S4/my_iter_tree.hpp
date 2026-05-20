@@ -1,5 +1,5 @@
-#ifndef MY_EQUAL_HPP
-#define MY_EQUAL_HPP
+#ifndef MY_ITER_TREE_HPP
+#define MY_ITER_TREE_HPP
 
 #include "my_citer_tree.hpp"
 #include "my_node_tree.hpp"
@@ -17,8 +17,8 @@ namespace zubarev
     Node* ptr_;
 
   public:
-    IterHashTable() = default;
-    IterHashTable(Node*);
+    BSTIterator() = default;
+    BSTIterator(Node*);
 
     Node& operator*() const;
     Node* operator->() const noexcept;
@@ -26,6 +26,33 @@ namespace zubarev
     bool operator!=(const BSTIterator&) const;
     bool operator==(const BSTIterator&) const;
   };
+  template < class Key, class Value >
+  BSTIterator< Key, Value >::BSTIterator(Node* node):
+    ptr_(node)
+  {}
+
+  template < class Key, class Value >
+  BSTreeNode< Key, Value >& BSTIterator< Key, Value >::operator*() const
+  {
+    return ptr_;
+  }
+
+  template < class Key, class Value >
+  BSTreeNode< Key, Value >* BSTIterator< Key, Value >::operator->() const noexcept
+  {
+    return std::addressof(operator*());
+  }
+  template < class Key, class Value >
+  BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator++()
+  {}
+  template < class Key, class Value >
+  bool BSTIterator< Key, Value >::operator!=(const BSTIterator& rhs) const
+  {
+    return !(*this == rhs);
+  }
+  template < class Key, class Value >
+  bool BSTIterator< Key, Value >::operator==(const BSTIterator& rhs) const
+  {}
 
 }
 

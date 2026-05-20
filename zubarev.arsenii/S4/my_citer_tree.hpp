@@ -1,5 +1,5 @@
-#ifndef MY_EQUAL_HPP
-#define MY_EQUAL_HPP
+#ifndef MY_CITER_TREE_HPP
+#define MY_CITER_TREE_HPP
 
 namespace zubarev
 {

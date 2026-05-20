@@ -1,5 +1,5 @@
-#ifndef MY_EQUAL_HPP
-#define MY_EQUAL_HPP
+#ifndef MY_COMPARE_HPP
+#define MY_COMPARE_HPP
 namespace zubarev
 {
   template < class T >
