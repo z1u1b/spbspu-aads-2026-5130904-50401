@@ -11,6 +11,7 @@ namespace zubarev
   template < class Key, class Value >
   class BSTIterator
   {
+    friend class BSTConstIterator< Key, Value >;
     using Node = BSTreeNode< Key, Value >;
 
   private:
@@ -26,6 +27,12 @@ namespace zubarev
     bool operator!=(const BSTIterator&) const;
     bool operator==(const BSTIterator&) const;
   };
+
+  template < class Key, class Value >
+  BSTIterator< Key, Value >::BSTIterator() noexcept:
+    ptr_(nullptr)
+  {}
+
   template < class Key, class Value >
   BSTIterator< Key, Value >::BSTIterator(Node* node):
     ptr_(node)
