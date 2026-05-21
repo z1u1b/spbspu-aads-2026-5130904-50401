@@ -5,8 +5,8 @@
 #include "my_node_tree.hpp"
 namespace zubarev
 {
-  template < class Key, class Value >
-  class BSTConstIterator;
+  // template < class Key, class Value >
+  // class BSTConstIterator;
 
   template < class Key, class Value >
   class BSTIterator
@@ -84,6 +84,10 @@ namespace zubarev
   {
     return ptr_ == rhs.ptr_;
   }
+  template < class Key, class Value >
+  zubarev::BSTConstIterator< Key, Value >::BSTConstIterator(const BSTIterator< Key, Value >& other) noexcept:
+    ptr_(other.ptr_)
+  {}
 
 }
 
