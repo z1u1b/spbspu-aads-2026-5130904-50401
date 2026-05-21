@@ -20,7 +20,7 @@ namespace zubarev
     Node* fake_root_;
     Compare comp_;
 
-    size_t height_implement(Node* node)
+    size_t height_implement(Node* node) const
     {
       if (!node || node == fake_root_) {
         return 0;
@@ -53,7 +53,7 @@ namespace zubarev
     Node* find_node(const Key k) const
     {
       Node* cur = fake_root_->parent_;
-      while (cur) {
+      while (cur && cur != fake_root_) {
         if (comp_(k, cur->data_.first)) {
           cur = cur->left_;
         } else if (comp_(cur->data_.first, k)) {
@@ -62,10 +62,11 @@ namespace zubarev
           return cur;
         }
       }
+
       return nullptr;
     }
 
-    Node* fall_left(Node* node)
+    Node* fall_left(Node* node) const
     {
       if (!node || node == fake_root_) {
         return fake_root_;
@@ -76,7 +77,7 @@ namespace zubarev
       return node;
     }
 
-    Node* fall_right(Node* node)
+    Node* fall_right(Node* node) const
     {
       if (!node || node == fake_root_) {
         return fake_root_;
@@ -101,6 +102,7 @@ namespace zubarev
     const Value& operator[](Key id) const;
     Value& at(Key id);
     const Value& at(Key id) const;
+    bool contains(Key k) const noexcept;
 
     BSTIterator< Key, Value > begin();
     BSTIterator< Key, Value > end();
@@ -130,10 +132,25 @@ namespace zubarev
 
     //...
 
-    size_t height(const_iterator it);
-    size_t height();
+    size_t height(const_iterator it) const;
+    size_t height() const;
+    bool empty() const;
+
     //...
   };
+  template < class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::empty() const
+  {
+    return fake_root_->parent_ == fake_root_;
+  }
+  template < class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::contains(Key k) const noexcept
+  {
+    if (find_node(k) == nullptr) {
+      return false;
+    }
+    return true;
+  }
   template < class Key, class Value, class Compare >
   void BSTree< Key, Value, Compare >::swap(BSTree& rhs) noexcept
   {
@@ -153,7 +170,7 @@ namespace zubarev
   {
     if (fake_root_) {
       fake_root_->left_ = fake_root_->right_ = fake_root_->parent_ = nullptr;
-      destroy(fake_root_);
+      destroy(fake_root_->parent_);
       delete fake_root_;
     }
   }
@@ -164,7 +181,7 @@ namespace zubarev
     comp_(tree.comp_)
   {
     fake_root_ = new Node(Key{}, Value{});
-    fake_root_->left_ = fake_root_->right_ = fake_root_->parent_ = nullptr;
+    fake_root_->left_ = fake_root_->right_ = fake_root_->parent_ = fake_root_;
 
     if (tree.fake_root_->parent_ && tree.fake_root_->parent_ != tree.fake_root_) {
       fake_root_->parent_ = clone(tree.fake_root_->parent_, fake_root_);
@@ -173,8 +190,6 @@ namespace zubarev
   template < class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree(BSTree&& table) noexcept
   {
-    // std::swap(table.comp_,comp_);
-    // std::swap(table.fake_root_,fake_root_);
     swap(table);
   }
   template < class Key, class Value, class Compare >
@@ -202,11 +217,15 @@ namespace zubarev
   template < class Key, class Value, class Compare >
   Value& BSTree< Key, Value, Compare >::operator[](Key k)
   {
+
     Node* node = find_node(k);
+
     if (!node) {
+
       push(k, Value{});
       node = find_node(k);
     }
+
     return node->data_.second;
   }
   template < class Key, class Value, class Compare >
@@ -281,6 +300,7 @@ namespace zubarev
       } else if (comp_(cur->data_.first, k)) {
         cur = cur->right_;
       } else {
+        throw std::logic_error("Key already exists");
         return;
       }
     }
@@ -290,15 +310,18 @@ namespace zubarev
     if (parent == fake_root_) {
       fake_root_->parent_ = tmp;
     } else if (comp_(k, parent->data_.first)) {
-      parent->right_ = tmp;
-    } else {
       parent->left_ = tmp;
+    } else {
+      parent->right_ = tmp;
     }
   }
   template < class Key, class Value, class Compare >
   Value BSTree< Key, Value, Compare >::get(Key k)
   {
     Node* tmp = find_node(k);
+    if (!tmp || tmp == fake_root_) {
+      throw std::out_of_range("Key not found");
+    }
     return tmp->data_.second;
   }
   template < class Key, class Value, class Compare >
@@ -410,12 +433,12 @@ namespace zubarev
   //...
 
   template < class Key, class Value, class Compare >
-  size_t BSTree< Key, Value, Compare >::height(const_iterator it)
+  size_t BSTree< Key, Value, Compare >::height(const_iterator it) const
   {
     return height_implement(*it);
   }
   template < class Key, class Value, class Compare >
-  size_t BSTree< Key, Value, Compare >::height()
+  size_t BSTree< Key, Value, Compare >::height() const
   {
     return height_implement(fake_root_->parent_);
   }

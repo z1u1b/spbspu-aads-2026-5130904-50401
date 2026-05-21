@@ -25,9 +25,9 @@ namespace zubarev
 
   public:
     void print(const std::string&, std::ostream&) const;
-    void complement(const std::string&, const std::string&, const std::string&, std::ostream&);
-    void intersect(const std::string&, const std::string&, const std::string&, std::ostream&);
-    void union_fun(const std::string&, const std::string&, const std::string&, std::ostream&);
+    void complement(const std::string&, const std::string&, const std::string&);
+    void intersect(const std::string&, const std::string&, const std::string&);
+    void union_fun(const std::string&, const std::string&, const std::string&);
     void insertDataset(const std::string& name, const BSTree< size_t, std::string, Comparator< size_t > >& dataset);
   };
 

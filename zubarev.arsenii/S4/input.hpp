@@ -10,7 +10,7 @@
 
 namespace zubarev
 {
-  void inputDataset(std::istream& in, std::ostream& out, DatasetTable& dataset);
+  void inputDataset(std::istream& in, DatasetTable& datasets);
 }
 
 #endif

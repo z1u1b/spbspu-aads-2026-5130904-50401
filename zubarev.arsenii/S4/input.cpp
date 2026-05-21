@@ -1,27 +1,48 @@
 #include "input.hpp"
 
-#include <iostream>
+#include <string>
 
 namespace zubarev
 {
-  void inputDataset(std::istream& in, std::ostream&, DatasetTable& datasets)
+  void inputDataset(std::istream& in, DatasetTable& datasets)
   {
-    std::string dataset_name;
-    while (in >> dataset_name) {
-      BSTree< size_t, std::string, Comparator< size_t > > dataset;
-      size_t key = 0;
-      std::string value;
+    while (true) {
+      std::string datasetName;
 
-      while (in >> key >> value) {
+      if (!(in >> datasetName)) {
+        break;
+      }
+
+      BSTree< size_t, std::string, Comparator< size_t > > dataset;
+
+      while (true) {
+        size_t key = 0;
+        std::string value;
+
+        if (in.peek() == '\n' || in.peek() == EOF) {
+          break;
+        }
+
+        if (!(in >> key)) {
+          break;
+        }
+
+        if (in.peek() == '\n' || in.peek() == EOF) {
+          break;
+        }
+
+        if (!(in >> value)) {
+          break;
+        }
 
         dataset.push(key, value);
-        if (in.peek() == '\n') {
-          in.get();
+
+        if (in.peek() == '\n' || in.peek() == EOF) {
           break;
         }
       }
 
-      datasets.insertDataset(dataset_name, dataset);
+      datasets.insertDataset(datasetName, dataset);
     }
   }
 }

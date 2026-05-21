@@ -65,7 +65,7 @@ namespace zubarev
     }
     if (ptr_->right_) {
       ptr_ = ptr_->right_;
-      while (ptr_->left != nullptr) {
+      while (ptr_->left_ != nullptr) {
         ptr_ = ptr_->left_;
       }
     } else {
