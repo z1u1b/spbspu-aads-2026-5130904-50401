@@ -1,12 +1,12 @@
 #ifndef MY_CITER_TREE_HPP
 #define MY_CITER_TREE_HPP
 
-#include "my_iter_tree.hpp"
 #include "my_node_tree.hpp"
 namespace zubarev
 {
-  template < class Key, class Value, class Compare >
-  class HashTable;
+
+  template < class Key, class Value >
+  class BSTIterator;
 
   template < class Key, class Value >
   class BSTConstIterator
