@@ -169,9 +169,9 @@ namespace zubarev
   BSTree< Key, Value, Compare >::~BSTree()
   {
     if (fake_root_) {
-      fake_root_->left_ = fake_root_->right_ = fake_root_->parent_ = nullptr;
       destroy(fake_root_->parent_);
       delete fake_root_;
+      fake_root_ = nullptr;
     }
   }
 
