@@ -9,14 +9,13 @@ namespace zubarev
   void DatasetTable::print(const std::string& name, std::ostream& out) const
   {
     const BSTree< size_t, std::string, Comparator< size_t > >& dataset = datasetsTable.at(name);
-    if (!dataset.empty()) {
-      out << name;
-    } else {
-      out << "<EMPTY>";
+    if (dataset.empty()) {
+      out << "<EMPTY>\n";
       return;
     }
+    out << name;
     for (auto it = dataset.begin(); it != dataset.end(); ++it) {
-      out << " " << (*it).first << " " << (*it).second;
+      out << " " << it->first << " " << it->second;
     }
     out << '\n';
   }
@@ -30,9 +29,10 @@ namespace zubarev
         new_tree.push((*it1).first, (*it1).second);
       }
     }
-    if (!new_tree.empty()) {
-      datasetsTable[new_name] = new_tree;
-    }
+    // if (!new_tree.empty()) {
+    //   datasetsTable[new_name] = new_tree;
+    // }
+    datasetsTable[new_name] = new_tree;
   }
   void DatasetTable::intersect(const std::string& new_name, const std::string& name1, const std::string& name2)
   {
@@ -44,9 +44,10 @@ namespace zubarev
         new_tree.push((*it1).first, (*it1).second);
       }
     }
-    if (!new_tree.empty()) {
-      datasetsTable[new_name] = new_tree;
-    }
+    // if (!new_tree.empty()) {
+    //   datasetsTable[new_name] = new_tree;
+    // }
+    datasetsTable[new_name] = new_tree;
   }
   void DatasetTable::union_fun(const std::string& new_name, const std::string& name1, const std::string& name2)
   {
@@ -61,8 +62,9 @@ namespace zubarev
         new_tree.push((*it2).first, (*it2).second);
       }
     }
-    if (!new_tree.empty()) {
-      datasetsTable[new_name] = new_tree;
-    }
+    // if (!new_tree.empty()) {
+    //   datasetsTable[new_name] = new_tree;
+    // }
+    datasetsTable[new_name] = new_tree;
   }
 }
