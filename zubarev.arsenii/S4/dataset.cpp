@@ -25,13 +25,10 @@ namespace zubarev
     const BSTree< size_t, std::string, Comparator< size_t > >& data1 = datasetsTable.at(name1);
     const BSTree< size_t, std::string, Comparator< size_t > >& data2 = datasetsTable.at(name2);
     for (auto it1 = data1.begin(); it1 != data1.end(); ++it1) {
-      if (!data2.contains((*it1).first)) {
-        new_tree.push((*it1).first, (*it1).second);
+      if (!data2.contains(it1->first)) {
+        new_tree.push(it1->first, it1->second);
       }
     }
-    // if (!new_tree.empty()) {
-    //   datasetsTable[new_name] = new_tree;
-    // }
     datasetsTable[new_name] = new_tree;
   }
   void DatasetTable::intersect(const std::string& new_name, const std::string& name1, const std::string& name2)
@@ -40,13 +37,10 @@ namespace zubarev
     const BSTree< size_t, std::string, Comparator< size_t > >& data1 = datasetsTable.at(name1);
     const BSTree< size_t, std::string, Comparator< size_t > >& data2 = datasetsTable.at(name2);
     for (auto it1 = data1.begin(); it1 != data1.end(); ++it1) {
-      if (data2.contains((*it1).first)) {
-        new_tree.push((*it1).first, (*it1).second);
+      if (data2.contains(it1->first)) {
+        new_tree.push(it1->first, it1->second);
       }
     }
-    // if (!new_tree.empty()) {
-    //   datasetsTable[new_name] = new_tree;
-    // }
     datasetsTable[new_name] = new_tree;
   }
   void DatasetTable::union_fun(const std::string& new_name, const std::string& name1, const std::string& name2)
@@ -55,16 +49,13 @@ namespace zubarev
     const BSTree< size_t, std::string, Comparator< size_t > >& data1 = datasetsTable.at(name1);
     const BSTree< size_t, std::string, Comparator< size_t > >& data2 = datasetsTable.at(name2);
     for (auto it1 = data1.begin(); it1 != data1.end(); ++it1) {
-      new_tree.push((*it1).first, (*it1).second);
+      new_tree.push(it1->first, it1->second);
     }
     for (auto it2 = data2.begin(); it2 != data2.end(); ++it2) {
-      if (!new_tree.contains((*it2).first)) {
-        new_tree.push((*it2).first, (*it2).second);
+      if (!new_tree.contains(it2->first)) {
+        new_tree.push(it2->first, it2->second);
       }
     }
-    // if (!new_tree.empty()) {
-    //   datasetsTable[new_name] = new_tree;
-    // }
     datasetsTable[new_name] = new_tree;
   }
 }

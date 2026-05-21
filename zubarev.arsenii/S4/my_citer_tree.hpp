@@ -31,10 +31,6 @@ namespace zubarev
   BSTConstIterator< Key, Value >::BSTConstIterator() noexcept:
     ptr_(nullptr)
   {}
-  // template < class Key, class Value >
-  // BSTConstIterator< Key, Value >::BSTConstIterator(const BSTIterator< Key, Value >& other) noexcept:
-  //   ptr_(other.ptr_)
-  // {}
   template < class Key, class Value >
   BSTConstIterator< Key, Value >::BSTConstIterator(const Node* node):
     ptr_(node)

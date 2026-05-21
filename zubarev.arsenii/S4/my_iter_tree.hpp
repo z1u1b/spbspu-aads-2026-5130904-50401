@@ -5,8 +5,6 @@
 #include "my_node_tree.hpp"
 namespace zubarev
 {
-  // template < class Key, class Value >
-  // class BSTConstIterator;
 
   template < class Key, class Value >
   class BSTIterator

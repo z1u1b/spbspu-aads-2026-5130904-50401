@@ -33,8 +33,11 @@ namespace zubarev
       if (!node || node == fake_root_) {
         return;
       }
+
       destroy(node->left_);
       destroy(node->right_);
+
+      node->left_ = node->right_ = node->parent_ = nullptr;
       delete node;
     }
     Node* clone(Node* node, Node* parent)
@@ -50,7 +53,7 @@ namespace zubarev
       return new_node;
     }
 
-    Node* find_node(const Key k) const
+    Node* find_node(const Key& k) const
     {
       Node* cur = fake_root_->parent_;
       while (cur && cur != fake_root_) {
@@ -91,7 +94,6 @@ namespace zubarev
 
   public:
     BSTree();
-    BSTree(BSTreeNode< Key, Value >&);
     ~BSTree();
     BSTree(const BSTree& table);
     BSTree(BSTree&& table) noexcept;
@@ -113,14 +115,11 @@ namespace zubarev
     BSTConstIterator< Key, Value > begin() const;
     BSTConstIterator< Key, Value > end() const;
 
-    //...
     void push(Key k, Value v);
     Value get(Key k);
     Value drop(Key k);
 
     void swap(BSTree& rhs) noexcept;
-
-    //...
 
     using const_iterator = BSTConstIterator< Key, Value >;
     using iterator = BSTIterator< Key, Value >;
@@ -130,13 +129,9 @@ namespace zubarev
     const_iterator rotateLargeLeft(const_iterator it);
     const_iterator rotateLargeRight(const_iterator it);
 
-    //...
-
     size_t height(const_iterator it) const;
     size_t height() const;
     bool empty() const;
-
-    //...
   };
   template < class Key, class Value, class Compare >
   bool BSTree< Key, Value, Compare >::empty() const
@@ -154,8 +149,8 @@ namespace zubarev
   template < class Key, class Value, class Compare >
   void BSTree< Key, Value, Compare >::swap(BSTree& rhs) noexcept
   {
-    std::swap(rhs.comp_, comp_);
-    std::swap(rhs.fake_root_, fake_root_);
+    std::swap(fake_root_, rhs.fake_root_);
+    std::swap(comp_, rhs.comp_);
   }
   template < class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree()
@@ -169,8 +164,11 @@ namespace zubarev
   BSTree< Key, Value, Compare >::~BSTree()
   {
     if (fake_root_) {
+
       destroy(fake_root_->parent_);
+
       delete fake_root_;
+
       fake_root_ = nullptr;
     }
   }
@@ -187,10 +185,20 @@ namespace zubarev
       fake_root_->parent_ = clone(tree.fake_root_->parent_, fake_root_);
     }
   }
+
   template < class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(BSTree&& table) noexcept
+  BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept
   {
-    swap(table);
+    fake_root_ = new Node(Key{}, Value{});
+    fake_root_->left_ = fake_root_->right_ = fake_root_->parent_ = fake_root_;
+
+    if (other.fake_root_->parent_ != other.fake_root_) {
+      delete fake_root_;
+      swap(other);
+
+      other.fake_root_ = new Node(Key{}, Value{});
+      other.fake_root_->left_ = other.fake_root_->right_ = other.fake_root_->parent_ = other.fake_root_;
+    }
   }
   template < class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >& BSTree< Key, Value, Compare >::operator=(const BSTree& rhs)
@@ -202,6 +210,7 @@ namespace zubarev
     swap(cpy);
     return *this;
   }
+
   template < class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >& BSTree< Key, Value, Compare >::operator=(BSTree&& rhs) noexcept
   {
@@ -209,8 +218,16 @@ namespace zubarev
       return *this;
     }
 
-    BSTree cpy(std::move(rhs));
-    swap(cpy);
+    if (fake_root_) {
+      destroy(fake_root_->parent_);
+      delete fake_root_;
+    }
+
+    swap(rhs);
+
+    rhs.fake_root_ = new Node(Key{}, Value{});
+    rhs.fake_root_->left_ = rhs.fake_root_->right_ = rhs.fake_root_->parent_ = rhs.fake_root_;
+
     return *this;
   }
 
@@ -418,19 +435,17 @@ namespace zubarev
   template < class Key, class Value, class Compare >
   BSTConstIterator< Key, Value > BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
   {
-    Node y = (*it)->left_;
-    rotateLeft(const_iterator(y));
-    return rotateRight(it);
+    Node* y = (*it)->left_;
+    rotateRight(const_iterator(y));
+    return rotateLeft(it);
   }
   template < class Key, class Value, class Compare >
   BSTConstIterator< Key, Value > BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
   {
-    Node y = (*it)->left_;
+    Node* y = (*it)->left_;
     rotateLeft(const_iterator(y));
     return rotateRight(it);
   }
-
-  //...
 
   template < class Key, class Value, class Compare >
   size_t BSTree< Key, Value, Compare >::height(const_iterator it) const
