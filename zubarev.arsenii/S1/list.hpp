@@ -81,21 +81,20 @@ namespace zubarev
   }
 
   template < class T >
-  List< T >::List(const List< T >& other)
+  List< T >::List(const List< T >& other):
+    head_(nullptr)
   {
-    if (other.head_ == nullptr) {
-      head_ = nullptr;
+    if (other.empty()) {
       return;
     }
     head_ = ctFake();
 
     List< T > tempList;
-    detail::Node< T >* tmp = tempList.head_;
-
+    auto it = tempList.before_begin();
     detail::Node< T >* curOld = other.head_->next;
+
     while (curOld != nullptr) {
-      tmp->next = new detail::Node< T >(curOld->val);
-      tmp = tmp->next;
+      it = tempList.insert_after(it, curOld->val);
       curOld = curOld->next;
     }
     std::swap(head_, tempList.head_);
