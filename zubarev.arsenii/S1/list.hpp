@@ -3,38 +3,30 @@
 #include "c-iter.hpp"
 #include "iter.hpp"
 #include <utility>
+
 namespace zubarev
 {
-  template < class T >
-  struct Node
+  namespace detail
   {
-    T val;
-    Node* next;
+    template < class T >
+    struct Node
+    {
+      T val;
+      Node* next;
 
-    Node(const T& v, Node* n = nullptr):
-      val(v),
-      next(n) {};
-  };
+      Node(const T& v, Node* n = nullptr):
+        val(v),
+        next(n) {};
+    };
 
+  }
   template < class T >
   class List
   {
 
-  private:
-    Node< T >* head_;
-    Node< T >* ctFake()
-    {
-      Node< T >* el = new Node< T >{T(), nullptr};
-      return el;
-    }
-    void rmFake() noexcept
-    {
-      delete head_;
-    }
-
   public:
     List();
-    ~List();
+    ~List() noexcept;
     List(const List& list);
     List(List&& list) noexcept;
     List& operator=(const List& other);
@@ -58,17 +50,29 @@ namespace zubarev
     void push_front(const T&);
     void insert_after(LIter< T >, const T&);
     void erase_after(LIter< T >);
+
+  private:
+    detail::Node< T >* head_;
+    detail::Node< T >* ctFake()
+    {
+      detail::Node< T >* el = new detail::Node< T >{T(), nullptr};
+      return el;
+    }
+    void rmFake()
+    {
+      delete head_;
+    }
   };
 
   template < class T >
-  List< T >::List()
+  List< T >::List():
+    head_(ctFake())
   {
-    head_ = ctFake();
     head_->next = nullptr;
   }
 
   template < class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
     if (head_) {
@@ -86,11 +90,11 @@ namespace zubarev
     head_ = ctFake();
 
     List< T > tempList;
-    Node< T >* tmp = tempList.head_;
+    detail::Node< T >* tmp = tempList.head_;
 
-    Node< T >* curOld = other.head_->next;
+    detail::Node< T >* curOld = other.head_->next;
     while (curOld != nullptr) {
-      tmp->next = new Node< T >(curOld->val);
+      tmp->next = new detail::Node< T >(curOld->val);
       tmp = tmp->next;
       curOld = curOld->next;
     }
@@ -99,28 +103,16 @@ namespace zubarev
 
   template < class T >
   List< T >::List(List< T >&& other) noexcept:
-    head_(other.head_)
-  {
-    other.head_ = nullptr;
-  }
+    head_(std::exchange(other.head_, nullptr))
+  {}
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this == &other) {
-      return *this;
-    }
-    clear();
-    List< T > tempList;
-    Node< T >* tmp = tempList.head_;
 
-    Node< T >* curOld = other.head_->next;
-    while (curOld != nullptr) {
-      tmp->next = new Node< T >(curOld->val);
-      tmp = tmp->next;
-      curOld = curOld->next;
+    if (this != &other) {
+      List< T > temp(other);
+      std::swap(head_, temp.head_);
     }
-
-    std::swap(head_, tempList.head_);
     return *this;
   }
 
@@ -202,9 +194,9 @@ namespace zubarev
     if (!head_) {
       return;
     }
-    Node< T >* cur = begin().ptr;
+    detail::Node< T >* cur = begin().ptr;
     while (cur != end().ptr) {
-      Node< T >* curNext = cur->next;
+      detail::Node< T >* curNext = cur->next;
       delete cur;
       cur = curNext;
     }
@@ -227,7 +219,7 @@ namespace zubarev
     if (!head_) {
       head_ = ctFake();
     }
-    head_->next = new Node< T >(val, head_->next);
+    head_->next = new detail::Node< T >(val, head_->next);
   }
 
   template < class T >
@@ -236,7 +228,7 @@ namespace zubarev
     if (empty() || !head_) {
       return;
     }
-    Node< T >* toDel = head_->next;
+    detail::Node< T >* toDel = head_->next;
     head_->next = toDel->next;
     delete toDel;
   }
@@ -247,8 +239,8 @@ namespace zubarev
     if (!it.ptr) {
       return;
     }
-    Node< T >* itNext = it.ptr->next;
-    it.ptr->next = new Node< T >(val, itNext);
+    detail::Node< T >* itNext = it.ptr->next;
+    it.ptr->next = new detail::Node< T >(val, itNext);
   }
 
   template < class T >
@@ -257,7 +249,7 @@ namespace zubarev
     if (!it.ptr || !it.ptr->next) {
       return;
     }
-    Node< T >* itNext = it.ptr->next;
+    detail::Node< T >* itNext = it.ptr->next;
     it.ptr->next = itNext->next;
     delete itNext;
   }
