@@ -21,8 +21,8 @@ namespace zubarev
       while (in.peek() != '\n' && !in.eof()) {
         size_t num;
         if (in >> num) {
-          nums.insert_after(itNum, num);
-          ++itNum;
+          itNum = nums.insert_after(itNum, num);
+
         } else {
           in.clear();
 
@@ -40,8 +40,7 @@ namespace zubarev
       }
 
       value.numbers = nums;
-      list.insert_after(itList, value);
-      ++itList;
+      itList = list.insert_after(itList, value);
     }
 
     if (!in.eof() && in.fail()) {
@@ -121,7 +120,7 @@ namespace zubarev
         }
 
         if (flag && itNums != (*itList).numbers.end()) {
-          std::cout << *itNums; // ✅ первый элемент без пробела
+          std::cout << *itNums;
           found_first = true;
         }
         ++itList;
@@ -193,8 +192,7 @@ namespace zubarev
         break;
       }
 
-      sums.insert_after(itSum, sum);
-      ++itSum;
+      itSum = sums.insert_after(itSum, sum);
     }
 
     if (overflow) {
