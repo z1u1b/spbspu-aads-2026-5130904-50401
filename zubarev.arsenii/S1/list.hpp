@@ -48,7 +48,7 @@ namespace zubarev
     bool empty() const;
     void pop_front();
     void push_front(const T&);
-    void insert_after(LIter< T >, const T&);
+    LIter< T > insert_after(LIter< T >, const T&);
     void erase_after(LIter< T >);
 
   private:
@@ -233,13 +233,14 @@ namespace zubarev
   }
 
   template < class T >
-  void List< T >::insert_after(LIter< T > it, const T& val)
+  LIter< T >  List< T >::insert_after(LIter< T > it, const T& val)
   {
     if (!it.ptr) {
-      return;
+      return end();
     }
     detail::Node< T >* itNext = it.ptr->next;
     it.ptr->next = new detail::Node< T >(val, itNext);
+      return LIter< T >(it.ptr->next);
   }
 
   template < class T >
