@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(self_assignment)
   list.push_front(1);
   list.push_front(2);
 
-  list = list;
+  list.operator=(list);
 
   auto it = list.begin();
   BOOST_CHECK(*it == 2);

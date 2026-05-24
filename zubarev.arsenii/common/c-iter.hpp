@@ -5,27 +5,32 @@ namespace zubarev
 {
   template < class T >
   class List;
-  template < class T >
-  struct Node;
+  namespace detail
+  {
+    template < class T >
+    struct Node;
+  }
 
   template < class T >
   class LCIter
   {
     friend class List< T >;
 
-  private:
-    const Node< T >* ptr;
-    LCIter(const Node< T >* p);
-
   public:
     const T& operator*() const;
-    LCIter< T > operator++();
+    const T* operator->() const;
+    LCIter< T >& operator++();
+    LCIter< T > operator++(int);
     bool operator!=(const LCIter&) const;
     bool operator==(const LCIter&) const;
+
+  private:
+    const detail::Node< T >* ptr;
+    LCIter(const detail::Node< T >* p);
   };
 
   template < class T >
-  LCIter< T >::LCIter(const Node< T >* p):
+  LCIter< T >::LCIter(const detail::Node< T >* p):
     ptr(p)
   {}
 
@@ -34,12 +39,25 @@ namespace zubarev
   {
     return ptr->val;
   }
+  template < class T >
+
+  const T* LCIter< T >::operator->() const
+  {
+    return &ptr->val;
+  }
 
   template < class T >
-  LCIter< T > LCIter< T >::operator++()
+  LCIter< T >& LCIter< T >::operator++()
   {
     ptr = ptr->next;
     return *this;
+  }
+  template < class T >
+  LCIter< T > LCIter< T >::operator++(int)
+  {
+    LCIter< T > tmp = this;
+    ptr = ptr->next;
+    return tmp;
   }
 
   template < class T >
