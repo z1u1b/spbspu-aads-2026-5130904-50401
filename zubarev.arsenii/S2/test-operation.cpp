@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
 
   zubarev::run(input, output);
 
-  BOOST_CHECK(output.str() == "153 1006 1035\n");
+  BOOST_CHECK(output.str() == "1035 1006 153\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -123,14 +123,14 @@ namespace zubarev
 void zubarev::run(std::istream& in, std::ostream& out)
 {
   Stack< long long > results;
-
-  while (in && !in.eof()) {
-    std::string expression = detail::readLine(in);
-    if (expression.empty()) {
+std::string expression ="";
+  while (std::getline(in, expression)) {
+     Queue< std::string > infixQ = detail::fromStrToQueue(expression);
+    if (infixQ.empty()) {
       continue;
     }
 
-    Queue< std::string > infixQ = detail::fromStrToQueue(expression);
+
     Queue< std::string > postfixQ = detail::fromInfixToPostfix(infixQ);
     results.push(eval(postfixQ));
   }
