@@ -122,18 +122,22 @@ namespace zubarev
 }
 void zubarev::run(std::istream& in, std::ostream& out)
 {
-  Queue< long long > results;
+  Stack< long long > results;
 
   while (in && !in.eof()) {
     std::string expression = detail::readLine(in);
-
-    if (!expression.empty()) {
-      Queue< std::string > infixQ = detail::fromStrToQueue(expression);
-      Queue< std::string > postfixQ = detail::fromInfixToPostfix(infixQ);
-      results.push(eval(postfixQ));
+    if (expression.empty()) {
+      continue;
     }
+
+    Queue< std::string > infixQ = detail::fromStrToQueue(expression);
+    Queue< std::string > postfixQ = detail::fromInfixToPostfix(infixQ);
+    results.push(eval(postfixQ));
   }
 
+  if (results.empty()) {
+    return;
+  }
   out << results.top();
   results.drop();
   while (!results.empty()) {
