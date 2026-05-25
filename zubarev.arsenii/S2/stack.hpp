@@ -35,7 +35,6 @@ namespace zubarev
     if (list_.empty()) {
       throw std::runtime_error("Stack is empty");
     }
-    T val = top();
     list_.pop_front();
     size_--;
   }
