@@ -13,9 +13,8 @@ int main(int argc, char const* argv[])
         return 1;
       }
       input = &file;
-
-      zubarev::run(*input, std::cout);
     }
+    zubarev::run(*input, std::cout);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;
