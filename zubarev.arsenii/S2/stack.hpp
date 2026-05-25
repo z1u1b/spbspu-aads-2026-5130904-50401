@@ -21,6 +21,8 @@ namespace zubarev
   private:
     List< T > list_;
     size_t size_ = 0;
+    template < class U >
+    friend std::ostream& operator<<(std::ostream& out, const Stack< U >& s);
   };
 
   template < class T >
@@ -56,16 +58,17 @@ namespace zubarev
   {
     return size_;
   }
-  template < class T >
-  void Stack< T >::print(std::ostream& out) const
+  template < class U >
+  std::ostream& operator<<(std::ostream& out, const Stack< U >& s)
   {
 
-    out << "Stack[ size = " << size_ << " ]: < ";
+    out << "Stack[ size = " << s.size_ << " ]: < ";
 
-    for (auto it = list_.begin(); it != list_.end(); ++it) {
+    for (auto it = s.list_.begin(); it != s.list_.end(); ++it) {
       out << *it << " ";
     }
     out << ">" << '\n';
+    return out;
   }
 }
 

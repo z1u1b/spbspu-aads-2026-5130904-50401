@@ -18,11 +18,12 @@ namespace zubarev
     const T& last() const;
     bool empty() const;
     size_t size() const;
-    void print(std::ostream& out = std::cout) const;
 
   private:
     List< T > list_;
     size_t size_ = 0;
+    template < class U >
+    friend std::ostream& operator<<(std::ostream& out, const Queue< U >& q);
   };
   template < class T >
   void Queue< T >::push(const T& rhs)
@@ -65,15 +66,16 @@ namespace zubarev
   {
     return size_;
   }
-  template < class T >
-  void Queue< T >::print(std::ostream& out) const
+  template < class U >
+  std::ostream& operator<<(std::ostream& out, const Queue< U >& q)
   {
-    out << "Queue[ size = " << size_ << " ]: < ";
+    out << "Queue[ size = " << q.size_ << " ]: < ";
 
-    for (auto it = list_.begin(); it != list_.end(); ++it) {
+    for (auto it = q.list_.begin(); it != q.list_.end(); ++it) {
       out << *it << " ";
     }
     out << ">" << '\n';
+    return out;
   }
 }
 
