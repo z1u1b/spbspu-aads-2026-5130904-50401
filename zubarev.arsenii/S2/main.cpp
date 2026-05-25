@@ -4,10 +4,12 @@
 
 int main(int argc, char const* argv[])
 {
-  std::istream* input = &std::cin;
+
   try {
+    std::ifstream file;
+    std::istream* input = &std::cin;
     if (argc > 1) {
-      std::ifstream file(argv[1]);
+      file.open(argv[1]);
       if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл " << argv[1] << '\n';
         return 1;
