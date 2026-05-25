@@ -1,20 +1,16 @@
-#include "all.hpp"
+#include "func-stack-queue.hpp"
 #include <fstream>
-#include <iostream>
+#include <sstream>
 
-int main(int argc, char const* argv[])
+#include <istream>
+
+int main()
 {
+  std::string inp = "( 10 + 5 ) ## 3\n100 ## ( 2 * 3 )\n( 2 ## 3 ) * ( 4 ## 5 )";
+  std::istringstream input(inp);
+
   try {
-    if (argc > 1) {
-      std::ifstream file(argv[1]);
-      if (!file.is_open()) {
-        std::cerr << "Ошибка: Не удалось открыть файл " << argv[1] << '\n';
-        return 1;
-      }
-      zubarev::output(file);
-    } else {
-      zubarev::output(std::cin);
-    }
+    zubarev::run(input, std::cout);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;

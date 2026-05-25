@@ -1,17 +1,20 @@
 #ifndef FUNC_MATH_HPP
 #define FUNC_MATH_HPP
-#include "all.hpp"
+#include "queue.hpp"
+#include "stack.hpp"
 #include <iosfwd>
+#include <string>
 namespace zubarev
 {
-  using ll_int = long long int;
-  ll_int summation(ll_int oper1, ll_int oper2);
-  ll_int division(ll_int oper1, ll_int oper2);
-  ll_int multiplication(ll_int oper1, ll_int oper2);
-  ll_int subtraction(ll_int oper1, ll_int oper2);
-  ll_int remainder(ll_int oper1, ll_int oper2);
-  ll_int concatenation(ll_int oper1, ll_int oper2);
-  ll_int fromStrToNum(std::string& str);
-  ll_int eval(Queue< std::string >& postfixQ);
+
+  long long (*getOperation(const std::string& op))(long long, long long);
+  long long summation(long long oper1, long long oper2);
+  long long division(long long oper1, long long oper2);
+  long long multiplication(long long oper1, long long oper2);
+  long long subtraction(long long oper1, long long oper2);
+  long long remainder(long long oper1, long long oper2);
+  long long concatenation(long long oper1, long long oper2);
+  long long eval(Queue< std::string >& postfixQ);
+
 }
 #endif

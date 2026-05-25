@@ -3,24 +3,26 @@
 #include "list.hpp"
 #include <iostream>
 #include <stdexcept>
+
 namespace zubarev
 {
   template < typename T >
 
   class Queue
   {
-  private:
-    List< T > list_;
-    size_t size_ = 0;
 
   public:
     void push(const T& rhs);
-    T drop();
+    void drop();
     const T& top() const;
     const T& last() const;
     bool empty() const;
     size_t size() const;
     void print(std::ostream& out = std::cout) const;
+
+  private:
+    List< T > list_;
+    size_t size_ = 0;
   };
   template < class T >
   void Queue< T >::push(const T& rhs)
@@ -29,7 +31,7 @@ namespace zubarev
     size_++;
   }
   template < class T >
-  T Queue< T >::drop()
+  void Queue< T >::drop()
   {
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
@@ -37,7 +39,6 @@ namespace zubarev
     T val = top();
     list_.pop_front();
     size_--;
-    return val;
   }
   template < class T >
   const T& Queue< T >::top() const
