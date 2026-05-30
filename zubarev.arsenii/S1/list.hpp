@@ -53,17 +53,22 @@ namespace zubarev
 
   private:
     detail::Node< T >* head_;
-    detail::Node< T >* ctFake()
-    {
-      detail::Node< T >* el = new detail::Node< T >{T(), nullptr};
-      return el;
-    }
-    void rmFake()
-    {
-      delete head_;
-    }
+
+    detail::Node< T >* ctFake();
+    void rmFake();
   };
 
+  template < class T >
+  detail::Node< T >* List< T >::ctFake()
+  {
+    return new detail::Node< T >{T(), nullptr};
+  }
+
+  template < class T >
+  void List< T >::rmFake()
+  {
+    delete head_;
+  }
   template < class T >
   List< T >::List():
     head_(ctFake())
