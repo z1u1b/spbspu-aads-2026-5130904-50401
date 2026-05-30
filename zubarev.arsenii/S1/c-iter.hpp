@@ -1,6 +1,6 @@
 #ifndef CITER_HPP
 #define CITER_HPP
-
+#include <memory>
 namespace zubarev
 {
   template < class T >

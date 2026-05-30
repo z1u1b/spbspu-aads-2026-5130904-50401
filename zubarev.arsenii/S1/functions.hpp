@@ -9,7 +9,6 @@ namespace zubarev
   size_t max_sequences(const List< Data >& list);
   size_t output_names(const List< Data >& list);
   size_t output_sequences(const List< Data >& list);
-  // size_t output_sums(List< Data >* list);
   List< size_t > calculate_sums(const List< Data >& list);
   void print_sums(const List< size_t >& list);
 
