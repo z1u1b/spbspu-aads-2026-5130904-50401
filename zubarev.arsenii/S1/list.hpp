@@ -237,22 +237,22 @@ namespace zubarev
   template < class T >
   LIter< T > List< T >::insert_after(LIter< T > it, const T& val)
   {
-    if (!it.ptr) {
+    if (!it.ptr_) {
       return end();
     }
-    detail::Node< T >* itNext = it.ptr->next;
-    it.ptr->next = new detail::Node< T >(val, itNext);
-    return LIter< T >(it.ptr->next);
+    detail::Node< T >* itNext = it.ptr_->next;
+    it.ptr_->next = new detail::Node< T >(val, itNext);
+    return LIter< T >(it.ptr_->next);
   }
 
   template < class T >
   void List< T >::erase_after(LIter< T > it) noexcept
   {
-    if (!it.ptr || !it.ptr->next) {
+    if (!it.ptr_ || !it.ptr_->next) {
       return;
     }
-    detail::Node< T >* itNext = it.ptr->next;
-    it.ptr->next = itNext->next;
+    detail::Node< T >* itNext = it.ptr_->next;
+    it.ptr_->next = itNext->next;
     delete itNext;
   }
 }

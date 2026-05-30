@@ -26,47 +26,47 @@ namespace zubarev
     bool operator==(const LIter&) const;
 
   private:
-    detail::Node< T >* ptr;
+    detail::Node< T >* ptr_;
     LIter(detail::Node< T >* p);
   };
   template < class T >
   LIter< T >::LIter(detail::Node< T >* p):
-    ptr(p)
+    ptr_(p)
   {}
 
   template < class T >
   T& LIter< T >::operator*()
   {
-    return ptr->val;
+    return ptr_->val;
   }
   template < class T >
   T* LIter< T >::operator->()
   {
-    return std::addressof(ptr->val);
+    return std::addressof(ptr_->val);
   }
 
   template < class T >
   LIter< T >& LIter< T >::operator++()
   {
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return *this;
   }
   template < class T >
   LIter< T > LIter< T >::operator++(int)
   {
     LIter< T > tmp = this;
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return tmp;
   }
   template < class T >
   bool LIter< T >::operator!=(const LIter& iter) const
   {
-    return ptr != iter.ptr;
+    return ptr_ != iter.ptr_;
   }
   template < class T >
   bool LIter< T >::operator==(const LIter& iter) const
   {
-    return ptr == iter.ptr;
+    return ptr_ == iter.ptr_;
   }
 }
 

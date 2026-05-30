@@ -25,51 +25,51 @@ namespace zubarev
     bool operator==(const LCIter&) const;
 
   private:
-    const detail::Node< T >* ptr;
+    const detail::Node< T >* ptr_;
     LCIter(const detail::Node< T >* p);
   };
 
   template < class T >
   LCIter< T >::LCIter(const detail::Node< T >* p):
-    ptr(p)
+    ptr_(p)
   {}
 
   template < class T >
   const T& LCIter< T >::operator*() const
   {
-    return ptr->val;
+    return ptr_->val;
   }
   template < class T >
 
   const T* LCIter< T >::operator->() const
   {
-    return std::addressof(ptr->val);
+    return std::addressof(ptr_->val);
   }
 
   template < class T >
   LCIter< T >& LCIter< T >::operator++()
   {
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return *this;
   }
   template < class T >
   LCIter< T > LCIter< T >::operator++(int)
   {
     LCIter< T > tmp = this;
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return tmp;
   }
 
   template < class T >
   bool LCIter< T >::operator!=(const LCIter& iter) const
   {
-    return ptr != iter.ptr;
+    return ptr_ != iter.ptr_;
   }
 
   template < class T >
   bool LCIter< T >::operator==(const LCIter& iter) const
   {
-    return ptr == iter.ptr;
+    return ptr_ == iter.ptr_;
   }
 }
 
