@@ -1,16 +1,17 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
-#include "data.hpp"
 #include <iosfwd>
+#include "data.hpp"
+
 namespace zubarev
 {
   List< Data > input(std::istream& in, bool& error);
-  template < class T >
-
-  size_t max_sequences(List< Data >* list);
-  size_t output_names(List< Data >* list);
-  size_t output_sequences(List< Data >* list);
-  size_t output_sums(List< Data >* list);
+  size_t max_sequences(const List< Data >& list);
+  size_t output_names(const List< Data >& list);
+  size_t output_sequences(const List< Data >& list);
+  // size_t output_sums(List< Data >* list);
+  List< size_t > calculate_sums(const List< Data >& list);
+  void print_sums(const List< size_t >& list);
 
 }
 

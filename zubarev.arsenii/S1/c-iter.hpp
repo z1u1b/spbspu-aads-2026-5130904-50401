@@ -43,7 +43,7 @@ namespace zubarev
 
   const T* LCIter< T >::operator->() const
   {
-    return &ptr->val;
+    return std::addressof(ptr->val);
   }
 
   template < class T >

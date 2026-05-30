@@ -17,7 +17,7 @@ namespace zubarev
 
   public:
     T& operator*();
-    T* operator->() const;
+    T* operator->();
     LIter< T >& operator++();
     LIter< T > operator++(int);
 
@@ -39,9 +39,9 @@ namespace zubarev
     return ptr->val;
   }
   template < class T >
-  T* LIter< T >::operator->() const
+  T* LIter< T >::operator->()
   {
-    return &ptr->val;
+    return std::addressof(ptr->val);
   }
 
   template < class T >

@@ -1,8 +1,9 @@
 #include "functions.hpp"
-#include "list.hpp"
 #include <iostream>
+#include <sstream>
 #include <limits>
 #include <string>
+#include "list.hpp"
 
 namespace zubarev
 {
@@ -10,35 +11,29 @@ namespace zubarev
   {
     List< Data > list;
     auto itList = list.before_begin();
-    Data value;
-
     error = false;
 
-    while (in >> value.name) {
+    std::string line;
+
+    while (std::getline(in, line)) {
+      std::istringstream iss(line);
+      Data value;
+
+      if (!(iss >> value.name)) {
+        continue;
+      }
+
       List< size_t > nums;
       auto itNum = nums.before_begin();
-
-      while (in.peek() != '\n' && !in.eof()) {
-        size_t num;
-        if (in >> num) {
-          itNum = nums.insert_after(itNum, num);
-
-        } else {
-          in.clear();
-
-          if (in.peek() == '\n' || in.eof()) {
-            break;
-          }
-
-          error = true;
-          return List< Data >{};
-        }
+      size_t num;
+      while (iss >> num) {
+        itNum = nums.insert_after(itNum, num);
       }
 
-      if (in.peek() == '\n') {
-        in.get();
+      if (!iss.eof()) {
+        error = true;
+        return List< Data >{};
       }
-
       value.numbers = nums;
       itList = list.insert_after(itList, value);
     }
@@ -47,42 +42,35 @@ namespace zubarev
       error = true;
       return List< Data >{};
     }
-
     return list;
   }
 
-  size_t output_names(List< Data >* list)
+  size_t output_names(const List< Data >& list)
   {
-    if (!list) {
-      std::cerr << "output_names: list pointer is nullptr" << '\n';
-      return 1;
+    if (list.empty()) {
+      return 0;
     }
-    if (!list->empty()) {
-      auto it = list->begin();
 
-      std::cout << it->name;
+    auto it = list.begin();
+
+    std::cout << it->name;
+    ++it;
+
+    while (it != list.end()) {
+      std::cout << " " << it->name;
       ++it;
-
-      while (it != list->end()) {
-        std::cout << " " << it->name;
-        ++it;
-      }
-
-      std::cout << '\n';
     }
+
+    std::cout << '\n';
 
     return 0;
   }
-  size_t max_sequences(List< Data >* list)
+  size_t max_sequences(const List< Data >& list)
   {
-    if (!list) {
-      std::cerr << "max_sequences: list pointer is nullptr";
-      return 0;
-    }
     size_t maxNum = 0;
-    LIter< Data > itList = list->begin();
-    while (itList != list->end()) {
-      const List< size_t >& nums = (*itList).numbers;
+    auto itList = list.begin();
+    while (itList != list.end()) {
+      const List< size_t >& nums = itList->numbers;
       LCIter< size_t > itNums = nums.begin();
       size_t count = 0;
       while (itNums != nums.end()) {
@@ -94,24 +82,22 @@ namespace zubarev
     }
     return maxNum;
   }
-  size_t output_sequences(List< Data >* list)
+  size_t output_sequences(const List< Data >& list)
   {
-    if (!list) {
-      std::cerr << "output_sequences: list pointer is nullptr";
-      return 1;
+    if (list.empty()) {
+      return 0;
     }
 
     for (size_t i = 0; i < max_sequences(list); ++i) {
-
-      LIter< Data > itList = list->begin();
+      LCIter< Data > itList = list.begin();
       bool found_first = false;
 
-      while (itList != list->end() && !found_first) {
-        LIter< size_t > itNums = (*itList).numbers.begin();
+      while (itList != list.end() && !found_first) {
+        LCIter< size_t > itNums = itList->numbers.begin();
         bool flag = true;
 
         for (size_t j = 0; j < i; ++j) {
-          if (itNums != (*itList).numbers.end()) {
+          if (itNums != itList->numbers.end()) {
             ++itNums;
           } else {
             flag = false;
@@ -119,99 +105,81 @@ namespace zubarev
           }
         }
 
-        if (flag && itNums != (*itList).numbers.end()) {
+        if (flag && itNums != itList->numbers.end()) {
           std::cout << *itNums;
           found_first = true;
         }
         ++itList;
       }
 
-      while (itList != list->end()) {
-        LIter< size_t > itNums = (*itList).numbers.begin();
+      while (itList != list.end()) {
+        LCIter< size_t > itNums = itList->numbers.begin();
         bool flag = true;
 
         for (size_t j = 0; j < i; ++j) {
-          if (itNums != (*itList).numbers.end()) {
+          if (itNums != itList->numbers.end()) {
             ++itNums;
           } else {
             flag = false;
             break;
           }
         }
-
-        if (flag && itNums != (*itList).numbers.end()) {
+        if (flag && itNums != itList->numbers.end()) {
           std::cout << " " << *itNums;
         }
         ++itList;
       }
-
       std::cout << '\n';
     }
     return 0;
   }
 
-  size_t output_sums(List< Data >* list)
+  List< size_t > calculate_sums(const List< Data >& list)
   {
-    if (!list) {
-      std::cerr << "output_sums: list pointer is nullptr" << '\n';
-      return 1;
-    }
-
     const size_t maxSeq = max_sequences(list);
-
-    if (maxSeq == 0) {
-      std::cout << "0\n";
-      return 0;
-    }
-
     List< size_t > sums;
-    LIter< size_t > itSum = sums.before_begin();
-    bool overflow = false;
+    auto itSum = sums.before_begin();
 
     for (size_t i = 0; i < maxSeq; ++i) {
       size_t sum = 0;
-      LIter< Data > itList = list->begin();
+      auto itList = list.begin();
 
-      while (itList != list->end()) {
-        LIter< size_t > itNums = (*itList).numbers.begin();
-        for (size_t j = 0; j < i && itNums != (*itList).numbers.end(); ++j) {
+      while (itList != list.end()) {
+        auto itNums = itList->numbers.begin();
+
+        for (size_t j = 0; j < i && itNums != itList->numbers.end(); ++j) {
           ++itNums;
         }
-        if (itNums != (*itList).numbers.end()) {
-          size_t value = (*itNums);
+        if (itNums != itList->numbers.end()) {
+          size_t value = *itNums;
           if (sum > std::numeric_limits< size_t >::max() - value) {
-            overflow = true;
-            break;
+            throw std::overflow_error("sum overflow");
           }
           sum += value;
         }
-        ++itList;
-      }
 
-      if (overflow) {
-        break;
+        ++itList;
       }
 
       itSum = sums.insert_after(itSum, sum);
     }
-
-    if (overflow) {
-      std::cerr << "output_sums: sum overflow" << '\n';
-      return 1;
-    }
-
-    if (!sums.empty()) {
-      auto it = sums.begin();
-      std::cout << *it;
-      ++it;
-      while (it != sums.end()) {
-        std::cout << " " << *it;
-        ++it;
-      }
-      std::cout << '\n';
-    }
-
-    return 0;
+    return sums;
   }
 
+  void print_sums(const List< size_t >& sums)
+  {
+    if (sums.empty()) {
+      return;
+    }
+
+    auto it = sums.begin();
+    std::cout << *it;
+    ++it;
+
+    while (it != sums.end()) {
+      std::cout << " " << *it;
+      ++it;
+    }
+    std::cout << '\n';
+  }
 }

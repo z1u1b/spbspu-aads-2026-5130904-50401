@@ -1,8 +1,8 @@
 #ifndef DATA_HPP
 #define DATA_HPP
-#include "list.hpp"
-#include <string>
 
+#include <string>
+#include "list.hpp"
 namespace zubarev
 {
 
