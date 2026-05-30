@@ -124,10 +124,10 @@ namespace zubarev
       return *this;
     }
     clear();
-    if (head_) {
-      rmFake();
-    }
-    std::exchange(head_, other.head_);
+
+    rmFake();
+
+    head_ = std::exchange(other.head_, nullptr);
 
     return *this;
   }
