@@ -4,10 +4,10 @@
 namespace zubarev
 {
   template < class Key, class Value >
-  class NodeRobin
+  class RobinNode
   {
-    NodeRobin();
-    NodeRobin(Key, Value, bool, int);
+    RobinNode();
+    RobinNode(Key, Value, bool, int);
 
     Value val_;
     Key key_;
@@ -16,7 +16,7 @@ namespace zubarev
   };
 
   template < class Key, class Value >
-  NodeRobin< Key, Value >::NodeRobin():
+  RobinNode< Key, Value >::RobinNode():
     key_(),
     val_(),
     occupied_(false),
@@ -24,7 +24,7 @@ namespace zubarev
   {}
 
   template < class Key, class Value >
-  NodeRobin< Key, Value >::NodeRobin(Key key, Value val, bool occupied, int psl):
+  RobinNode< Key, Value >::RobinNode(Key key, Value val, bool occupied, int psl):
     key_(key),
     val_(val),
     occupied_(occupied),
