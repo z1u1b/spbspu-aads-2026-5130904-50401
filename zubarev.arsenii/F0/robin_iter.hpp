@@ -1,7 +1,6 @@
 #ifndef MY_ROBIN_ITER_HPP
 #define MY_ROBIN_ITER_HPP
 
-#include "../common/iter.hpp"
 #include "robin_hashtable.hpp"
 
 namespace zubarev
@@ -23,7 +22,7 @@ namespace zubarev
     Node* operator->() const noexcept;
 
     RobinIter& operator++();
-    RobinIter& operator++(int);
+    RobinIter operator++(int);
 
     bool operator!=(const RobinIter&) const;
     bool operator==(const RobinIter&) const;
@@ -83,10 +82,7 @@ namespace zubarev
     if (table_ != rhs.table_) {
       return false;
     }
-
     return el_idx_ == rhs.el_idx_;
   }
-
 }
-
 #endif
