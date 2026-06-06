@@ -2,11 +2,16 @@
 #include <cstddef>
 #include "robin_node.hpp"
 #include "../common/top-it-vector.hpp"
+#include "robin_iter.hpp"
+#include "robin_citer.hpp"
 namespace zubarev
 {
   template < class Key, class Value, class Hash, class Equal >
   class RobinHashTable
   {
+    friend class IterHashTable< Key, Value, Hash, Equal >;
+    friend class CIterHashTable< Key, Value, Hash, Equal >;
+
     using Node = RobinNode< Key, Value >;
     using Iter = IterRobinHashTable< Key, Value, Hash, Equal >;
     using CIter = CIterRobinHashTable< Key, Value, Hash, Equal >;

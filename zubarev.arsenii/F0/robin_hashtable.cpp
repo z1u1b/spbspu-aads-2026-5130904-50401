@@ -1,5 +1,5 @@
-#include "robin.hpp"
-#include <iostream>
+#include "robin_hashtable.hpp"
+
 template < class Key, class T, class Hash, class Equal >
 HashTable< Key, T, Hash, Equal >::HashTable(size_t cap = 16):
   capacity(cap),
