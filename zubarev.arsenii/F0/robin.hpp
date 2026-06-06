@@ -1,45 +1,57 @@
 
 #include <cstddef>
 #include "robin_node.hpp"
+#include "../common/top-it-vector.hpp"
 namespace zubarev
 {
-  template < class Key, class T, class Hash, class Equal >
+  template < class Key, class Value, class Hash, class Equal >
   class RobinHashTable
   {
-
-    size_t size;
-    size_t capacity;
-    Robin< Key, T >* slots;
-    Hash hasher;
-    Equal equal;
+    using Node = RobinNode< Key, Value >;
+    using Iter = IterRobinHashTable< Key, Value, Hash, Equal >;
+    using CIter = CIterRobinHashTable< Key, Value, Hash, Equal >;
+    using Table = RobinHashTable< Key, Value, Hash, Equal >;
 
   public:
     RobinHashTable(size_t cap = 16);
     ~RobinHashTable();
-    size_t erase(const Key& k);
-    size_t insert(const Key& k, const T& val);
+    RobinHashTable(const RobinHashTable& table);
+    RobinHashTable(RobinHashTable&& table) noexcept;
+    RobinHashTable& operator=(const RobinHashTable& other);
+    RobinHashTable& operator=(RobinHashTable&& other) noexcept;
+
+    Value& operator[](const Key& k) noexcept;
+    const Value& operator[](const Key& id) const noexcept;
+    Value& at(const Key& id);
+    const Value& at(const Key& id) const;
+
+    void swap(Table& rhs) noexcept;
+
+    void add(const Key& k, Value v);
+    Value drop(const Key& k);
+    bool has(const Key& k) const;
+    void rehash(size_t slots);
+
+    Iter begin();
+    Iter end();
+
+    CIter cbegin() const;
+    CIter cend() const;
+
+    CIter begin() const;
+    CIter end() const;
+
+    size_t size() const;
+    size_t capacity() const;
+    bool empty() const;
+    double load_factor() const;
 
   private:
-    void rehash();
+    size_t size_;
+    size_t capacity_;
+    topit::Vector< Node > slots_;
+    Hash hasher_;
+    Equal equal_;
   };
 
 }
-template < class Key, class T, class Hash, class Equal >
-class HashTable
-{
-
-  size_t size;
-  size_t capacity;
-  Rob< Key, T >* slots;
-  Hash hasher;
-  Equal equal;
-
-public:
-  HashTable(size_t cap = 16);
-  ~HashTable();
-  size_t erase(const Key& k);
-  size_t insert(const Key& k, const T& val);
-
-private:
-  void rehash();
-};
