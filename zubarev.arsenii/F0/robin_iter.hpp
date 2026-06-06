@@ -1,7 +1,10 @@
 #ifndef MY_ROBIN_ITER_HPP
 #define MY_ROBIN_ITER_HPP
 
-#include "robin_hashtable.hpp"
+// #include "robin_hashtable.hpp"
+#include "robin_node.hpp"
+#include <cstddef>
+#include <stdexcept>
 
 namespace zubarev
 {
@@ -42,7 +45,7 @@ namespace zubarev
   template < class Key, class Value, class Hash, class Equal >
   RobinNode< Key, Value >& RobinIter< Key, Value, Hash, Equal >::operator*() const
   {
-    if (el_idx_ > table_->capacity()) {
+    if (el_idx_ > table_->capacity_) {
       throw std::out_of_range("Invalid node in overflow");
     }
     return table_->slots_[el_idx_];
@@ -59,6 +62,7 @@ namespace zubarev
     if (!table_) {
       return *this;
     }
+    ++el_idx_;
     while (el_idx_ < table_->capacity_ && !table_->slots_[el_idx_].occupied_) {
       ++el_idx_;
     }
