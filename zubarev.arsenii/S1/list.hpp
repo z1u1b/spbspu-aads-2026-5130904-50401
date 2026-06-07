@@ -14,7 +14,7 @@ namespace zubarev
       T val;
       Node* next;
 
-      template<class U>
+      template< class U >
       Node(U&& v, Node* n = nullptr);
     };
 
@@ -46,11 +46,11 @@ namespace zubarev
     void clear() noexcept;
     bool empty() const noexcept;
     void pop_front() noexcept;
-    template<class U>
+    template< class U >
     void push_front(U&&);
 
-    template<class U>
-    LIter<T> insert_after(LIter<T>, U&&);
+    template< class U >
+    LIter<T> insert_after(LIter< T >, U&&);
     void erase_after(LIter< T >) noexcept;
 
   private:
@@ -65,10 +65,10 @@ namespace zubarev
     return new detail::Node< T >{T(), nullptr};
   }
 
-  template<class T>
-  template<class U>
+  template< class T >
+  template< class U >
   detail::Node<T>::Node(U&& v, Node* n):
-    val(std::forward<U>(v)),
+    val(std::forward< U >(v)),
     next(n)
   {}
   template< class T >
