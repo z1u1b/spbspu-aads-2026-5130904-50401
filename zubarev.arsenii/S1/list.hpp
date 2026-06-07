@@ -16,7 +16,8 @@ namespace zubarev
 
       Node(const T& v, Node* n = nullptr):
         val(v),
-        next(n) {};
+        next(n)
+      {};
     };
 
   }
