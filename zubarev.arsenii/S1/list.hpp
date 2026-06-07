@@ -124,7 +124,7 @@ namespace zubarev
   template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
-    if (this == &other) {
+    if (this == std::addressof(other)) {
       return *this;
     }
     clear();
