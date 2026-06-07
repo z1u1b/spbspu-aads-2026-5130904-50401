@@ -14,10 +14,7 @@ namespace zubarev
       T val;
       Node* next;
 
-      Node(const T& v, Node* n = nullptr):
-        val(v),
-        next(n)
-      {};
+      Node(const T& v, Node* n = nullptr);
     };
 
   }
@@ -64,6 +61,11 @@ namespace zubarev
     return new detail::Node< T >{T(), nullptr};
   }
 
+  template< class T >
+  zubarev::detail::Node<T>::Node(const T& v, Node<T>* n):
+    val(v),
+    next(n)
+  {}
   template< class T >
   void List< T >::rmFake()
   {
