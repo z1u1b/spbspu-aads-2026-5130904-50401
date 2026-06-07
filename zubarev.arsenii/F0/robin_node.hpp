@@ -9,8 +9,8 @@ namespace zubarev
     RobinNode();
     RobinNode(Key, Value, bool, int);
 
-    Value val_;
     Key key_;
+    Value val_;
     bool occupied_ = false;
     int psl_ = -1;
   };

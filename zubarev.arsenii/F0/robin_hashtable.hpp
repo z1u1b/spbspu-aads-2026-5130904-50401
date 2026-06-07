@@ -2,6 +2,7 @@
 #define ROBIN_HASHTABLE_HPP
 
 #include <cstddef>
+#include <ut>
 #include "robin_node.hpp"
 #include "../common/top-it-vector.hpp"
 #include "robin_iter.hpp"
@@ -282,33 +283,35 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
-    Table tmp(*this);
-    size_t index = hasher_(k) % capacity_;
-    if (!slots_[index].occupied) {
+    if (load_factor() >= 0.75) {
+      rehash(capacity_ * 2);
     }
-    // size_t buc_idx = getBucketIndex(k);
-    // size_t is_over = true;
-    // for (size_t i = 0; i < bucket_capacity_; ++i) {
-    //   if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val_) {
-    //     tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
-    //     tmp.sizes_[buc_idx]++;
-    //     is_over = false;
-    //     break;
-    //   }
-    // }
-    // if (is_over) {
-    //   for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it) {
-    //     if ((*it).is_val_ && equaler_((*it).key_, k)) {
-    //       (*it).val_ = v;
-    //       is_over = false;
-    //       break;
-    //     }
-    //   }
-    // }
-    // if (is_over) {
-    //   tmp.overflow_bucket_.push_back(Node(k, v, true));
-    // }
-    swap(tmp);
+
+    size_t index = hasher_(k) % capacity_;
+    size_t cur_psl = 0;
+
+    Node node_to_add(k, v, false, 0);
+
+    for (size_t i = 0; i < capacity_; ++i) {
+      if (!slots_[index].occupied) {
+        slots_[index] = node_to_add;
+        size_++;
+        return;
+      }
+
+      if (equal_(slots_[index].key, node_to_add.key)) {
+        slots_[index].val_ = node_to_add.val_;
+        return;
+      }
+
+      if (node_to_add.psl > slots_[index].psl) {
+        std::swap(node_to_add, slots_[index]);
+      }
+
+      node_to_add.psl_++;
+      index = (index + 1) % capacity_;
+    }
+    throw std::runtime_error("RobinHashTable overflow: rehash failed or capacity logic error");
   }
   template< class Key, class Value, class Hash, class Equal >
   Value RobinHashTable< Key, Value, Hash, Equal >::drop(Key k)
