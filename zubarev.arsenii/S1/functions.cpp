@@ -5,18 +5,6 @@
 #include <string>
 #include "list.hpp"
 
-
-
-
-
-
-
-
-
-
-
-
-
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
   zubarev::List< zubarev::Data > list;
