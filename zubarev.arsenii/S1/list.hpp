@@ -14,8 +14,8 @@ namespace zubarev
       T val;
       Node* next;
 
-      template< class U >
-      Node(U&& v, Node* n = nullptr);
+      Node(const T& v, Node* n = nullptr);
+      Node(T&& v, Node* n = nullptr);
     };
 
   }
@@ -46,11 +46,13 @@ namespace zubarev
     void clear() noexcept;
     bool empty() const noexcept;
     void pop_front() noexcept;
-    template< class U >
-    void push_front(U&&);
 
-    template< class U >
-    LIter<T> insert_after(LIter< T >, U&&);
+    void push_front(const T& val);
+    void push_front(T&& val);
+
+    LIter< T > insert_after(LIter< T > it, const T& val);
+    LIter< T > insert_after(LIter< T > it, T&& val);
+
     void erase_after(LIter< T >) noexcept;
 
   private:
@@ -66,9 +68,14 @@ namespace zubarev
   }
 
   template< class T >
-  template< class U >
-  detail::Node< T >::Node(U&& v, Node* n):
-    val(std::forward< U >(v)),
+  detail::Node< T >::Node(const T& v, Node* n):
+    val(v),
+    next(n)
+  {}
+
+  template< class T >
+  detail::Node< T >::Node(T&& v, Node* n):
+    val(std::move(v)),
     next(n)
   {}
   template< class T >
@@ -221,17 +228,22 @@ namespace zubarev
     return head_->next == nullptr;
   }
 
-  template<class T>
-  template<class U>
-  void List<T>::push_front(U&& val)
+  template< class T >
+  void List< T >::push_front(const T& val)
   {
     if (!head_) {
       head_ = ctFake();
     }
-    head_->next = new detail::Node<T>(
-      std::forward<U>(val),
-      head_->next
-    );
+    head_->next = new detail::Node< T >(val, head_->next);
+  }
+
+  template< class T >
+  void List< T >::push_front(T&& val)
+  {
+    if (!head_) {
+      head_ = ctFake();
+    }
+    head_->next = new detail::Node< T >(std::move(val), head_->next);
   }
 
   template< class T >
@@ -245,19 +257,26 @@ namespace zubarev
     delete toDel;
   }
 
-  template<class T>
-  template<class U>
-  LIter<T> List<T>::insert_after(LIter<T> it, U&& val)
+  template< class T >
+  LIter< T > List< T >::insert_after(LIter< T > it, const T& val)
   {
     if (!it.ptr_) {
       return end();
     }
-    detail::Node<T>* itNext = it.ptr_->next;
-    it.ptr_->next = new detail::Node<T>(
-      std::forward<U>(val),
-      itNext
-    );
-    return LIter<T>(it.ptr_->next);
+    detail::Node< T >* itNext = it.ptr_->next;
+    it.ptr_->next = new detail::Node< T >(val, itNext);
+    return LIter< T >(it.ptr_->next);
+  }
+
+  template< class T >
+  LIter< T > List< T >::insert_after(LIter< T > it, T&& val)
+  {
+    if (!it.ptr_) {
+      return end();
+    }
+    detail::Node< T >* itNext = it.ptr_->next;
+    it.ptr_->next = new detail::Node< T >(std::move(val), itNext);
+    return LIter< T >(it.ptr_->next);
   }
 
   template< class T >
