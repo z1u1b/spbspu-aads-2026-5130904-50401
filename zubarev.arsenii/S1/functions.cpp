@@ -5,43 +5,18 @@
 #include <string>
 #include "list.hpp"
 
-// zubarev::zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
-// {
-//   zubarev::List< zubarev::Data > list;
-//   auto itList = list.before_begin();
-//   error = false;
 
-//   std::string line;
 
-//   while (std::getline(in, line)) {
-//     std::istringstream iss(line);
-//     zubarev::Data value;
 
-//     if (!(iss >> value.name)) {
-//       continue;
-//     }
 
-//     zubarev::List< size_t > nums;
-//     auto itNum = nums.before_begin();
-//     size_t num;
-//     while (iss >> num) {
-//       itNum = nums.insert_after(itNum, num);
-//     }
 
-//     if (!iss.eof()) {
-//       error = true;
-//       return zubarev::List< zubarev::Data >{};
-//     }
-//     value.numbers = nums;
-//     itList = list.insert_after(itList, value);
-//   }
 
-//   if (!in.eof() && in.fail()) {
-//     error = true;
-//     return zubarev::List< zubarev::Data >{};
-//   }
-//   return list;
-// }
+
+
+
+
+
+
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
   zubarev::List< zubarev::Data > list;
@@ -49,6 +24,19 @@ zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
   error = false;
 
   while (true) {
+    while (in.peek() == ' ' || in.peek() == '\t') {
+      in.get();
+    }
+
+    if (in.peek() == EOF) {
+      break;
+    }
+
+    if (in.peek() == '\n') {
+      in.get();
+      continue;
+    }
+
     zubarev::Data value;
     if (!(in >> value.name)) {
       break;
@@ -56,12 +44,15 @@ zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 
     zubarev::List< size_t > nums;
     auto itNum = nums.before_begin();
-    while (true) {
-      in >> std::ws;
 
-      if (in.eof() || in.peek() == '\n') {
-        if (in.peek() == '\n')
+    while (true) {
+      while (in.peek() == ' ' || in.peek() == '\t') {
+        in.get();
+      }
+      if (in.peek() == '\n' || in.peek() == EOF) {
+        if (in.peek() == '\n') {
           in.get();
+        }
         break;
       }
 
@@ -76,14 +67,12 @@ zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
       }
       itNum = nums.insert_after(itNum, num);
     }
-
     value.numbers = nums;
     itList = list.insert_after(itList, value);
   }
 
   return list;
 }
-
 size_t zubarev::output_names(const zubarev::List< zubarev::Data >& list)
 {
   if (list.empty()) {

@@ -23,8 +23,10 @@ int main()
   zubarev::output_names(list);
   std::cout << '\n';
 
-  zubarev::output_sequences(list);
-  std::cout << '\n';
+  if (zubarev::max_sequences(list) > 0) {
+    zubarev::output_sequences(list);
+    std::cout << '\n';
+  }
 
   try {
     const zubarev::List< size_t > sums = zubarev::calculate_sums(list);
