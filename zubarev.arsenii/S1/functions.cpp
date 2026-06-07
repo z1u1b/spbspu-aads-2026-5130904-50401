@@ -6,7 +6,7 @@
 #include "list.hpp"
 
 
-List< Data > zubarev::input(std::istream& in, bool& error)
+zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
 {
   List< Data > list;
   auto itList = list.before_begin();
@@ -133,7 +133,7 @@ size_t zubarev::output_sequences(const List< Data >& list)
   return 0;
 }
 
-List< size_t > zubarev::calculate_sums(const List< Data >& list)
+zubarev::List< size_t > zubarev::calculate_sums(const List< Data >& list)
 {
   const size_t maxSeq = max_sequences(list);
   List< size_t > sums;
