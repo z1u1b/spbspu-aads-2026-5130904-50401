@@ -16,11 +16,15 @@ int main()
     return 1;
   }
 
-  error = zubarev::output_names(list) || zubarev::output_sequences(list);
-
-  if (error) {
-    return 1;
+  if (list.empty()) {
+    std::cout << "0\n";
+    return 0;
   }
+  zubarev::output_names(list);
+  std::cout << '\n';
+
+  zubarev::output_sequences(list);
+  std::cout << '\n';
 
   try {
     const zubarev::List< size_t > sums = zubarev::calculate_sums(list);
@@ -29,6 +33,7 @@ int main()
       std::cout << "0\n";
     } else {
       zubarev::print_sums(sums);
+      std::cout << '\n';
     }
   } catch (const std::overflow_error&) {
     std::cerr << "sum overflow\n";

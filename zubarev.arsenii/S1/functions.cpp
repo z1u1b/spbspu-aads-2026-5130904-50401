@@ -42,7 +42,7 @@
 //   }
 //   return list;
 // }
-zubarev::zubarev::List< zubarev::zubarev::Data > zubarev::input(std::istream& in, bool& error)
+zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
   zubarev::List< zubarev::Data > list;
   auto itList = list.before_begin();
@@ -100,8 +100,6 @@ size_t zubarev::output_names(const zubarev::List< zubarev::Data >& list)
     ++it;
   }
 
-  std::cout << '\n';
-
   return 0;
 }
 size_t zubarev::max_sequences(const zubarev::List< zubarev::Data >& list)
@@ -127,7 +125,8 @@ size_t zubarev::output_sequences(const zubarev::List< zubarev::Data >& list)
     return 0;
   }
 
-  for (size_t i = 0; i < max_sequences(list); ++i) {
+  size_t maxSeq = max_sequences(list);
+  for (size_t i = 0; i < maxSeq; ++i) {
     LCIter< zubarev::Data > itList = list.begin();
     bool found_first = false;
 
@@ -168,12 +167,14 @@ size_t zubarev::output_sequences(const zubarev::List< zubarev::Data >& list)
       }
       ++itList;
     }
-    std::cout << '\n';
+    if (i + 1 != maxSeq) {
+      std::cout << '\n';
+    }
   }
   return 0;
 }
 
-zubarev::zubarev::List< size_t > zubarev::calculate_sums(const zubarev::List< zubarev::Data >& list)
+zubarev::List< size_t > zubarev::calculate_sums(const zubarev::List< zubarev::Data >& list)
 {
   const size_t maxSeq = max_sequences(list);
   zubarev::List< size_t > sums;
@@ -219,5 +220,4 @@ void zubarev::print_sums(const zubarev::List< size_t >& sums)
     std::cout << " " << *it;
     ++it;
   }
-  std::cout << '\n';
 }
