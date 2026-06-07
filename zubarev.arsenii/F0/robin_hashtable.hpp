@@ -64,83 +64,58 @@ namespace zubarev
 
   template < class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable():
-    bucket_count_(8),
-    bucket_capacity_(8),
-    data_(new Node[8 * 8]()),
-    sizes_(new size_t[8]()),
-    overflow_bucket_(),
+    size_(8),
+    capacity_(8),
+    slots_(topit::Vector< Node >(8)),
     hasher_(),
-    equaler_()
+    equal_()
   {}
 
+  // template < class Key, class Value, class Hash, class Equal >
+  // RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(
+  //     size_t size, size_t capacity, topit::Vector< Node > slots, Hash hasher, Equal equal):
+  //   size_(size),
+  //   capacity_(capacity),
+  //   slots_(slots),
+  //   hasher_(hasher),
+  //   equal_(equal)
+  // {}
   template < class Key, class Value, class Hash, class Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t bucket_count,
-                                                            size_t bucket_capacity,
-                                                            Node* data,
-                                                            size_t* sizes,
-                                                            OverflowList overflow_bucket,
-                                                            Hash hasher,
-                                                            Equal equaler):
-    bucket_count_(bucket_count),
-    bucket_capacity_(bucket_capacity),
-    data_(nullptr),
-    sizes_(nullptr),
-    overflow_bucket_(overflow_bucket),
-    hasher_(hasher),
-    equaler_(equaler)
-  {
-    if (data) {
-      data_ = data;
-    } else {
-      data_ = new Node[bucket_count_ * bucket_capacity_]();
-    }
-    if (sizes) {
-      sizes_ = sizes;
-    } else {
-      sizes_ = new size_t[bucket_count_]();
-    }
-  }
+  RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
+    size_(capacity),
+    capacity_(capacity),
+    slots_(topit::Vector< Node >(capacity)),
+    hasher_(),
+    equal_()
+  {}
 
   template < class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::~RobinHashTable()
   {
-    delete[] data_;
-    delete[] sizes_;
+    delete[] slots_;
   }
   template < class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(const RobinHashTable& table):
-    bucket_count_(table.bucket_count_),
-    bucket_capacity_(table.bucket_capacity_),
-    data_(),
-    sizes_(),
-    overflow_bucket_(),
+    size_(table.size_),
+    capacity_(table.capacity_),
+    slots_(),
     hasher_(table.hasher_),
-    equaler_(table.equaler_)
+    equal_(table.equal_)
   {
-    sizes_ = new size_t[bucket_count_];
-    data_ = new Node[bucket_capacity_ * bucket_count_];
-    for (size_t i = 0; i < bucket_count_; ++i) {
-      sizes_[i] = table.sizes_[i];
-      for (size_t j = 0; j < sizes_[i]; ++j) {
-        data_[i * bucket_capacity_ + j] = table.data_[i * bucket_capacity_ + j];
-      }
+    slots_ = topit::Vector< Node >(table.capacity_);
+    for (size_t i = 0; i < table.size_; ++i) {
+      slots_[i] = table.slots_[i];
     }
-    overflow_bucket_ = table.overflow_bucket_;
   }
   template < class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(RobinHashTable&& table) noexcept:
-    bucket_count_(table.bucket_count_),
-    bucket_capacity_(table.bucket_capacity_),
-    data_(table.data_),
-    sizes_(table.sizes_),
-    overflow_bucket_(table.overflow_bucket_),
+    size_(table.size_),
+    capacity_(table.capacity_),
+    slots_(table.slots_),
     hasher_(table.hasher_),
-    equaler_(table.equaler_)
+    equal_(table.equal_)
   {
-    table.bucket_count_ = 0;
-    table.bucket_capacity_ = 0;
-    table.data_ = nullptr;
-    table.sizes_ = nullptr;
+    table.slots_ = topit::Vector< Node >();
   }
   template < class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >&
@@ -169,7 +144,7 @@ namespace zubarev
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](Key k) noexcept
+  Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k) noexcept
   {
     Node* el = find_el(k);
     if (el) {
@@ -209,13 +184,11 @@ namespace zubarev
   template < class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
   {
-    std::swap(bucket_count_, rhs.bucket_count_);
-    std::swap(bucket_capacity_, rhs.bucket_capacity_);
-    std::swap(data_, rhs.data_);
-    std::swap(sizes_, rhs.sizes_);
-    std::swap(overflow_bucket_, rhs.overflow_bucket_);
+    std::swap(size_, rhs.size_);
+    std::swap(capacity_, rhs.capacity_);
+    std::swap(slots_, rhs.slots_);
     std::swap(hasher_, rhs.hasher_);
-    std::swap(equaler_, rhs.equaler_);
+    std::swap(equal_, rhs.equal_);
   }
   template < class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin()
