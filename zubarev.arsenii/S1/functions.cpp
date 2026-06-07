@@ -1,67 +1,7 @@
 #include "functions.hpp"
 #include <iostream>
-#include <sstream>
 #include <limits>
-#include <string>
 #include "list.hpp"
-
-// zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
-// {
-//   zubarev::List< zubarev::Data > list;
-//   auto itList = list.before_begin();
-//   error = false;
-
-//   while (true) {
-//     while (in.peek() == ' ' || in.peek() == '\t') {
-//       in.get();
-//     }
-
-//     if (in.peek() == EOF) {
-//       break;
-//     }
-
-//     if (in.peek() == '\n') {
-//       in.get();
-//       continue;
-//     }
-
-//     zubarev::Data value;
-//     if (!(in >> value.name)) {
-//       break;
-//     }
-
-//     zubarev::List< size_t > nums;
-//     auto itNum = nums.before_begin();
-
-//     while (true) {
-//       while (in.peek() == ' ' || in.peek() == '\t') {
-//         in.get();
-//       }
-//       if (in.peek() == '\n' || in.peek() == EOF) {
-//         if (in.peek() == '\n') {
-//           in.get();
-//         }
-//         break;
-//       }
-
-//       if (!std::isdigit(in.peek())) {
-//         error = true;
-//         return zubarev::List< zubarev::Data >{};
-//       }
-//       size_t num;
-//       if (!(in >> num)) {
-//         error = true;
-//         return zubarev::List< zubarev::Data >{};
-//       }
-//       itNum = nums.insert_after(itNum, num);
-//     }
-//     value.numbers = nums;
-//     itList = list.insert_after(itList, value);
-//   }
-
-//   return list;
-// }
-#include <iostream>
 #include <cctype>
 
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
