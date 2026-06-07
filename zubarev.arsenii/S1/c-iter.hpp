@@ -14,7 +14,7 @@ namespace zubarev
   template< class T >
   class LCIter
   {
-    friend class List< T >;
+
 
   public:
     const T& operator*() const;
@@ -25,6 +25,7 @@ namespace zubarev
     bool operator==(const LCIter&) const;
 
   private:
+    friend class List< T >;
     const detail::Node< T >* ptr_;
     LCIter(const detail::Node< T >* p);
   };

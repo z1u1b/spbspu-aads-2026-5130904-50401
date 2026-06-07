@@ -53,7 +53,6 @@ namespace zubarev
 
   private:
     detail::Node< T >* head_;
-
     detail::Node< T >* ctFake();
     void rmFake();
   };

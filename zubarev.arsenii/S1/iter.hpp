@@ -14,7 +14,7 @@ namespace zubarev
   template< class T >
   class LIter
   {
-    friend class List< T >;
+
 
   public:
     T& operator*();
@@ -26,6 +26,7 @@ namespace zubarev
     bool operator==(const LIter&) const;
 
   private:
+    friend class List< T >;
     detail::Node< T >* ptr_;
     LIter(detail::Node< T >* p);
   };
