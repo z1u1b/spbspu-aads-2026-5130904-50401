@@ -8,7 +8,7 @@ namespace zubarev
 {
   namespace detail
   {
-    template < class T >
+    template< class T >
     struct Node
     {
       T val;
@@ -20,7 +20,7 @@ namespace zubarev
     };
 
   }
-  template < class T >
+  template< class T >
   class List
   {
 
@@ -58,25 +58,25 @@ namespace zubarev
     void rmFake();
   };
 
-  template < class T >
+  template< class T >
   detail::Node< T >* List< T >::ctFake()
   {
     return new detail::Node< T >{T(), nullptr};
   }
 
-  template < class T >
+  template< class T >
   void List< T >::rmFake()
   {
     delete head_;
   }
-  template < class T >
+  template< class T >
   List< T >::List():
     head_(ctFake())
   {
     head_->next = nullptr;
   }
 
-  template < class T >
+  template< class T >
   List< T >::~List() noexcept
   {
     clear();
@@ -85,7 +85,7 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(const List< T >& other):
     head_(nullptr)
   {
@@ -107,11 +107,11 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(List< T >&& other) noexcept:
     head_(std::exchange(other.head_, nullptr))
   {}
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
 
@@ -122,7 +122,7 @@ namespace zubarev
     return *this;
   }
 
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
     if (this == &other) {
@@ -136,7 +136,7 @@ namespace zubarev
 
     return *this;
   }
-  template < class T >
+  template< class T >
   LIter< T > List< T >::before_begin() noexcept
   {
     if (!head_) {
@@ -144,7 +144,7 @@ namespace zubarev
     }
     return LIter< T >(head_);
   }
-  template < class T >
+  template< class T >
   LIter< T > List< T >::begin() noexcept
   {
     if (!head_) {
@@ -153,47 +153,47 @@ namespace zubarev
     return LIter< T >(head_->next);
   }
 
-  template < class T >
+  template< class T >
   LIter< T > List< T >::end() noexcept
   {
     return LIter< T >(nullptr);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::before_begin() const noexcept
   {
     return LCIter< T >(head_);
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::begin() const noexcept
   {
     return LCIter< T >(head_->next);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::end() const noexcept
   {
     return LCIter< T >(nullptr);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cbefore_begin() const noexcept
   {
     return before_begin();
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cbegin() const noexcept
   {
     return begin();
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cend() const noexcept
   {
     return end();
   }
 
-  template < class T >
+  template< class T >
   void List< T >::clear() noexcept
   {
     if (!head_) {
@@ -205,7 +205,7 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   bool List< T >::empty() const noexcept
   {
     if (!head_) {
@@ -214,7 +214,7 @@ namespace zubarev
     return head_->next == nullptr;
   }
 
-  template < class T >
+  template< class T >
   void List< T >::push_front(const T& val)
   {
     if (!head_) {
@@ -223,7 +223,7 @@ namespace zubarev
     head_->next = new detail::Node< T >(val, head_->next);
   }
 
-  template < class T >
+  template< class T >
   void List< T >::pop_front() noexcept
   {
     if (empty() || !head_) {
@@ -234,7 +234,7 @@ namespace zubarev
     delete toDel;
   }
 
-  template < class T >
+  template< class T >
   LIter< T > List< T >::insert_after(LIter< T > it, const T& val)
   {
     if (!it.ptr_) {
@@ -245,7 +245,7 @@ namespace zubarev
     return LIter< T >(it.ptr_->next);
   }
 
-  template < class T >
+  template< class T >
   void List< T >::erase_after(LIter< T > it) noexcept
   {
     if (!it.ptr_ || !it.ptr_->next) {
