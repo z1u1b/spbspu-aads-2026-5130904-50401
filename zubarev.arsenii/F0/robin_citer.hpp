@@ -6,10 +6,10 @@
 #include <stdexcept>
 namespace zubarev
 {
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class RobinHashTable;
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class RobinCIter
   {
     friend class RobinHashTable< Key, Value, Hash, Equal >;
@@ -34,13 +34,13 @@ namespace zubarev
     Table* table_;
   };
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal >::RobinCIter(size_t el_idx, Table* table):
     el_idx_(el_idx),
     table_(table)
   {}
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const RobinNode< Key, Value >& RobinCIter< Key, Value, Hash, Equal >::operator*() const
   {
     if (el_idx_ > table_->capacity()) {
@@ -49,12 +49,12 @@ namespace zubarev
     return table_->slots_[el_idx_];
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const RobinNode< Key, Value >* RobinCIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal >& RobinCIter< Key, Value, Hash, Equal >::operator++()
   {
     if (!table_) {
@@ -66,19 +66,19 @@ namespace zubarev
     }
     return *this;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinCIter< Key, Value, Hash, Equal >::operator++(int)
   {
     RobinCIter tmp = *this;
     ++(*this);
     return tmp;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool RobinCIter< Key, Value, Hash, Equal >::operator!=(const RobinCIter& rhs) const
   {
     return !(*this == rhs);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool RobinCIter< Key, Value, Hash, Equal >::operator==(const RobinCIter& rhs) const
   {
     if (table_ != rhs.table_) {

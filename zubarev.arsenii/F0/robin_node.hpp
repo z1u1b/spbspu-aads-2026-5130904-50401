@@ -3,7 +3,7 @@
 
 namespace zubarev
 {
-  template < class Key, class Value >
+  template< class Key, class Value >
   class RobinNode
   {
     RobinNode();
@@ -15,7 +15,7 @@ namespace zubarev
     int psl_ = -1;
   };
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   RobinNode< Key, Value >::RobinNode():
     key_(),
     val_(),
@@ -23,7 +23,7 @@ namespace zubarev
     psl_(-1)
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   RobinNode< Key, Value >::RobinNode(Key key, Value val, bool occupied, int psl):
     key_(key),
     val_(val),

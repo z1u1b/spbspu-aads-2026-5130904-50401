@@ -8,7 +8,7 @@
 #include "robin_citer.hpp"
 namespace zubarev
 {
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class RobinHashTable
   {
     friend class RobinIter< Key, Value, Hash, Equal >;
@@ -22,14 +22,13 @@ namespace zubarev
   public:
     RobinHashTable();
     RobinHashTable(size_t cap = 16);
-    ~RobinHashTable();
+    ~RobinHashTable() = default;
     RobinHashTable(const RobinHashTable& table);
     RobinHashTable(RobinHashTable&& table) noexcept;
     RobinHashTable& operator=(const RobinHashTable& other);
     RobinHashTable& operator=(RobinHashTable&& other) noexcept;
 
-    Value& operator[](const Key& k) noexcept;
-    const Value& operator[](const Key& id) const noexcept;
+    Value& operator[](const Key& k);
     Value& at(const Key& id);
     const Value& at(const Key& id) const;
 
@@ -67,7 +66,7 @@ namespace zubarev
         return nullptr;
       }
 
-      size_t index = hasher_(k) % size_;
+      size_t index = hasher_(k) % capacity_;
       int cur_psl = 0;
 
       for (size_t i = 0; i < capacity_; ++i) {
@@ -82,7 +81,8 @@ namespace zubarev
         if (equal_(k, cur_node.k)) {
           return std::addressof(slots_[index]);
         }
-        index++;
+        index = (index + 1) % capacity_;
+        ;
         cur_psl++;
       }
       return nullptr;
@@ -94,7 +94,7 @@ namespace zubarev
         return nullptr;
       }
 
-      size_t index = hasher_(k) % size_;
+      size_t index = hasher_(k) % capacity_;
       int cur_psl = 0;
 
       for (size_t i = 0; i < capacity_; ++i) {
@@ -109,16 +109,16 @@ namespace zubarev
         if (equal_(k, cur_node.k)) {
           return std::addressof(slots_[index]);
         }
-        index++;
+        index = (index + 1) % capacity_;
         cur_psl++;
       }
       return nullptr;
     }
   };
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable():
-    size_(8),
+    size_(0),
     capacity_(8),
     slots_(topit::Vector< Node >(8)),
     hasher_(),
@@ -134,21 +134,16 @@ namespace zubarev
   //   hasher_(hasher),
   //   equal_(equal)
   // {}
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
-    size_(capacity),
+    size_(0),
     capacity_(capacity),
     slots_(topit::Vector< Node >(capacity)),
     hasher_(),
     equal_()
   {}
 
-  template < class Key, class Value, class Hash, class Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::~RobinHashTable()
-  {
-    delete[] slots_;
-  }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(const RobinHashTable& table):
     size_(table.size_),
     capacity_(table.capacity_),
@@ -161,7 +156,7 @@ namespace zubarev
       slots_[i] = table.slots_[i];
     }
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(RobinHashTable&& table) noexcept:
     size_(table.size_),
     capacity_(table.capacity_),
@@ -171,7 +166,7 @@ namespace zubarev
   {
     table.slots_ = topit::Vector< Node >();
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >&
   RobinHashTable< Key, Value, Hash, Equal >::operator=(const RobinHashTable& rhs)
   {
@@ -184,7 +179,7 @@ namespace zubarev
     return *this;
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >&
   RobinHashTable< Key, Value, Hash, Equal >::operator=(RobinHashTable&& rhs) noexcept
   {
@@ -197,24 +192,19 @@ namespace zubarev
     return *this;
   }
 
-  template < class Key, class Value, class Hash, class Equal >
-  Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k) noexcept
+  template< class Key, class Value, class Hash, class Equal >
+  Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
   {
     Node* el = find_el(k);
     if (el) {
       return el->val_;
     } else {
       add(k, Value{});
-      return find_el(k)->val_;
+      return Value{};
     }
   }
-  template < class Key, class Value, class Hash, class Equal >
-  const Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& id) const noexcept
-  {
-    return at(id);
-  }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
     Node* el = find_el(id);
@@ -224,7 +214,7 @@ namespace zubarev
       throw std::out_of_range("RobinHashTable: index out of range");
     }
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id) const
   {
     const Node* el = find_el(id);
@@ -235,7 +225,7 @@ namespace zubarev
     }
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
   {
     std::swap(size_, rhs.size_);
@@ -244,7 +234,7 @@ namespace zubarev
     std::swap(hasher_, rhs.hasher_);
     std::swap(equal_, rhs.equal_);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin()
   {
     size_t cap = capacity();
@@ -255,13 +245,13 @@ namespace zubarev
     }
     return end();
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end()
   {
     return Iter(capacity_, this);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
   {
     size_t cap = capacity();
@@ -272,52 +262,55 @@ namespace zubarev
     }
     return cend();
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cend() const
   {
     return CIter(capacity_, this);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin() const
   {
     return cbegin();
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end() const
   {
     return cend();
   }
 
-  template < class Key, class Value, class Hash, class Equal >
-  void RobinHashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+  template< class Key, class Value, class Hash, class Equal >
+  void RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
     Table tmp(*this);
-    size_t buc_idx = getBucketIndex(k);
-    size_t is_over = true;
-    for (size_t i = 0; i < bucket_capacity_; ++i) {
-      if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val_) {
-        tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
-        tmp.sizes_[buc_idx]++;
-        is_over = false;
-        break;
-      }
+    size_t index = hasher_(k) % capacity_;
+    if (!slots_[index].occupied) {
     }
-    if (is_over) {
-      for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it) {
-        if ((*it).is_val_ && equaler_((*it).key_, k)) {
-          (*it).val_ = v;
-          is_over = false;
-          break;
-        }
-      }
-    }
-    if (is_over) {
-      tmp.overflow_bucket_.push_back(Node(k, v, true));
-    }
+    // size_t buc_idx = getBucketIndex(k);
+    // size_t is_over = true;
+    // for (size_t i = 0; i < bucket_capacity_; ++i) {
+    //   if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val_) {
+    //     tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
+    //     tmp.sizes_[buc_idx]++;
+    //     is_over = false;
+    //     break;
+    //   }
+    // }
+    // if (is_over) {
+    //   for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it) {
+    //     if ((*it).is_val_ && equaler_((*it).key_, k)) {
+    //       (*it).val_ = v;
+    //       is_over = false;
+    //       break;
+    //     }
+    //   }
+    // }
+    // if (is_over) {
+    //   tmp.overflow_bucket_.push_back(Node(k, v, true));
+    // }
     swap(tmp);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   Value RobinHashTable< Key, Value, Hash, Equal >::drop(Key k)
   {
     Table tmp(*this);
@@ -349,7 +342,7 @@ namespace zubarev
     }
     throw std::out_of_range("Key not found in drop()");
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool RobinHashTable< Key, Value, Hash, Equal >::has(Key k) const
   {
 
@@ -371,7 +364,7 @@ namespace zubarev
 
     return false;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
     Table tmp(slots,
