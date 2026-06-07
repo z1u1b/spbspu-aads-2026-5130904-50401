@@ -5,9 +5,9 @@
 #include <string>
 #include "list.hpp"
 
-// zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
+// zubarev::zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 // {
-//   List< Data > list;
+//   zubarev::List< zubarev::Data > list;
 //   auto itList = list.before_begin();
 //   error = false;
 
@@ -15,13 +15,13 @@
 
 //   while (std::getline(in, line)) {
 //     std::istringstream iss(line);
-//     Data value;
+//     zubarev::Data value;
 
 //     if (!(iss >> value.name)) {
 //       continue;
 //     }
 
-//     List< size_t > nums;
+//     zubarev::List< size_t > nums;
 //     auto itNum = nums.before_begin();
 //     size_t num;
 //     while (iss >> num) {
@@ -30,7 +30,7 @@
 
 //     if (!iss.eof()) {
 //       error = true;
-//       return List< Data >{};
+//       return zubarev::List< zubarev::Data >{};
 //     }
 //     value.numbers = nums;
 //     itList = list.insert_after(itList, value);
@@ -38,23 +38,23 @@
 
 //   if (!in.eof() && in.fail()) {
 //     error = true;
-//     return List< Data >{};
+//     return zubarev::List< zubarev::Data >{};
 //   }
 //   return list;
 // }
-zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
+zubarev::zubarev::List< zubarev::zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
-  List< Data > list;
+  zubarev::List< zubarev::Data > list;
   auto itList = list.before_begin();
   error = false;
 
   while (true) {
-    Data value;
+    zubarev::Data value;
     if (!(in >> value.name)) {
       break;
     }
 
-    List< size_t > nums;
+    zubarev::List< size_t > nums;
     auto itNum = nums.before_begin();
     while (true) {
       in >> std::ws;
@@ -67,12 +67,12 @@ zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
 
       if (!std::isdigit(in.peek())) {
         error = true;
-        return List< Data >{};
+        return zubarev::List< zubarev::Data >{};
       }
       size_t num;
       if (!(in >> num)) {
         error = true;
-        return List< Data >{};
+        return zubarev::List< zubarev::Data >{};
       }
       itNum = nums.insert_after(itNum, num);
     }
@@ -84,7 +84,7 @@ zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
   return list;
 }
 
-size_t zubarev::output_names(const List< Data >& list)
+size_t zubarev::output_names(const zubarev::List< zubarev::Data >& list)
 {
   if (list.empty()) {
     return 0;
@@ -104,12 +104,12 @@ size_t zubarev::output_names(const List< Data >& list)
 
   return 0;
 }
-size_t zubarev::max_sequences(const List< Data >& list)
+size_t zubarev::max_sequences(const zubarev::List< zubarev::Data >& list)
 {
   size_t maxNum = 0;
   auto itList = list.begin();
   while (itList != list.end()) {
-    const List< size_t >& nums = itList->numbers;
+    const zubarev::List< size_t >& nums = itList->numbers;
     LCIter< size_t > itNums = nums.begin();
     size_t count = 0;
     while (itNums != nums.end()) {
@@ -121,14 +121,14 @@ size_t zubarev::max_sequences(const List< Data >& list)
   }
   return maxNum;
 }
-size_t zubarev::output_sequences(const List< Data >& list)
+size_t zubarev::output_sequences(const zubarev::List< zubarev::Data >& list)
 {
   if (list.empty()) {
     return 0;
   }
 
   for (size_t i = 0; i < max_sequences(list); ++i) {
-    LCIter< Data > itList = list.begin();
+    LCIter< zubarev::Data > itList = list.begin();
     bool found_first = false;
 
     while (itList != list.end() && !found_first) {
@@ -173,10 +173,10 @@ size_t zubarev::output_sequences(const List< Data >& list)
   return 0;
 }
 
-zubarev::List< size_t > zubarev::calculate_sums(const List< Data >& list)
+zubarev::zubarev::List< size_t > zubarev::calculate_sums(const zubarev::List< zubarev::Data >& list)
 {
   const size_t maxSeq = max_sequences(list);
-  List< size_t > sums;
+  zubarev::List< size_t > sums;
   auto itSum = sums.before_begin();
 
   for (size_t i = 0; i < maxSeq; ++i) {
@@ -205,7 +205,7 @@ zubarev::List< size_t > zubarev::calculate_sums(const List< Data >& list)
   return sums;
 }
 
-void zubarev::print_sums(const List< size_t >& sums)
+void zubarev::print_sums(const zubarev::List< size_t >& sums)
 {
   if (sums.empty()) {
     return;
