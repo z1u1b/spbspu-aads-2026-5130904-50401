@@ -75,7 +75,7 @@ namespace zubarev
 
   template< class T >
   detail::Node< T >::Node(T&& v, Node* n):
-    val(std::move(v)),
+    val(std::forward(v)),
     next(n)
   {}
   template< class T >
@@ -129,7 +129,7 @@ namespace zubarev
   List< T >& List< T >::operator=(const List& other)
   {
 
-    if (this != &other) {
+    if (this != std::addressof(other)) {
       List< T > temp(other);
       std::swap(head_, temp.head_);
     }

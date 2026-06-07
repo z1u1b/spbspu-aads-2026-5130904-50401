@@ -1,8 +1,9 @@
 #include "functions.hpp"
 #include <iostream>
 #include <limits>
-#include "list.hpp"
 #include <cctype>
+#include "list.hpp"
+
 
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
@@ -27,15 +28,15 @@ zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
     in.clear();
 
 
-    char ch;
-    if (in >> ch) {
-      if (std::isalpha(static_cast< unsigned char >(ch))) {
-        in.unget();
-      } else {
-        error = true;
-        return zubarev::List< zubarev::Data >{};
-      }
-    }
+    // char ch;
+    // if (in >> ch) {
+    //   if (std::isalpha(static_cast< unsigned char >(ch))) {
+    //     in.unget();
+    //   } else {
+    //     error = true;
+    //     return zubarev::List< zubarev::Data >{};
+    //   }
+    // }
 
     value.numbers = nums;
     itList = list.insert_after(itList, value);
