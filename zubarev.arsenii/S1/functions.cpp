@@ -5,42 +5,82 @@
 #include <string>
 #include "list.hpp"
 
+// zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
+// {
+//   List< Data > list;
+//   auto itList = list.before_begin();
+//   error = false;
 
+//   std::string line;
+
+//   while (std::getline(in, line)) {
+//     std::istringstream iss(line);
+//     Data value;
+
+//     if (!(iss >> value.name)) {
+//       continue;
+//     }
+
+//     List< size_t > nums;
+//     auto itNum = nums.before_begin();
+//     size_t num;
+//     while (iss >> num) {
+//       itNum = nums.insert_after(itNum, num);
+//     }
+
+//     if (!iss.eof()) {
+//       error = true;
+//       return List< Data >{};
+//     }
+//     value.numbers = nums;
+//     itList = list.insert_after(itList, value);
+//   }
+
+//   if (!in.eof() && in.fail()) {
+//     error = true;
+//     return List< Data >{};
+//   }
+//   return list;
+// }
 zubarev::List< Data > zubarev::input(std::istream& in, bool& error)
 {
   List< Data > list;
   auto itList = list.before_begin();
   error = false;
 
-  std::string line;
-
-  while (std::getline(in, line)) {
-    std::istringstream iss(line);
+  while (true) {
     Data value;
-
-    if (!(iss >> value.name)) {
-      continue;
+    if (!(in >> value.name)) {
+      break;
     }
 
     List< size_t > nums;
     auto itNum = nums.before_begin();
-    size_t num;
-    while (iss >> num) {
+    while (true) {
+      in >> std::ws;
+
+      if (in.eof() || in.peek() == '\n') {
+        if (in.peek() == '\n')
+          in.get();
+        break;
+      }
+
+      if (!std::isdigit(in.peek())) {
+        error = true;
+        return List< Data >{};
+      }
+      size_t num;
+      if (!(in >> num)) {
+        error = true;
+        return List< Data >{};
+      }
       itNum = nums.insert_after(itNum, num);
     }
 
-    if (!iss.eof()) {
-      error = true;
-      return List< Data >{};
-    }
     value.numbers = nums;
     itList = list.insert_after(itList, value);
   }
 
-  if (!in.eof() && in.fail()) {
-    error = true;
-    return List< Data >{};
-  }
   return list;
 }
 
@@ -181,4 +221,3 @@ void zubarev::print_sums(const List< size_t >& sums)
   }
   std::cout << '\n';
 }
-
