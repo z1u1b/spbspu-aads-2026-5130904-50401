@@ -60,6 +60,60 @@ namespace zubarev
     topit::Vector< Node > slots_;
     Hash hasher_;
     Equal equal_;
+
+    Node* find_el(const Key& k) noexcept
+    {
+      if (empty()) {
+        return nullptr;
+      }
+
+      size_t index = hasher_(k) % size_;
+      int cur_psl = 0;
+
+      for (size_t i = 0; i < capacity_; ++i) {
+        const Node& cur_node = slots_[index];
+        if (cur_node.psl == -1) {
+          return nullptr;
+        }
+
+        if (cur_psl > cur_node.psl) {
+          return nullptr;
+        }
+        if (equal_(k, cur_node.k)) {
+          return std::addressof(slots_[index]);
+        }
+        index++;
+        cur_psl++;
+      }
+      return nullptr;
+    }
+
+    const Node* find_el(const Key& k) const noexcept
+    {
+      if (empty()) {
+        return nullptr;
+      }
+
+      size_t index = hasher_(k) % size_;
+      int cur_psl = 0;
+
+      for (size_t i = 0; i < capacity_; ++i) {
+        const Node& cur_node = slots_[index];
+        if (cur_node.psl == -1) {
+          return nullptr;
+        }
+
+        if (cur_psl > cur_node.psl) {
+          return nullptr;
+        }
+        if (equal_(k, cur_node.k)) {
+          return std::addressof(slots_[index]);
+        }
+        index++;
+        cur_psl++;
+      }
+      return nullptr;
+    }
   };
 
   template < class Key, class Value, class Hash, class Equal >
@@ -155,13 +209,13 @@ namespace zubarev
     }
   }
   template < class Key, class Value, class Hash, class Equal >
-  const Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](Key id) const noexcept
+  const Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& id) const noexcept
   {
     return at(id);
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  Value& RobinHashTable< Key, Value, Hash, Equal >::at(Key id)
+  Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
     Node* el = find_el(id);
     if (el) {
@@ -171,7 +225,7 @@ namespace zubarev
     }
   }
   template < class Key, class Value, class Hash, class Equal >
-  const Value& RobinHashTable< Key, Value, Hash, Equal >::at(Key id) const
+  const Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id) const
   {
     const Node* el = find_el(id);
     if (el) {
@@ -191,75 +245,48 @@ namespace zubarev
     std::swap(equal_, rhs.equal_);
   }
   template < class Key, class Value, class Hash, class Equal >
-  IterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin()
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin()
   {
-    Iter it(0, 0, overflow_bucket_.begin(), this);
-
-    while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
-      ++it;
-      if (it.is_in_overflow())
-        break;
+    size_t cap = capacity();
+    for (size_t i = 0; i < cap; ++i) {
+      if (slots_[i].occupied) {
+        return Iter(i, this);
+      }
     }
-
-    if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
-      return end();
-    }
-
-    return it;
+    return end();
   }
   template < class Key, class Value, class Hash, class Equal >
-  IterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end()
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end()
   {
-    return Iter(0, bucket_count_, overflow_bucket_.end(), this);
+    return Iter(capacity_, this);
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  CIterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
   {
-    CIter it(0, 0, overflow_bucket_.begin(), this);
-
-    while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
-      ++it;
-      if (it.is_in_overflow())
-        break;
+    size_t cap = capacity();
+    for (size_t i = 0; i < cap; ++i) {
+      if (slots_[i].occupied) {
+        return CIter(i, this);
+      }
     }
-
-    if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
-      return cend();
-    }
-
-    return it;
+    return cend();
   }
   template < class Key, class Value, class Hash, class Equal >
-  CIterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cend() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cend() const
   {
-    return CIter(0, bucket_count_, overflow_bucket_.end(), this);
+    return CIter(capacity_, this);
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  CIterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin() const
   {
-    CIter it(0, 0, overflow_bucket_.begin(), this);
-
-    while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
-      ++it;
-      if (it.is_in_overflow())
-        break;
-    }
-
-    if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
-      return cend();
-    }
-
-    return it;
+    return cbegin();
   }
   template < class Key, class Value, class Hash, class Equal >
-  CIterHashTable< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end() const
   {
-    return CIter(0, bucket_count_, overflow_bucket_.end(), this);
+    return cend();
   }
 
   template < class Key, class Value, class Hash, class Equal >

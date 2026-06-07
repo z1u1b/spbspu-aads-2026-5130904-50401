@@ -27,6 +27,9 @@ namespace zubarev
     RobinIter& operator++();
     RobinIter operator++(int);
 
+    RobinIter& operator--();
+    RobinIter operator--(int);
+
     bool operator!=(const RobinIter&) const;
     bool operator==(const RobinIter&) const;
 
