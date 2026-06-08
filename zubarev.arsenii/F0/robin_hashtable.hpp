@@ -35,7 +35,7 @@ namespace zubarev
 
     void swap(Table& rhs) noexcept;
 
-    void add(const Key& k, Value v);
+    Iter add(const Key& k, Value v);
     Value drop(const Key& k);
     bool has(const Key& k) const;
     void rehash(size_t slots);
@@ -61,34 +61,39 @@ namespace zubarev
     Hash hasher_;
     Equal equal_;
 
+    // std::pair< size_t, Node* > find_el(const Key& k) noexcept
+    // {
+    //   if (empty()) {
+    //     return {0, nullptr};
+    //   }
+
+    //   size_t index = hasher_(k) % capacity_;
+    //   int cur_psl = 0;
+
+    //   for (size_t i = 0; i < capacity_; ++i) {
+    //     const Node& cur_node = slots_[index];
+    //     if (cur_node.psl_ == -1) {
+    //       return {index, nullptr};
+    //     }
+
+    //     if (cur_psl > cur_node.psl_) {
+    //       return {index, nullptr};
+    //     }
+    //     if (equal_(k, cur_node.k)) {
+    //       return {index, std::addressof(slots_[index])};
+    //     }
+    //     index = (index + 1) % capacity_;
+    //     cur_psl++;
+    //   }
+    //   return {capacity_, nullptr};
+    // }
     std::pair< size_t, Node* > find_el(const Key& k) noexcept
     {
-      if (empty()) {
-        return {0, nullptr};
-      }
-
-      size_t index = hasher_(k) % capacity_;
-      int cur_psl = 0;
-
-      for (size_t i = 0; i < capacity_; ++i) {
-        const Node& cur_node = slots_[index];
-        if (cur_node.psl_ == -1) {
-          return {index, nullptr};
-        }
-
-        if (cur_psl > cur_node.psl_) {
-          return {index, nullptr};
-        }
-        if (equal_(k, cur_node.k)) {
-          return {index, std::addressof(slots_[index])};
-        }
-        index = (index + 1) % capacity_;
-        cur_psl++;
-      }
-      return {capacity_, nullptr};
+      auto res = const_cast< const Table* >(this)->find_el(k);
+      return {res.first, const_cast< Node* >(res.second)};
     }
 
-    const std::pair< size_t, Node* > find_el(const Key& k) const noexcept
+    const std::pair< size_t, const Node* > find_el(const Key& k) const noexcept
     {
       if (empty()) {
         return {0, nullptr};
@@ -138,10 +143,15 @@ namespace zubarev
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
     size_(0),
     capacity_(capacity),
-    slots_(topit::Vector< Node >(capacity)),
+    slots_(),
     hasher_(),
     equal_()
-  {}
+  {
+    if (capacity == 0) {
+      capacity_ = 8;
+    }
+    slots_ = topit::Vector< Node >(capacity_);
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(const RobinHashTable& table):
@@ -199,8 +209,8 @@ namespace zubarev
     if (el) {
       return el->val_;
     } else {
-      add(k, Value{});
-      return find_el(k).second_->val;
+
+      return (add(k, Value{}))->val_;
     }
   }
 
@@ -239,7 +249,7 @@ namespace zubarev
   {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i) {
-      if (slots_[i].occupied) {
+      if (slots_[i].occupied_) {
         return Iter(i, this);
       }
     }
@@ -256,7 +266,7 @@ namespace zubarev
   {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i) {
-      if (slots_[i].occupied) {
+      if (slots_[i].occupied_) {
         return CIter(i, this);
       }
     }
@@ -280,7 +290,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
     if (load_factor() >= 0.75) {
       rehash(capacity_ * 2);
@@ -289,18 +299,18 @@ namespace zubarev
     size_t index = hasher_(k) % capacity_;
     size_t cur_psl = 0;
 
-    Node node_to_add(k, v, false, 0);
+    Node node_to_add(k, v, true, 0);
 
     for (size_t i = 0; i < capacity_; ++i) {
-      if (!slots_[index].occupied) {
+      if (!slots_[index].occupied_) {
         slots_[index] = node_to_add;
         size_++;
-        return;
+        return Iter(index, this);
       }
 
-      if (equal_(slots_[index].key, node_to_add.key)) {
+      if (equal_(slots_[index].key_, node_to_add.key_)) {
         slots_[index].val_ = node_to_add.val_;
-        return;
+        return Iter(index, this);
       }
 
       if (node_to_add.psl_ > slots_[index].psl_) {
@@ -320,10 +330,10 @@ namespace zubarev
     size_t cur_id = found_el.first;
     if (node_to_del) {
 
-      Value saved_val = node_to_del->val;
+      Value saved_val = node_to_del->val_;
 
       size_t next_id = (cur_id + 1) % capacity_;
-      while (slots_[next_id].occupaied && slots_[next_id].psl_ != 0) {
+      while (slots_[next_id].occupied_ && slots_[next_id].psl_ != 0) {
         slots_[cur_id] = slots_[next_id];
         slots_[cur_id].psl_--;
 
@@ -331,7 +341,7 @@ namespace zubarev
         next_id = (next_id + 1) % capacity_;
       }
 
-      slots_[cur_id].occupied = false;
+      slots_[cur_id].occupied_ = false;
       slots_[cur_id].psl_ = -1;
       size_--;
       return saved_val;
@@ -342,21 +352,38 @@ namespace zubarev
   bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
     auto found_el = find_el(k);
-    if (found_el.second->occupied) {
-      return true;
-    }
-    return false;
+    return found_el != nullptr;
   }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
     Table tmp(slots);
     for (size_t i = 0; i < capacity_; ++i) {
-      if (slots_[i].occupied) {
+      if (slots_[i].occupied_) {
         tmp.add(slots_[i].key_, slots_[i].val_);
       }
     }
     swap(tmp);
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  size_t RobinHashTable< Key, Value, Hash, Equal >::size() const
+  {
+    return size_;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  size_t RobinHashTable< Key, Value, Hash, Equal >::capacity() const
+  {
+    return capacity_;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  bool RobinHashTable< Key, Value, Hash, Equal >::empty() const
+  {
+    return size_ == 0;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  double RobinHashTable< Key, Value, Hash, Equal >::load_factor() const
+  {
+    return static_cast< double >(size_) / capacity_;
   }
 }
 
