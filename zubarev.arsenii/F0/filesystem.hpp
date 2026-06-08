@@ -102,9 +102,6 @@ namespace zubarev
       meta = m;
     }
 
-    // Если ты выбрал "Путь Б" (иерархический), здесь будет твоя RobinHashTable.
-    // Если "Путь А" (плоская таблица путей), то этот вектор вообще не нужен,
-    // либо он хранит только имена (std::string) детей для быстрой команды `ls`.
     const topit::Vector< std::string >& getSubNodeNames() const noexcept
     {
       return sub_nodes_;
