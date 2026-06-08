@@ -83,7 +83,6 @@ namespace zubarev
           return std::addressof(slots_[index]);
         }
         index = (index + 1) % capacity_;
-        ;
         cur_psl++;
       }
       return nullptr;
@@ -314,34 +313,27 @@ namespace zubarev
     throw std::runtime_error("RobinHashTable overflow: rehash failed or capacity logic error");
   }
   template< class Key, class Value, class Hash, class Equal >
-  Value RobinHashTable< Key, Value, Hash, Equal >::drop(Key k)
+  Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
   {
-    Table tmp(*this);
-    Value val;
-    size_t buc_idx = getBucketIndex(k);
+    Node* node_to_del=find_el(k);
+    if (node_to_del) {
+      size_t cur_id=get_el_idx(node_to_del);
+      Value saved_val=node_to_del->val;
 
-    auto prev = overflow_bucket_.before_begin();
 
-    for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it, ++prev) {
-      if (equaler_(k, (*it).key_) && (*it).is_val_) {
-        Value val = (*it).val_;
+      size_t next_id=(cur_id+1)%capacity_;
+      while (slots_[index].occupaied && slots_[index].psl!=0) {
+        slots_[cur_id]=slots_[next_id];
+        slots_[cur_id].psl--;
 
-        tmp.overflow_bucket_.erase_after(prev);
-        swap(tmp);
-        return val;
+        cur_id=next_id;
+        next_id=(next_id+1)%capacity_;
       }
-    }
 
-    for (size_t i = 0; i < tmp.bucket_capacity_; ++i) {
-      size_t idx = tmp.bucket_capacity_ * buc_idx + i;
-      if (equaler_(tmp.data_[idx].key_, k) && tmp.data_[idx].is_val_) {
-
-        tmp.data_[idx].is_val_ = false;
-        tmp.sizes_[buc_idx]--;
-        val = tmp.data_[bucket_capacity_ * buc_idx + i].val_;
-        swap(tmp);
-        return val;
-      }
+      slots_[cur_id].occupied=false;
+      slots_[cur_id].psl=-1;
+      size_--;
+      return saved_val;
     }
     throw std::out_of_range("Key not found in drop()");
   }
