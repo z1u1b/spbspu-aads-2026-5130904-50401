@@ -2,7 +2,7 @@
 #define ROBIN_HASHTABLE_HPP
 
 #include <cstddef>
-#include <ut>
+// #include <ut>
 #include "robin_node.hpp"
 #include "../common/top-it-vector.hpp"
 #include "robin_iter.hpp"
@@ -61,10 +61,10 @@ namespace zubarev
     Hash hasher_;
     Equal equal_;
 
-    Node* find_el(const Key& k) noexcept
+    std::pair< size_t, Node* > find_el(const Key& k) noexcept
     {
       if (empty()) {
-        return nullptr;
+        return {0, nullptr};
       }
 
       size_t index = hasher_(k) % capacity_;
@@ -72,26 +72,26 @@ namespace zubarev
 
       for (size_t i = 0; i < capacity_; ++i) {
         const Node& cur_node = slots_[index];
-        if (cur_node.psl == -1) {
-          return nullptr;
+        if (cur_node.psl_ == -1) {
+          return {index, nullptr};
         }
 
-        if (cur_psl > cur_node.psl) {
-          return nullptr;
+        if (cur_psl > cur_node.psl_) {
+          return {index, nullptr};
         }
         if (equal_(k, cur_node.k)) {
-          return std::addressof(slots_[index]);
+          return {index, std::addressof(slots_[index])};
         }
         index = (index + 1) % capacity_;
         cur_psl++;
       }
-      return nullptr;
+      return {capacity_, nullptr};
     }
 
-    const Node* find_el(const Key& k) const noexcept
+    const std::pair< size_t, Node* > find_el(const Key& k) const noexcept
     {
       if (empty()) {
-        return nullptr;
+        return {0, nullptr};
       }
 
       size_t index = hasher_(k) % capacity_;
@@ -99,20 +99,20 @@ namespace zubarev
 
       for (size_t i = 0; i < capacity_; ++i) {
         const Node& cur_node = slots_[index];
-        if (cur_node.psl == -1) {
-          return nullptr;
+        if (cur_node.psl_ == -1) {
+          return {index, nullptr};
         }
 
-        if (cur_psl > cur_node.psl) {
-          return nullptr;
+        if (cur_psl > cur_node.psl_) {
+          return {index, nullptr};
         }
         if (equal_(k, cur_node.k)) {
-          return std::addressof(slots_[index]);
+          return {index, std::addressof(slots_[index])};
         }
         index = (index + 1) % capacity_;
         cur_psl++;
       }
-      return nullptr;
+      return {capacity_, nullptr};
     }
   };
 
@@ -152,7 +152,7 @@ namespace zubarev
     equal_(table.equal_)
   {
     slots_ = topit::Vector< Node >(table.capacity_);
-    for (size_t i = 0; i < table.size_; ++i) {
+    for (size_t i = 0; i < table.capacity_; ++i) {
       slots_[i] = table.slots_[i];
     }
   }
@@ -195,19 +195,19 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
   {
-    Node* el = find_el(k);
+    Node* el = find_el(k).second;
     if (el) {
       return el->val_;
     } else {
       add(k, Value{});
-      return Value{};
+      return find_el(k).second_->val;
     }
   }
 
   template< class Key, class Value, class Hash, class Equal >
   Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
-    Node* el = find_el(id);
+    Node* el = find_el(id).second;
     if (el) {
       return el->val_;
     } else {
@@ -217,7 +217,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   const Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id) const
   {
-    const Node* el = find_el(id);
+    const Node* el = find_el(id).second;
     if (el) {
       return el->val_;
     } else {
@@ -303,7 +303,7 @@ namespace zubarev
         return;
       }
 
-      if (node_to_add.psl > slots_[index].psl) {
+      if (node_to_add.psl_ > slots_[index].psl_) {
         std::swap(node_to_add, slots_[index]);
       }
 
@@ -315,72 +315,45 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
   {
-    Node* node_to_del=find_el(k);
+    auto found_el = find_el(k);
+    Node* node_to_del = found_el.second;
+    size_t cur_id = found_el.first;
     if (node_to_del) {
-      size_t cur_id=get_el_idx(node_to_del);
-      Value saved_val=node_to_del->val;
 
+      Value saved_val = node_to_del->val;
 
-      size_t next_id=(cur_id+1)%capacity_;
-      while (slots_[index].occupaied && slots_[index].psl!=0) {
-        slots_[cur_id]=slots_[next_id];
-        slots_[cur_id].psl--;
+      size_t next_id = (cur_id + 1) % capacity_;
+      while (slots_[next_id].occupaied && slots_[next_id].psl_ != 0) {
+        slots_[cur_id] = slots_[next_id];
+        slots_[cur_id].psl_--;
 
-        cur_id=next_id;
-        next_id=(next_id+1)%capacity_;
+        cur_id = next_id;
+        next_id = (next_id + 1) % capacity_;
       }
 
-      slots_[cur_id].occupied=false;
-      slots_[cur_id].psl=-1;
+      slots_[cur_id].occupied = false;
+      slots_[cur_id].psl_ = -1;
       size_--;
       return saved_val;
     }
     throw std::out_of_range("Key not found in drop()");
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool RobinHashTable< Key, Value, Hash, Equal >::has(Key k) const
+  bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
-
-    size_t buc_idx = getBucketIndex(k);
-
-    for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-      if (equaler_(k, (*it).key_) && (*it).is_val_) {
-        return true;
-      }
+    auto found_el = find_el(k);
+    if (found_el.second->occupied) {
+      return true;
     }
-
-    for (size_t i = 0; i < bucket_capacity_; ++i) {
-      size_t idx = bucket_capacity_ * buc_idx + i;
-      if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
-
-        return true;
-      }
-    }
-
     return false;
   }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
-    Table tmp(slots,
-              bucket_capacity_,
-              new Node[slots * bucket_capacity_],
-              new size_t[slots],
-              OverflowList(),
-              hasher_,
-              equaler_);
-    for (size_t i = 0; i < bucket_count_; ++i) {
-      for (size_t j = 0; j < bucket_capacity_; ++j) {
-        size_t idx = bucket_capacity_ * i + j;
-        if (data_[idx].is_val_) {
-          tmp.add(data_[idx].key_, data_[idx].val_);
-        }
-      }
-    }
-
-    for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-      if ((*it).is_val_) {
-        tmp.add((*it).key_, (*it).val_);
+    Table tmp(slots);
+    for (size_t i = 0; i < capacity_; ++i) {
+      if (slots_[i].occupied) {
+        tmp.add(slots_[i].key_, slots_[i].val_);
       }
     }
     swap(tmp);
