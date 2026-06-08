@@ -4,7 +4,6 @@
 #include <boost/hash2/get_integral_result.hpp>
 #include <boost/hash2/siphash.hpp>
 #include <cstdint>
-#include <string>
 
 namespace zubarev
 {
