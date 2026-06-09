@@ -75,6 +75,7 @@ namespace topit
     void erase(CVectIter< T > pos, size_t count);
     void erase(CVectIter< T > first, CVectIter< T > last);
     void erase(VectIter< T > first, VectIter< T > last);
+    void clear();
 
   private:
     explicit Vector(size_t size);
@@ -647,6 +648,13 @@ void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
   size_t b = first - cbegin();
   size_t e = last - cbegin();
   erase(b, e);
+}
+
+template< class T >
+void topit::Vector< T >::clear()
+{
+  size_ = 0;
+  shrinkToFit();
 }
 
 template< class T >
