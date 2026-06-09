@@ -154,8 +154,8 @@ namespace zubarev
     void ssearch();
 
   private:
-    std::shared_ptr< FSNode > resolvePath(const std::string& path);
-    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > directories_;
+    // std::shared_ptr< FSNode > resolvePath(const std::string& path);
+    std::unique_ptr< TreeStorage > storage_;
     std::string current_path_;
   };
 
