@@ -17,19 +17,19 @@ namespace zubarev
   {
   public:
     // Основные операции файловой системы
-    void mkdir();
-    void rm();
-    void touch();
-    void write();
-    void cat();
-    void append();
-    void cd();
+    void mkdir(const std::string& name_dir);
+    void rm(const std::string& name);
+    void touch(const std::string& name_file);
+    void write(const std::string& name, const std::string& text);
+    void cat(const std::string& name);
+    void append(const std::string& name, const std::string& text);
+    void cd(const std::string& path);
     void pwd();
     void ls();
-    void tree();
-    void search();
-    void mv();
-    void cp();
+    void tree(const std::string& path);
+    void search(const std::string& name);
+    void mv(const std::string&, const std::string&);
+    void cp(const std::string&, const std::string&);
 
     // Работа с постоянным хранилищем сессий и внешними файлами
     void save();
