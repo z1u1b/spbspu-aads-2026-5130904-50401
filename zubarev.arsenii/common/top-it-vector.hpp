@@ -12,7 +12,7 @@
 
 namespace topit
 {
-  template < class T >
+  template< class T >
   struct Vector
   {
     ~Vector();
@@ -39,15 +39,23 @@ namespace topit
     VectIter< T > begin();
     VectIter< T > end();
 
-        CVectIter< T > begin() const;
+    CVectIter< T > begin() const;
     CVectIter< T > end() const;
 
     CVectIter< T > cbegin() const;
     CVectIter< T > cend() const;
 
+    T& front();
+    const T& front() const;
+    const T& cfront() const;
+
+    T& back();
+    const T& back() const;
+    const T& cback() const;
+
     void pushBack(const T& v);
     void pushBackCount(size_t k, const T& v);
-    template < class IT >
+    template< class IT >
     void pushBackRange(IT a, size_t count);
     void unsafePushBack(const T& v);
 
@@ -66,7 +74,7 @@ namespace topit
     void erase(CVectIter< T > pos);
     void erase(CVectIter< T > pos, size_t count);
     void erase(CVectIter< T > first, CVectIter< T > last);
-    void erase(VectIter<T> first, VectIter<T> last);
+    void erase(VectIter< T > first, VectIter< T > last);
 
   private:
     explicit Vector(size_t size);
@@ -77,26 +85,25 @@ namespace topit
     T* data_;
     size_t size_, capacity_;
   };
-  template < class T >
+  template< class T >
   bool operator==(const Vector< T >& lhs, const Vector< T >& rhs);
 }
 
-
-template < class T >
+template< class T >
 topit::Vector< T >::~Vector()
 {
   destroy_range(data_, 0, size_);
   deallocate(data_);
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector():
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector(const Vector& rhs):
   Vector(rhs.getSize())
 {
@@ -105,7 +112,7 @@ topit::Vector< T >::Vector(const Vector& rhs):
   }
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
   data_(rhs.data_),
   size_(rhs.size_),
@@ -116,7 +123,7 @@ topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
   rhs.capacity_ = 0;
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector(std::initializer_list< T > il):
   Vector(il.size())
 {
@@ -128,7 +135,7 @@ topit::Vector< T >::Vector(std::initializer_list< T > il):
   }
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector(size_t size, const T& init):
 
   size_(size),
@@ -148,15 +155,14 @@ topit::Vector< T >::Vector(size_t size, const T& init):
   }
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >::Vector(size_t size):
   data_(size ? allocate(size) : nullptr),
   size_(size),
   capacity_(size)
 {}
 
-
-template < class T >
+template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 {
   if (this == std::addressof(rhs)) {
@@ -168,7 +174,7 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
   return *this;
 }
 
-template < class T >
+template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
   if (this == std::addressof(rhs)) {
@@ -180,27 +186,25 @@ topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
   return *this;
 }
 
-
-template < class T >
+template< class T >
 bool topit::Vector< T >::isEmpty() const noexcept
 {
   return !size_;
 }
 
-template < class T >
+template< class T >
 size_t topit::Vector< T >::getSize() const noexcept
 {
   return size_;
 }
 
-template < class T >
+template< class T >
 size_t topit::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
 
-
-template < class T >
+template< class T >
 void topit::Vector< T >::reserve(size_t n)
 {
   if (n > capacity_) {
@@ -228,7 +232,7 @@ void topit::Vector< T >::reserve(size_t n)
   }
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::shrinkToFit()
 {
   if (size_ < capacity_) {
@@ -255,7 +259,7 @@ void topit::Vector< T >::shrinkToFit()
   }
 }
 
-template < class T >
+template< class T >
 T* topit::Vector< T >::allocate(size_t n)
 {
   if (n > std::numeric_limits< size_t >::max() / sizeof(T)) {
@@ -264,13 +268,13 @@ T* topit::Vector< T >::allocate(size_t n)
   return static_cast< T* >(::operator new(sizeof(T) * n));
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::deallocate(T* ptr)
 {
   ::operator delete(ptr);
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::destroy_range(T* ptr, size_t first, size_t last)
 {
   for (size_t j = first; j < last; ++j) {
@@ -278,7 +282,7 @@ void topit::Vector< T >::destroy_range(T* ptr, size_t first, size_t last)
   }
 }
 
-template < class T >
+template< class T >
 size_t topit::Vector< T >::calcCap(size_t curr, size_t needed)
 {
   if (curr == 0) {
@@ -293,8 +297,7 @@ size_t topit::Vector< T >::calcCap(size_t curr, size_t needed)
   return curr;
 }
 
-
-template < class T >
+template< class T >
 T& topit::Vector< T >::operator[](size_t id) noexcept
 {
   const Vector< T >* cthis = this;
@@ -302,20 +305,20 @@ T& topit::Vector< T >::operator[](size_t id) noexcept
   return const_cast< T& >((*cthis)[id]);
 }
 
-template < class T >
+template< class T >
 const T& topit::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
 
-template < class T >
+template< class T >
 T& topit::Vector< T >::at(size_t id)
 {
   const Vector< T >* cthis = this;
   return const_cast< T& >(cthis->at(id));
 }
 
-template < class T >
+template< class T >
 const T& topit::Vector< T >::at(size_t id) const
 {
   if (id < getSize()) {
@@ -324,8 +327,7 @@ const T& topit::Vector< T >::at(size_t id) const
   throw std::out_of_range("bad id");
 }
 
-
-template < class T >
+template< class T >
 void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
   std::swap(data_, rhs.data_);
@@ -333,45 +335,74 @@ void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
   std::swap(capacity_, rhs.capacity_);
 }
 
-template < class T >
+template< class T >
 topit::VectIter< T > topit::Vector< T >::begin()
 {
   return VectIter< T >(data_);
 }
 
-template < class T >
+template< class T >
 topit::VectIter< T > topit::Vector< T >::end()
 {
   return VectIter< T >(data_ + size_);
 }
 
-
-template < class T >
+template< class T >
 topit::CVectIter< T > topit::Vector< T >::begin() const
 {
   return CVectIter< T >(data_);
 }
 
-template < class T >
+template< class T >
 topit::CVectIter< T > topit::Vector< T >::end() const
 {
   return CVectIter< T >(data_ + size_);
 }
 
-
-template < class T >
+template< class T >
 topit::CVectIter< T > topit::Vector< T >::cbegin() const
 {
   return CVectIter< T >(data_);
 }
-template < class T >
+template< class T >
 topit::CVectIter< T > topit::Vector< T >::cend() const
 {
   return CVectIter< T >(data_ + size_);
 }
 
+template< class T >
+T& topit::Vector< T >::front()
+{
+  return *data_;
+}
+template< class T >
+const T& topit::Vector< T >::front() const
+{
+  return *data_;
+}
+template< class T >
+const T& topit::Vector< T >::cfront() const
+{
+  return *data_;
+}
 
-template < class T >
+template< class T >
+T& topit::Vector< T >::back()
+{
+  return *(data_ + size_ - 1);
+}
+template< class T >
+const T& topit::Vector< T >::back() const
+{
+  return *(data_ + size_ - 1);
+}
+template< class T >
+const T& topit::Vector< T >::cback() const
+{
+  return *(data_ + size_ - 1);
+}
+
+template< class T >
 void topit::Vector< T >::pushBack(const T& v)
 {
   if (size_ >= capacity_) {
@@ -385,7 +416,7 @@ void topit::Vector< T >::pushBack(const T& v)
   }
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::pushBackCount(size_t count, const T& v)
 {
   if (size_ + count >= capacity_) {
@@ -403,8 +434,8 @@ void topit::Vector< T >::pushBackCount(size_t count, const T& v)
   }
 }
 
-template < class T >
-template < class IT >
+template< class T >
+template< class IT >
 void topit::Vector< T >::pushBackRange(IT a, size_t count)
 {
 
@@ -423,7 +454,7 @@ void topit::Vector< T >::pushBackRange(IT a, size_t count)
   }
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::unsafePushBack(const T& v)
 {
   assert(size_ < capacity_);
@@ -431,7 +462,7 @@ void topit::Vector< T >::unsafePushBack(const T& v)
   ++size_;
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::popBack()
 {
   if (size_ == 0) {
@@ -442,8 +473,7 @@ void topit::Vector< T >::popBack()
   data_[size_].~T();
 }
 
-
-template < class T >
+template< class T >
 void topit::Vector< T >::insert(size_t index, const T& v)
 {
   Vector< T > tmp;
@@ -470,7 +500,7 @@ void topit::Vector< T >::insert(size_t index, const T& v)
   }
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, size_t end)
 {
   size_t count = end - beg;
@@ -500,8 +530,7 @@ void topit::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, si
   }
 }
 
-
-template < class T >
+template< class T >
 void topit::Vector< T >::erase(size_t index)
 {
   for (size_t i = index; i < size_ - 1; ++i) {
@@ -512,7 +541,7 @@ void topit::Vector< T >::erase(size_t index)
   --size_;
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::erase(size_t beg, size_t end)
 {
   size_t count = end - beg;
@@ -525,8 +554,7 @@ void topit::Vector< T >::erase(size_t beg, size_t end)
   size_ -= count;
 }
 
-
-template < class T >
+template< class T >
 topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, const T& v)
 {
   size_t index = pos - cbegin();
@@ -534,7 +562,7 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, const T& v)
   return begin() + index;
 }
 
-template < class T >
+template< class T >
 topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, size_t count, const T& v)
 {
   size_t index = pos - cbegin();
@@ -565,7 +593,7 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, size_t count
   }
 }
 
-template < class T >
+template< class T >
 topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, VectIter< T > first, VectIter< T > last)
 {
   size_t index = pos - begin();
@@ -598,15 +626,14 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, VectIter< T 
   }
 }
 
-
-template < class T >
+template< class T >
 void topit::Vector< T >::erase(CVectIter< T > pos)
 {
   size_t index = pos - cbegin();
   erase(index);
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::erase(CVectIter< T > pos, size_t count)
 {
   size_t b = pos - cbegin();
@@ -614,7 +641,7 @@ void topit::Vector< T >::erase(CVectIter< T > pos, size_t count)
   erase(b, e);
 }
 
-template < class T >
+template< class T >
 void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
 {
   size_t b = first - cbegin();
@@ -622,8 +649,7 @@ void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
   erase(b, e);
 }
 
-
-template < class T >
+template< class T >
 bool topit::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
 {
 

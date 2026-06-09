@@ -5,7 +5,7 @@
 #include <utility>
 namespace zubarev
 {
-  template < class T >
+  template< class T >
   struct Node
   {
     T val;
@@ -16,7 +16,7 @@ namespace zubarev
       next(n) {};
   };
 
-  template < class T >
+  template< class T >
   class List
   {
 
@@ -66,7 +66,7 @@ namespace zubarev
     void erase_after(LIter< T >);
   };
 
-  template < class T >
+  template< class T >
   List< T >::List()
   {
     head_ = ctFake();
@@ -74,7 +74,7 @@ namespace zubarev
     head_->next = nullptr;
   }
 
-  template < class T >
+  template< class T >
   List< T >::~List()
   {
     clear();
@@ -83,7 +83,7 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(const List< T >& other)
   {
     if (other.head_ == nullptr) {
@@ -105,7 +105,7 @@ namespace zubarev
     tail_ = tmp;
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(List< T >&& other) noexcept:
     head_(other.head_),
     tail_(other.tail_)
@@ -113,7 +113,7 @@ namespace zubarev
     other.head_ = nullptr;
     other.tail_ = other.head_;
   }
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
     if (this == &other) {
@@ -135,7 +135,7 @@ namespace zubarev
     return *this;
   }
 
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
     if (this == &other) {
@@ -151,7 +151,7 @@ namespace zubarev
 
     return *this;
   }
-  template < class T >
+  template< class T >
   LIter< T > List< T >::before_begin()
   {
     if (!head_) {
@@ -159,7 +159,7 @@ namespace zubarev
     }
     return LIter< T >(head_);
   }
-  template < class T >
+  template< class T >
   LIter< T > List< T >::begin()
   {
     if (!head_) {
@@ -168,62 +168,62 @@ namespace zubarev
     return LIter< T >(head_->next);
   }
 
-  template < class T >
+  template< class T >
   LIter< T > List< T >::end()
   {
     return LIter< T >(nullptr);
   }
-  template < class T >
+  template< class T >
   LIter< T > List< T >::back()
   {
     return LIter< T >(tail_);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::before_begin() const
   {
     return LCIter< T >(head_);
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::begin() const
   {
     return LCIter< T >(head_->next);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::end() const
   {
     return LCIter< T >(nullptr);
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::back() const
   {
     return LCIter< T >(tail_);
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cbefore_begin() const
   {
     return before_begin();
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cbegin() const
   {
     return begin();
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cend() const
   {
     return end();
   }
-  template < class T >
+  template< class T >
   LCIter< T > List< T >::cback() const
   {
     return back();
   }
 
-  template < class T >
+  template< class T >
   void List< T >::clear()
   {
     if (!head_) {
@@ -240,7 +240,7 @@ namespace zubarev
     tail_ = head_;
   }
 
-  template < class T >
+  template< class T >
   bool List< T >::empty() const
   {
     if (!head_) {
@@ -249,7 +249,7 @@ namespace zubarev
     return head_->next == nullptr;
   }
 
-  template < class T >
+  template< class T >
   void List< T >::push_front(const T& val)
   {
     if (!head_) {
@@ -263,7 +263,7 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   void List< T >::push_back(const T& val)
   {
     Node< T >* newNode = new Node< T >{val, nullptr};
@@ -275,7 +275,7 @@ namespace zubarev
     tail_ = newNode;
   }
 
-  template < class T >
+  template< class T >
   void List< T >::pop_front()
   {
     if (empty() || !head_) {
@@ -289,7 +289,7 @@ namespace zubarev
     delete toDel;
   }
 
-  template < class T >
+  template< class T >
   void List< T >::insert_after(LIter< T > it, const T& val)
   {
     if (!it.ptr) {
@@ -302,7 +302,7 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   void List< T >::erase_after(LIter< T > it)
   {
     if (!it.ptr || !it.ptr->next) {

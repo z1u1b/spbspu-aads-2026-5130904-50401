@@ -3,11 +3,11 @@
 namespace zubarev
 
 {
-  template < class T >
+  template< class T >
   class List;
-  template < class T >
+  template< class T >
   struct Node;
-  template < class T >
+  template< class T >
   class LIter
   {
     friend class List< T >;
@@ -23,33 +23,33 @@ namespace zubarev
     bool operator!=(const LIter&) const;
     bool operator==(const LIter&) const;
   };
-  template < class T >
+  template< class T >
   LIter< T >::LIter(Node< T >* p):
     ptr(p)
   {}
 
-  template < class T >
+  template< class T >
   T& LIter< T >::operator*()
   {
     return ptr->val;
   }
-    template < class T >
+  template< class T >
   T& LIter< T >::operator*() const
   {
     return ptr->val;
   }
-  template < class T >
+  template< class T >
   LIter< T > LIter< T >::operator++()
   {
     ptr = ptr->next;
     return *this;
   }
-  template < class T >
+  template< class T >
   bool LIter< T >::operator!=(const LIter& iter) const
   {
     return ptr != iter.ptr;
   }
-  template < class T >
+  template< class T >
   bool LIter< T >::operator==(const LIter& iter) const
   {
     return ptr == iter.ptr;

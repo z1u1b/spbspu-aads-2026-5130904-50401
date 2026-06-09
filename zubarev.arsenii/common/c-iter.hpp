@@ -3,12 +3,12 @@
 
 namespace zubarev
 {
-  template < class T >
+  template< class T >
   class List;
-  template < class T >
+  template< class T >
   struct Node;
 
-  template < class T >
+  template< class T >
   class LCIter
   {
     friend class List< T >;
@@ -24,31 +24,31 @@ namespace zubarev
     bool operator==(const LCIter&) const;
   };
 
-  template < class T >
+  template< class T >
   LCIter< T >::LCIter(const Node< T >* p):
     ptr(p)
   {}
 
-  template < class T >
+  template< class T >
   const T& LCIter< T >::operator*() const
   {
     return ptr->val;
   }
 
-  template < class T >
+  template< class T >
   LCIter< T > LCIter< T >::operator++()
   {
     ptr = ptr->next;
     return *this;
   }
 
-  template < class T >
+  template< class T >
   bool LCIter< T >::operator!=(const LCIter& iter) const
   {
     return ptr != iter.ptr;
   }
 
-  template < class T >
+  template< class T >
   bool LCIter< T >::operator==(const LCIter& iter) const
   {
     return ptr == iter.ptr;

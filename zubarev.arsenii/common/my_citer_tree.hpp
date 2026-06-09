@@ -5,10 +5,10 @@
 namespace zubarev
 {
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   class BSTIterator;
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   class BSTConstIterator
   {
     using Node = BSTreeNode< Key, Value >;
@@ -27,16 +27,16 @@ namespace zubarev
     bool operator!=(const BSTConstIterator&) const;
     bool operator==(const BSTConstIterator&) const;
   };
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTConstIterator< Key, Value >::BSTConstIterator() noexcept:
     ptr_(nullptr)
   {}
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTConstIterator< Key, Value >::BSTConstIterator(const Node* node):
     ptr_(node)
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   const std::pair< Key, Value >& BSTConstIterator< Key, Value >::operator*() const
   {
     if (!ptr_) {
@@ -45,7 +45,7 @@ namespace zubarev
     return ptr_->data_;
   }
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   const std::pair< Key, Value >* BSTConstIterator< Key, Value >::operator->() const
   {
     if (!ptr_) {
@@ -53,7 +53,7 @@ namespace zubarev
     }
     return &ptr_->data_;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTConstIterator< Key, Value >& BSTConstIterator< Key, Value >::operator++()
   {
     if (!ptr_) {
@@ -72,12 +72,12 @@ namespace zubarev
     }
     return *this;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   bool BSTConstIterator< Key, Value >::operator!=(const BSTConstIterator& rhs) const
   {
     return !(*this == rhs);
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   bool BSTConstIterator< Key, Value >::operator==(const BSTConstIterator& rhs) const
   {
     return ptr_ == rhs.ptr_;
