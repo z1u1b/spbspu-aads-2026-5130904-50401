@@ -57,6 +57,8 @@ namespace zubarev
     std::string current_path_str_;
 
     RobinHashTable< std::string, std::shared_ptr< DataBlock >, SipHash, Equaler< std::string > > data_block_;
+
+    topit::Vector<std::string>
   };
 
 }

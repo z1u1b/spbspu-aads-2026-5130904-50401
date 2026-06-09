@@ -2,7 +2,9 @@
 namespace zubarev
 {
   void FileSystem::mkdir(const std::string& name_dir)
-  {}
+  {
+    
+  }
   void FileSystem::rm(const std::string& name)
   {}
   void FileSystem::touch(const std::string& name_file)
