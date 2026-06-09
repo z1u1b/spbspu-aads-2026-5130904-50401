@@ -21,10 +21,11 @@ namespace zubarev
   struct DataBlock
   {
     // topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
-    std::string ompressed_data;
-    BSTree< char, std::string, Comparator< char > >& out_dictionary; // Таблица частот / дерево Хаффмана для распаковки
-    std::string content_hash;                                        // Хэш исходных данных
-    size_t original_size;                                            // Размер до сжатия (полезно для контроля)
+    std::string compressed_data;
+    std::shared_ptr< BSTree< char, std::string, Comparator< char > > >
+        out_dictionary;       // Таблица частот / дерево Хаффмана для распаковки
+    std::string content_hash; // Хэш исходных данных
+    size_t original_size;     // Размер до сжатия (полезно для контроля)
   };
 
   // 3. Базовый интерфейс для узла ФС
@@ -33,10 +34,8 @@ namespace zubarev
   public:
     virtual ~FSNode() = default;
 
-    // Чисто виртуальный метод для определения типа узла (вместо тяжелого dynamic_cast)
     virtual bool isDirectory() const noexcept = 0;
 
-    // Общий интерфейс для работы с метаданными
     virtual const FileMetaData& getMeta() const noexcept = 0;
     virtual void setMeta(const FileMetaData& meta) = 0;
   };
@@ -155,6 +154,7 @@ namespace zubarev
     void ssearch();
 
   private:
+    std::shared_ptr< FSNode > resolvePath(const std::string& path);
     RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > directories_;
     std::string current_path_;
   };
