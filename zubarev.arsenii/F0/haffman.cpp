@@ -46,4 +46,20 @@ namespace zubarev
     }
     return tree.front();
   }
+
+  void generateCodes(const BSTreeNode< size_t, char >* node,
+                     const std::string& code,
+                     BSTree< char, std::string, Comparator< char > >& out_dictionary)
+  {
+    if (!node) {
+      return;
+    }
+    if (node->data_.second != '\0') {
+      out_dictionary[node->data_.second] = code;
+    }
+
+    generateCodes(node->left_, code + "0", out_dictionary);
+
+    generateCodes(node->right_, code + "1", out_dictionary);
+  }
 }
