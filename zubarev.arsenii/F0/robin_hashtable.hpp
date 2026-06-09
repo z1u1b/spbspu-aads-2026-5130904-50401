@@ -4,7 +4,7 @@
 #include <cstddef>
 // #include <ut>
 #include "robin_node.hpp"
-#include <top-it-vector.hpp>
+#include "../common/top-it-vector.hpp"
 #include "robin_iter.hpp"
 #include "robin_citer.hpp"
 namespace zubarev
@@ -32,7 +32,7 @@ namespace zubarev
     Value& operator[](const Key& k);
     Value& at(const Key& id);
     const Value& at(const Key& id) const;
-
+    Iter find(const Key& id) const;
     void swap(Table& rhs) noexcept;
 
     Iter add(const Key& k, Value v);
@@ -234,7 +234,11 @@ namespace zubarev
       throw std::out_of_range("RobinHashTable: index out of range");
     }
   }
-
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
+  {
+    return RobinIter< Key, Value, Hash, Equal >(find_el(id)->second);
+  }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
   {

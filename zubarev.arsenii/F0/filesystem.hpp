@@ -45,7 +45,7 @@ namespace zubarev
   {
   public:
     File(FileMetaData m):
-      meta(std::move(m))
+      meta_(std::move(m))
     {}
 
     bool isDirectory() const noexcept override
@@ -55,30 +55,30 @@ namespace zubarev
 
     const FileMetaData& getMeta() const noexcept override
     {
-      return meta;
+      return meta_;
     }
     void setMeta(const FileMetaData& m) override
     {
-      meta = m;
+      meta_ = m;
     }
 
     // Геттеры и сеттеры для блоков данных (для Хаффмана и дедупликации)
     const topit::Vector< std::shared_ptr< DataBlock > >& getBlocks() const noexcept
     {
-      return blocks;
+      return blocks_;
     }
     void addBlock(std::shared_ptr< DataBlock > block)
     {
-      blocks.pushBack(std::move(block));
+      blocks_.pushBack(std::move(block));
     }
     void clearBlocks()
     {
-      blocks.clear();
+      blocks_.clear();
     }
 
   private:
-    FileMetaData meta;
-    topit::Vector< std::shared_ptr< DataBlock > > blocks;
+    FileMetaData meta_;
+    topit::Vector< std::shared_ptr< DataBlock > > blocks_;
   };
 
   // 5. Класс Директории
@@ -155,8 +155,12 @@ namespace zubarev
 
   private:
     // std::shared_ptr< FSNode > resolvePath(const std::string& path);
-    std::unique_ptr< TreeStorage > storage_;
-    std::string current_path_;
+
+    std::shared_ptr< Directory > root_;
+    std::shared_ptr< Directory > curr_dir_;
+    std::string current_path_str_;
+
+    RobinHashTable< std::string, std::shared_ptr< DataBlock >, SipHash, Equaler< std::string > > data_block_;
   };
 
 }
