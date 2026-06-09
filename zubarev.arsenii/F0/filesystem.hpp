@@ -1,15 +1,16 @@
 #pragma once
 #include <string>
-#include <vector>
 #include <memory>
 #include <cstdint>
 #include "robin_hashtable.hpp"
 #include "../common/top-it-vector.hpp"
-#include "../common/my_siphash.hpp"
-#include "../common/my_equal.hpp"
+// #include "../common/my_siphash.hpp"
+// #include "../common/my_equal.hpp"
+#include "my_siphash.hpp"
+#include "my_equal.hpp"
+#include "haffman.cpp"
 namespace zubarev
 {
-  // 1. Метаданные (сделаем структуры открытыми или добавим конструкторы)
   struct FileMetaData
   {
     std::string date;
@@ -19,10 +20,11 @@ namespace zubarev
   // 2. Блок данных для дедупликации и сжатия Хаффмана
   struct DataBlock
   {
-    topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
-    topit::Vector< uint8_t > codebook;        // Таблица частот / дерево Хаффмана для распаковки
-    std::string content_hash;                 // Хэш исходных данных (например, MD5/SHA или простой хэш)
-    size_t original_size;                     // Размер до сжатия (полезно для контроля)
+    // topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
+    std::string ompressed_data;
+    BSTree< char, std::string, Comparator< char > >& out_dictionary; // Таблица частот / дерево Хаффмана для распаковки
+    std::string content_hash;                                        // Хэш исходных данных
+    size_t original_size;                                            // Размер до сжатия (полезно для контроля)
   };
 
   // 3. Базовый интерфейс для узла ФС
@@ -102,18 +104,59 @@ namespace zubarev
       meta = m;
     }
 
-    const topit::Vector< std::string >& getSubNodeNames() const noexcept
-    {
-      return sub_nodes_;
-    }
-    void addSubNodeName(const std::string& name)
-    {
-      sub_nodes_.push_back(name);
-    }
+    // const topit::Vector< std::string >& getSubNodeNames() const noexcept
+    // {
+    //   return sub_nodes_;
+    // }
+    // void addSubNodeName(const std::string& name)
+    // {
+    //   sub_nodes_.push_back(name);
+    // }
 
   private:
     FileMetaData meta;
-    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > children;
+    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > children_;
+  };
+
+  class FileSystem
+  {
+  public:
+    // Основные операции файловой системы
+    void mkdir();
+    void rm();
+    void touch();
+    void write();
+    void cat();
+    void append();
+    void cd();
+    void pwd();
+    void ls();
+    void tree();
+    void search();
+    void mv();
+    void cp();
+
+    // Работа с постоянным хранилищем сессий и внешними файлами
+    void save();
+    void load();
+    void archive();
+    void states();
+    void import();
+    void export_s();
+    void start_state();
+
+    // Управление кэшированием (LRU)
+    void cache_size();
+    void cache_on();
+    void cache_off();
+    void cache_stats();
+
+    // Поисковый движок
+    void ssearch();
+
+  private:
+    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > directories_;
+    std::string current_path_;
   };
 
 }
