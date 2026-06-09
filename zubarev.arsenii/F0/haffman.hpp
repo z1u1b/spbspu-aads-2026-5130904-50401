@@ -1,7 +1,6 @@
 #include <string>
 #include "../common/my_tree.hpp"
 #include "../common/my_compare.hpp"
-#include "../common/top-it-vector.hpp"
 namespace zubarev
 {
   BSTree< char, size_t, Comparator< char > > calculateLetters(const std::string& text);

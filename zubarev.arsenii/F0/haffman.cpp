@@ -1,4 +1,6 @@
 #include "haffman.hpp"
+#include "../common/top-it-vector.hpp"
+
 namespace zubarev
 {
 
