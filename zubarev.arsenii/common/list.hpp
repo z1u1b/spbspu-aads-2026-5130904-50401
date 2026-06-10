@@ -1,26 +1,25 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+
+#include <utility>
 #include "c-iter.hpp"
 #include "iter.hpp"
-#include <utility>
-
 namespace zubarev
 {
   namespace detail
   {
-    template < class T >
+    template< class T >
     struct Node
     {
       T val;
       Node* next;
 
-      Node(const T& v, Node* n = nullptr):
-        val(v),
-        next(n) {};
+      Node(const T& v, Node* n = nullptr);
+      Node(T&& v, Node* n = nullptr);
     };
 
   }
-  template < class T >
+  template< class T >
   class List
   {
 
@@ -34,44 +33,65 @@ namespace zubarev
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
 
-    LIter< T > begin();
-    LIter< T > before_begin();
-    LIter< T > end();
+    LIter< T > begin() noexcept;
+    LIter< T > before_begin() noexcept;
+    LIter< T > end() noexcept;
     LIter< T > back();
 
-    LCIter< T > begin() const;
-    LCIter< T > before_begin() const;
-    LCIter< T > end() const;
+    LCIter< T > begin() const noexcept;
+    LCIter< T > before_begin() const noexcept;
+    LCIter< T > end() const noexcept;
     LCIter< T > back() const;
 
-    LCIter< T > cbegin() const;
-    LCIter< T > cbefore_begin() const;
-    LCIter< T > cend() const;
+    LCIter< T > cbegin() const noexcept;
+    LCIter< T > cbefore_begin() const noexcept;
+    LCIter< T > cend() const noexcept;
     LCIter< T > cback() const;
 
-    void clear();
-    bool empty() const;
-    void pop_front();
-    void push_front(const T&);
+    void clear() noexcept;
+    bool empty() const noexcept;
+    void pop_front() noexcept;
+
+    void push_front(const T& val);
+    void push_front(T&& val);
     void push_back(const T&);
-    LIter< T > insert_after(LIter< T >, const T&);
-    void erase_after(LIter< T >);
+
+
+    LIter< T > insert_after(LIter< T > it, const T& val);
+    LIter< T > insert_after(LIter< T > it, T&& val);
+
+    void erase_after(LIter< T >) noexcept;
 
   private:
     detail::Node< T >* head_;
     detail::Node< T >* tail_;
-    detail::Node< T >* ctFake()
-    {
-      detail::Node< T >* el = new detail::Node< T >{T(), nullptr};
-      return el;
-    }
-    void rmFake()
-    {
-      delete head_;
-    }
+    detail::Node< T >* ctFake();
+    void rmFake();
   };
 
-  template < class T >
+  template< class T >
+  detail::Node< T >* List< T >::ctFake()
+  {
+    return new detail::Node< T >{T(), nullptr};
+  }
+
+  template< class T >
+  detail::Node< T >::Node(const T& v, Node* n):
+    val(v),
+    next(n)
+  {}
+
+  template< class T >
+  detail::Node< T >::Node(T&& v, Node* n):
+    val(std::move(v)),
+    next(n)
+  {}
+  template< class T >
+  void List< T >::rmFake()
+  {
+    delete head_;
+  }
+  template< class T >
   List< T >::List():
     head_(ctFake()),
     tail_(head_)
@@ -79,7 +99,7 @@ namespace zubarev
     head_->next = nullptr;
   }
 
-  template < class T >
+  template< class T >
   List< T >::~List() noexcept
   {
     clear();
@@ -88,42 +108,37 @@ namespace zubarev
     }
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(const List< T >& other):
-    head_(ctFake()),
+    head_(nullptr),
     tail_(head_)
   {
-    if (other.head_ == nullptr) {
-      head_ = nullptr;
-      return;
-    }
     List< T > tempList;
 
     auto it = tempList.before_begin();
 
     detail::Node< T >* curOld = other.head_->next;
 
-    while (curOld != nullptr) {
-      it = tempList.insert_after(it, curOld->val);
-      curOld = curOld->next;
-    }
+      while (curOld != nullptr) {
+        it = tempList.insert_after(it, curOld->val);
+        curOld = curOld->next;
+      }
 
 
     std::swap(head_, tempList.head_);
     std::swap(tail_, tempList.tail_);
-
   }
 
-  template < class T >
+  template< class T >
   List< T >::List(List< T >&& other) noexcept:
     head_(std::exchange(other.head_, nullptr)),
     tail_(std::exchange(other.tail_, nullptr))
   {}
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
 
-    if (this != &other) {
+    if (this != std::addressof(other)) {
       List< T > temp(other);
       std::swap(head_, temp.head_);
       std::swap(tail_, temp.tail_);
@@ -131,10 +146,10 @@ namespace zubarev
     return *this;
   }
 
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
-    if (this == &other) {
+    if (this == std::addressof(other)) {
       return *this;
     }
     clear();
@@ -147,16 +162,16 @@ tail_ = std::exchange(other.tail_, nullptr);
 
     return *this;
   }
-  template < class T >
-  LIter< T > List< T >::before_begin()
+  template< class T >
+  LIter< T > List< T >::before_begin() noexcept
   {
     if (!head_) {
       return end();
     }
     return LIter< T >(head_);
   }
-  template < class T >
-  LIter< T > List< T >::begin()
+  template< class T >
+  LIter< T > List< T >::begin() noexcept
   {
     if (!head_) {
       return end();
@@ -164,8 +179,8 @@ tail_ = std::exchange(other.tail_, nullptr);
     return LIter< T >(head_->next);
   }
 
-  template < class T >
-  LIter< T > List< T >::end()
+  template< class T >
+  LIter< T > List< T >::end() noexcept
   {
     return LIter< T >(nullptr);
   }
@@ -178,16 +193,16 @@ tail_ = std::exchange(other.tail_, nullptr);
     return LIter< T >(tail_);
   }
 
-  template < class T >
-  LCIter< T > List< T >::before_begin() const
+  template< class T >
+  LCIter< T > List< T >::before_begin() const noexcept
   {
         if (!head_) {
   return end();
 }
     return LCIter< T >(head_);
   }
-  template < class T >
-  LCIter< T > List< T >::begin() const
+  template< class T >
+  LCIter< T > List< T >::begin() const noexcept
   {
     if (!head_) {
   return end();
@@ -195,8 +210,8 @@ tail_ = std::exchange(other.tail_, nullptr);
     return LCIter< T >(head_->next);
   }
 
-  template < class T >
-  LCIter< T > List< T >::end() const
+  template< class T >
+  LCIter< T > List< T >::end() const noexcept
   {
     return LCIter< T >(nullptr);
   }
@@ -209,19 +224,19 @@ if (empty()) {
     return LCIter< T >(tail_);
   }
 
-  template < class T >
-  LCIter< T > List< T >::cbefore_begin() const
+  template< class T >
+  LCIter< T > List< T >::cbefore_begin() const noexcept
   {
     return before_begin();
   }
-  template < class T >
-  LCIter< T > List< T >::cbegin() const
+  template< class T >
+  LCIter< T > List< T >::cbegin() const noexcept
   {
     return begin();
   }
 
-  template < class T >
-  LCIter< T > List< T >::cend() const
+  template< class T >
+  LCIter< T > List< T >::cend() const noexcept
   {
     return end();
   }
@@ -231,25 +246,22 @@ if (empty()) {
     return back();
   }
 
-  template < class T >
-  void List< T >::clear()
+  template< class T >
+  void List< T >::clear() noexcept
   {
     if (!head_) {
       return;
     }
-    detail::Node< T >* cur = begin().ptr;
-    while (cur != end().ptr) {
-      detail::Node< T >* curNext = cur->next;
-      delete cur;
-      cur = curNext;
+
+    while (head_->next) {
+      erase_after(before_begin());
     }
 
-    head_->next = nullptr;
     tail_ = head_;
   }
 
-  template < class T >
-  bool List< T >::empty() const
+  template< class T >
+  bool List< T >::empty() const noexcept
   {
     if (!head_) {
       return true;
@@ -257,7 +269,7 @@ if (empty()) {
     return head_->next == nullptr;
   }
 
-  template < class T >
+  template< class T >
   void List< T >::push_front(const T& val)
   {
     if (!head_) {
@@ -270,7 +282,19 @@ if (empty()) {
       tail_ = newNode;
     }
   }
-
+template< class T >
+  void List< T >::push_front(T&& val)
+  {
+    if (!head_) {
+      head_ = ctFake();
+      tail_ = head_;
+    }
+    detail::Node< T >* newNode = new detail::Node< T >(std::move(val), head_->next);
+    head_->next = newNode;
+    if (tail_ == head_) {
+      tail_ = newNode;
+    }
+  }
 template < class T >
 void List< T >::push_back(const T& val)
 {
@@ -285,8 +309,10 @@ void List< T >::push_back(const T& val)
   tail_ = newNode;
 }
 
-  template < class T >
-  void List< T >::pop_front()
+
+
+  template< class T >
+  void List< T >::pop_front() noexcept
   {
     if (empty() || !head_) {
       return;
@@ -299,35 +325,50 @@ void List< T >::push_back(const T& val)
     delete toDel;
   }
 
-  template < class T >
+  template< class T >
   LIter< T > List< T >::insert_after(LIter< T > it, const T& val)
   {
-    if (!it.ptr) {
+    if (!it.ptr_) {
       return end();
     }
-    detail::Node< T >* itNext = it.ptr->next;
-    detail::Node<T>* newNode = new detail::Node<T>(val, itNext);
-it.ptr->next = newNode;
+    detail::Node< T >* itNext = it.ptr_->next;
+    detail::Node< T >* newNode = new detail::Node< T >(val, itNext);
+    it.ptr_->next = newNode;
 
-if (tail_ == it.ptr)
-{
-  tail_ = newNode;
-}
-    return LIter< T >(it.ptr->next);
+    if (tail_ == it.ptr_) {
+      tail_ = newNode;
+    }
+    return LIter< T >(newNode);
   }
 
-  template < class T >
-  void List< T >::erase_after(LIter< T > it)
+  template< class T >
+  LIter< T > List< T >::insert_after(LIter< T > it, T&& val)
   {
-    if (!it.ptr || !it.ptr->next) {
+    if (!it.ptr_) {
+      return end();
+    }
+    detail::Node< T >* itNext = it.ptr_->next;
+    detail::Node< T >* newNode = new detail::Node< T >(std::move(val), itNext);
+    it.ptr_->next = newNode;
+
+    if (tail_ == it.ptr_) {
+      tail_ = newNode;
+    }
+    return LIter< T >(newNode);
+  }
+
+  template< class T >
+  void List< T >::erase_after(LIter< T > it) noexcept
+  {
+    if (!it.ptr_ || !it.ptr_->next) {
       return;
     }
-    detail::Node< T >* itNext = it.ptr->next;
-    it.ptr->next = itNext->next;
-        if (tail_ == itNext)
-{
-  tail_ = it.ptr;
-}
+    detail::Node< T >* itNext = it.ptr_->next;
+    it.ptr_->next = itNext->next;
+
+    if (tail_ == itNext) {
+      tail_ = it.ptr_; 
+    }
     delete itNext;
 
   }

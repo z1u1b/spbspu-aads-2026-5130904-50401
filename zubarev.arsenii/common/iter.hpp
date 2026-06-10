@@ -1,23 +1,24 @@
 #ifndef ITER_HPP
 #define ITER_HPP
+#include <memory>
 namespace zubarev
 
 {
-  template < class T >
+  template< class T >
   class List;
   namespace detail
   {
-    template < class T >
+    template< class T >
     struct Node;
   }
-  template < class T >
+  template< class T >
   class LIter
   {
-    friend class List< T >;
+
 
   public:
     T& operator*();
-    T* operator->() const;
+    T* operator->();
     LIter< T >& operator++();
     LIter< T > operator++(int);
 
@@ -25,47 +26,48 @@ namespace zubarev
     bool operator==(const LIter&) const;
 
   private:
-    detail::Node< T >* ptr;
+    friend class List< T >;
+    detail::Node< T >* ptr_;
     LIter(detail::Node< T >* p);
   };
-  template < class T >
+  template< class T >
   LIter< T >::LIter(detail::Node< T >* p):
-    ptr(p)
+    ptr_(p)
   {}
 
-  template < class T >
+  template< class T >
   T& LIter< T >::operator*()
   {
-    return ptr->val;
+    return ptr_->val;
   }
-  template < class T >
-  T* LIter< T >::operator->() const
+  template< class T >
+  T* LIter< T >::operator->()
   {
-    return &ptr->val;
+    return std::addressof(ptr_->val);
   }
 
-  template < class T >
+  template< class T >
   LIter< T >& LIter< T >::operator++()
   {
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return *this;
   }
-  template < class T >
+  template< class T >
   LIter< T > LIter< T >::operator++(int)
   {
     LIter< T > tmp = this;
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return tmp;
   }
-  template < class T >
+  template< class T >
   bool LIter< T >::operator!=(const LIter& iter) const
   {
-    return ptr != iter.ptr;
+    return ptr_ != iter.ptr_;
   }
-  template < class T >
+  template< class T >
   bool LIter< T >::operator==(const LIter& iter) const
   {
-    return ptr == iter.ptr;
+    return ptr_ == iter.ptr_;
   }
 }
 
