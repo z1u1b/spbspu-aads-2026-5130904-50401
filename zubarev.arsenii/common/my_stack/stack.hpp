@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "list.hpp"
+#include "../my_list/list.hpp"
 #include <iostream>
 #include <stdexcept>
 

@@ -17,19 +17,22 @@ namespace zubarev
   {
   public:
     // Основные операции файловой системы
-    void mkdir(const std::string& name_dir);
-    void rm(const std::string& name);
-    void touch(const std::string& name_file);
-    void write(const std::string& name, const std::string& text);
-    void cat(const std::string& name);
-    void append(const std::string& name, const std::string& text);
-    void cd(const std::string& path);
-    void pwd();
-    void ls();
-    void tree(const std::string& path);
-    void search(const std::string& name);
-    void mv(const std::string&, const std::string&);
-    void cp(const std::string&, const std::string&);
+    // Модифицирующие методы (возвращают bool для обработки ошибок в контроллере)
+    bool mkdir(const std::string& name_dir);
+    bool rm(const std::string& name);
+    bool touch(const std::string& name_file);
+    bool write(const std::string& name, const std::string& text);
+    bool append(const std::string& name, const std::string& text);
+    bool cd(const std::string& path);
+    bool mv(const std::string& from, const std::string& to);
+    bool cp(const std::string& from, const std::string& to);
+
+    // Методы чтения (const!)
+    std::string cat(const std::string& name) const;
+    std::string pwd() const;
+    topit::Vector< std::string > ls() const;
+    std::string tree(const std::string& path) const;
+    topit::Vector< std::string > search(const std::string& name) const;
 
     // Работа с постоянным хранилищем сессий и внешними файлами
     void save();
@@ -57,8 +60,6 @@ namespace zubarev
     std::string current_path_str_;
 
     RobinHashTable< std::string, std::shared_ptr< DataBlock >, SipHash, Equaler< std::string > > data_block_;
-
-    topit::Vector<std::string>
   };
 
 }

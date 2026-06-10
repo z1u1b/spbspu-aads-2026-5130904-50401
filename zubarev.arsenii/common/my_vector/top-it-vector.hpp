@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
-#include <iomanip>
 #include <memory>
 #include <stdexcept>
 #include <limits>
