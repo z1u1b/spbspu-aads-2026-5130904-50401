@@ -15,7 +15,6 @@ namespace zubarev
   class LCIter
   {
 
-
   public:
     const T& operator*() const;
     const T* operator->() const;

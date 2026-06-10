@@ -6,7 +6,7 @@
 
 namespace zubarev
 {
-  template < typename T >
+  template< typename T >
   class Stack
   {
 
@@ -21,17 +21,17 @@ namespace zubarev
   private:
     List< T > list_;
     size_t size_ = 0;
-    template < class U >
+    template< class U >
     friend std::ostream& operator<<(std::ostream& out, const Stack< U >& s);
   };
 
-  template < class T >
+  template< class T >
   void Stack< T >::push(const T& rhs)
   {
     list_.push_front(rhs);
     size_++;
   }
-  template < class T >
+  template< class T >
   void Stack< T >::drop()
   {
     if (list_.empty()) {
@@ -40,7 +40,7 @@ namespace zubarev
     list_.pop_front();
     size_--;
   }
-  template < class T >
+  template< class T >
   const T& Stack< T >::top() const
   {
     if (list_.empty()) {
@@ -48,17 +48,17 @@ namespace zubarev
     }
     return *list_.begin();
   }
-  template < class T >
+  template< class T >
   bool Stack< T >::empty() const
   {
     return list_.empty();
   }
-  template < class T >
+  template< class T >
   size_t Stack< T >::size() const
   {
     return size_;
   }
-  template < class U >
+  template< class U >
   std::ostream& operator<<(std::ostream& out, const Stack< U >& s)
   {
 
