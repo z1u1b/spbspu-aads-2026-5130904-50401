@@ -83,6 +83,8 @@ namespace zubarev
   // 5. Класс Директории
   class Directory : public FSNode
   {
+    friend class FileSystem;
+
   public:
     Directory(FileMetaData m):
       meta(std::move(m))

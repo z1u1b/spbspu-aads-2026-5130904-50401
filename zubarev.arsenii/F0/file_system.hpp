@@ -19,6 +19,7 @@ namespace zubarev
     // Основные операции файловой системы
     // Модифицирующие методы (возвращают bool для обработки ошибок в контроллере)
     bool mkdir(const std::string& name_dir);
+    bool rmdir(const std::string& name_dir);
     bool rm(const std::string& name);
     bool touch(const std::string& name_file);
     bool write(const std::string& name, const std::string& text);
