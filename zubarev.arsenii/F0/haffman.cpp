@@ -3,7 +3,36 @@
 
 namespace zubarev
 {
+  std::string Huffman::encode(const std::string& text)
+  {
+    BSTree< char, size_t, Comparator< char > > freq_let = calculateLetters(text);
+    root_ = treeLetters(freq_let);
 
+    generateCodes(root_, "", codes_);
+
+    std::string out_code = "";
+    for (auto it = text.begin(); it != text.end(); ++it) {
+      out_code += codes_[*it];
+    }
+    return out_code;
+  }
+  std::string Huffman::decode(const std::string& code)
+  {
+    auto current = root_;
+    std::string out_str = "";
+    for (auto it = code.begin(); it != code.end(); ++it) {
+      if (*it == '0') {
+        current = current->left_;
+      } else {
+        current = current->right_;
+      }
+      if (current->data_.second != '/0') {
+        out_str += current->data_.second;
+        current = root_;
+      }
+    }
+    return out_str;
+  }
   BSTree< char, size_t, Comparator< char > > calculateLetters(const std::string& text)
   {
     BSTree< char, size_t, Comparator< char > > letters;
@@ -49,7 +78,7 @@ namespace zubarev
 
   void generateCodes(const BSTreeNode< size_t, char >* node,
                      const std::string& code,
-                     BSTree< char, std::string, Comparator< char > > out_dictionary)
+                     BSTree< char, std::string, Comparator< char > >& out_dictionary)
   {
     if (!node) {
       return;
