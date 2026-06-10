@@ -7,6 +7,11 @@ namespace zubarev
   {
     std::string name;
     in >> name;
+    try {
+      file_sys.mkdir(name);
+    } catch (...) {
+      out << "<INVALID COMMAND>";
+    }
     // Логика: file_sys.mkdir(name);
   }
 
@@ -14,6 +19,11 @@ namespace zubarev
   {
     std::string name;
     in >> name;
+    try {
+      file_sys.rm(name);
+    } catch (...) {
+      out << "<INVALID COMMAND>";
+    }
     // Логика: file_sys.rm(name);
   }
 
