@@ -6,9 +6,19 @@ namespace zubarev
   template< class Key, class Value >
   class RobinNode
   {
+  public:
+    const Value& getValue() const
+    {
+      return val_;
+    }
+    const Key& getKey() const
+    {
+      return key_;
+    }
     RobinNode();
     RobinNode(Key, Value, bool, int);
 
+  private:
     Key key_;
     Value val_;
     bool occupied_ = false;

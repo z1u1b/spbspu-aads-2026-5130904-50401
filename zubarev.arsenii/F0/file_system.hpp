@@ -9,6 +9,7 @@
 #include "my_siphash.hpp"
 #include "my_equal.hpp"
 #include "fs_nodes.hpp"
+#include "utils.hpp"
 
 namespace zubarev
 {
@@ -58,6 +59,48 @@ namespace zubarev
     void ssearch();
 
   private:
+    struct FindResult
+    {
+      std::shared_ptr< Directory > parent_dir_ = nullptr;
+      std::shared_ptr< FSNode > target_ = nullptr;
+      std::string target_name_ = "";
+    };
+
+    FindResult navigateTo(const std::string& path)
+    {
+      FindResult result;
+      Queue< std::string > dirs = detail::resolvePath(path);
+      if (dirs.empty()) {
+        return result;
+      }
+      std::shared_ptr< Directory > current = curr_dir_;
+      if (path[0] == '/') {
+        current = root_;
+      }
+      while (!dirs.empty()) {
+        auto next_name = dirs.top();
+        dirs.drop();
+
+        auto it = current->children_.find(next_name);
+
+        if (dirs.empty()) {
+          result.parent_dir_ = current;
+          result.target_name_ = next_name;
+          if (it != current->children_.end()) {
+            {
+              result.target_ = it->getValue();
+            }
+            return result;
+          }
+
+          if (it == current->children_.end() || !it->getValue()->isDirectory()) {
+            return result;
+          }
+          current = std::static_pointer_cast< Directory >(it->getValue());
+        }
+      }
+      return result;
+    }
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
     std::string current_path_str_;
