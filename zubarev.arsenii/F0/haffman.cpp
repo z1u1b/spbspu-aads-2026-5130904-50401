@@ -164,4 +164,8 @@ namespace zubarev
     }
     return bit_string;
   }
+  BSTree< char, std::string, Comparator< char > > Huffman::getCodes() const
+  {
+    return codes_;
+  }
 }

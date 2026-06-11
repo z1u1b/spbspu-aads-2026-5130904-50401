@@ -60,7 +60,7 @@ namespace zubarev
     std::shared_ptr< Directory > curr_dir_;
     std::string current_path_str_;
 
-    RobinHashTable< std::string, std::shared_ptr< DataBlock >, SipHash, Equaler< std::string > > data_block_;
+    RobinHashTable< uint64_t, std::shared_ptr< DataBlock >, SipHash, Equaler< uint64_t > > data_block_;
   };
 
 }

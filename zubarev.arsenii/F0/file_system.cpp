@@ -50,8 +50,42 @@ namespace zubarev
     return true;
   }
 
-  bool FileSystem::write(const std::string& name, const std::string& text)
+  bool FileSystem::write(const std::string& name_file, const std::string& text)
   {
+    if (!curr_dir_->children_.has(name_file)) {
+      throw std::runtime_error("write: " + name_file + ": No such file");
+    } else if (curr_dir_->children_[name_file]->isDirectory()) {
+      throw std::runtime_error("write: " + name_file + ": is a directory");
+    }
+    auto file_ptr = std::static_pointer_cast< File >(curr_dir_->children_[name_file]);
+    file_ptr->clearBlocks();
+
+    const size_t BLOCK_SIZE = 4096;
+    size_t total_size = text.size();
+    size_t offset = 0;
+    while (offset < total_size) {
+      size_t cur_size = std::min(BLOCK_SIZE, total_size - offset);
+      std::string cur_str = text.substr(offset, cur_size);
+      offset += cur_size;
+
+      SipHash hasher;
+      uint64_t cur_hash = hasher(cur_str);
+      if (data_block_.has(cur_hash)) {
+        file_ptr->addBlock(data_block_[cur_hash]);
+      } else {
+        Huffman huffman;
+        auto block = std::make_shared< DataBlock >();
+        block->content_hash = cur_hash;
+        block->original_size = cur_size;
+        block->compressed_data = huffman.compress(huffman.encode(text));
+
+        block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
+
+        data_block_.add(cur_hash, block);
+        file_ptr->addBlock(block);
+      }
+    }
+
     return false;
   }
 

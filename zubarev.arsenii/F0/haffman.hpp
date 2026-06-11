@@ -13,6 +13,7 @@ namespace zubarev
     std::string decode(const std::string& code);
     topit::Vector< uint8_t > compress(const std::string& text_bit);
     std::string decompress(topit::Vector< uint8_t >& compress_bytes, size_t total_bits);
+    BSTree< char, std::string, Comparator< char > > getCodes() const;
 
   private:
     BSTree< char, std::string, Comparator< char > > codes_;
