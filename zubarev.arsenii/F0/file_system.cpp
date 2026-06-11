@@ -6,7 +6,7 @@
 namespace zubarev
 {
   FileSystem::FileSystem():
-    current_path_str_("~/")
+    current_path_str_("/")
   {
     FileMetaData root_data;
     root_data.date = detail::getCurrentDateTime();
