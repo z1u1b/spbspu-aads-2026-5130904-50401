@@ -20,8 +20,8 @@ namespace zubarev
     using Table = RobinHashTable< Key, Value, Hash, Equal >;
 
   public:
-    RobinHashTable();
-    RobinHashTable(size_t cap = 16);
+    // RobinHashTable();
+    explicit RobinHashTable(size_t cap = 16);
     ~RobinHashTable() = default;
     RobinHashTable(const RobinHashTable& table);
     RobinHashTable(RobinHashTable&& table) noexcept;
@@ -120,14 +120,14 @@ namespace zubarev
     }
   };
 
-  template< class Key, class Value, class Hash, class Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable():
-    size_(0),
-    capacity_(8),
-    slots_(topit::Vector< Node >(8)),
-    hasher_(),
-    equal_()
-  {}
+  // template< class Key, class Value, class Hash, class Equal >
+  // RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable():
+  //   size_(0),
+  //   capacity_(8),
+  //   slots_(topit::Vector< Node >(8)),
+  //   hasher_(),
+  //   equal_()
+  // {}
 
   // template < class Key, class Value, class Hash, class Equal >
   // RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(

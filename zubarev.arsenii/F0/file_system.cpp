@@ -5,6 +5,16 @@
 
 namespace zubarev
 {
+  FileSystem::FileSystem():
+    current_path_str_("~/")
+  {
+    FileMetaData root_data;
+    root_data.date = detail::getCurrentDateTime();
+    root_data.owner = detail::getCurrentUser();
+    Directory root_dir(root_data);
+    root_ = std::make_shared< Directory >(root_dir);
+    curr_dir_ = root_;
+  }
   bool FileSystem::mkdir(const std::string& name_dir)
   {
     if (curr_dir_->children_.has(name_dir)) {

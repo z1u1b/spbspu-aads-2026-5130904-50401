@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include "file_system.hpp"
+#include "robin_hashtable.hpp"
 
 int main(int argc, char* argv[])
 
@@ -15,17 +16,17 @@ int main(int argc, char* argv[])
 
   namespace zub = zubarev;
 
-  if (argc != 2) {
-    std::cerr << "Wrong arguments\n";
-    return 1;
-  }
+  // if (argc != 2) {
+  //   std::cerr << "Wrong arguments\n";
+  //   return 1;
+  // }
 
-  std::ifstream input(argv[1]);
+  // std::ifstream input(argv[1]);
 
-  if (!input) {
-    std::cerr << "Cannot open file\n";
-    return 1;
-  }
+  // if (!input) {
+  //   std::cerr << "Cannot open file\n";
+  //   return 1;
+  // }
 
   using Hash = zub::SipHash;
   using Equal = zub::Equaler< std::string >;

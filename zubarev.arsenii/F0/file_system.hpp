@@ -16,6 +16,10 @@ namespace zubarev
   class FileSystem
   {
   public:
+    FileSystem();
+    ~FileSystem() = default;
+    FileSystem(const FileSystem&) = delete;
+    FileSystem& operator=(const FileSystem&) = delete;
     // Основные операции файловой системы
     // Модифицирующие методы (возвращают bool для обработки ошибок в контроллере)
     bool mkdir(const std::string& name_dir);
