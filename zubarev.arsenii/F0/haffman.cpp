@@ -110,4 +110,58 @@ namespace zubarev
 
     generateCodes(node->right_, code + "1", out_dictionary);
   }
+  topit::Vector< uint8_t > Huffman::compress(const std::string& text)
+  {
+    size_t bit_count = 0;
+    topit::Vector< uint8_t > packed_bytes;
+    uint8_t cur_byte = 0;
+
+    for (auto it = text.begin(); it != text.end(); ++it) {
+      // cur_byte=*it;
+      cur_byte <<= 1;
+
+      if (*it == '1') {
+        cur_byte |= 1;
+      }
+      bit_count++;
+
+      if (bit_count == 8) {
+        packed_bytes.pushBack(cur_byte);
+        bit_count = 0;
+        cur_byte = 0;
+      }
+    }
+
+    if (bit_count > 0) {
+      cur_byte <<= (8 - bit_count);
+      packed_bytes.pushBack(cur_byte);
+    }
+
+    return packed_bytes;
+  }
+  std::string Huffman::decompress(topit::Vector< uint8_t >& compress_bytes, size_t total_bits)
+  {
+    std::string bit_string = "";
+    size_t few_bits = 0;
+
+    for (auto it = compress_bytes.begin(); it != compress_bytes.end(); ++it) {
+
+      uint8_t byte = *it;
+
+      for (size_t i = 7; i >= 0; --i) {
+        if (few_bits >= total_bits) {
+          break;
+        }
+
+        if ((byte >> i) & 1) {
+          bit_string += '1';
+        } else {
+          bit_string += '0';
+        }
+
+        few_bits++;
+      }
+    }
+    return bit_string;
+  }
 }

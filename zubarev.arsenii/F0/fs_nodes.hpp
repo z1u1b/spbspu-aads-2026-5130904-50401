@@ -19,12 +19,12 @@ namespace zubarev
   // 2. Блок данных для дедупликации и сжатия Хаффмана
   struct DataBlock
   {
-    // topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
-    std::string compressed_data;
+    topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
     std::shared_ptr< BSTree< char, std::string, Comparator< char > > >
         out_dictionary;       // Таблица частот / дерево Хаффмана для распаковки
     std::string content_hash; // Хэш исходных данных
     size_t original_size;     // Размер до сжатия (полезно для контроля)
+    size_t total_bits_count;  // Важно: сколько ИМЕННО значащих бит в сжатом потоке
   };
 
   // 3. Базовый интерфейс для узла ФС

@@ -1,6 +1,7 @@
 #include <string>
 #include "../common/my_tree/my_tree.hpp"
 #include "../common/my_tree/my_compare.hpp"
+#include "../common/my_vector/top-it-vector.hpp"
 namespace zubarev
 {
   class Huffman
@@ -8,8 +9,10 @@ namespace zubarev
   public:
     Huffman();
     ~Huffman();
-    std::string encode(const std::string&);
-    std::string decode(const std::string&);
+    std::string encode(const std::string& text);
+    std::string decode(const std::string& code);
+    topit::Vector< uint8_t > compress(const std::string& text_bit);
+    std::string decompress(topit::Vector< uint8_t >& compress_bytes, size_t total_bits);
 
   private:
     BSTree< char, std::string, Comparator< char > > codes_;
