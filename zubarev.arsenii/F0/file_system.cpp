@@ -182,8 +182,20 @@ namespace zubarev
 
   std::string FileSystem::cat(const std::string& name) const
   {
-
-    return "";
+    FindResult src = navigateTo(name);
+    if (!src.target_) {
+      throw std::runtime_error("cat: " + name + ": No such directory");
+    } else if (src.target_->isDirectory()) {
+      throw std::runtime_error("cat: " + name + ": Is a directory");
+    }
+    std::shared_ptr< File > file = std::static_pointer_cast< File >(src.target_);
+    std::string output_str = "";
+    topit::Vector< std::shared_ptr< DataBlock > > blocks = file->getBlocks();
+    Huffman huffman;
+    for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+      output_str += huffman.decode(huffman.decompress(*it, it->total_bits_count));
+    }
+    return output_str;
   }
 
   std::string FileSystem::pwd() const

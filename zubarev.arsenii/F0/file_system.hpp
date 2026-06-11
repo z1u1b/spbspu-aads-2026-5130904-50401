@@ -66,7 +66,7 @@ namespace zubarev
       std::string target_name_ = "";
     };
 
-    FindResult navigateTo(const std::string& path)
+    FindResult navigateTo(const std::string& path) const
     {
       FindResult result;
       Queue< std::string > dirs = detail::resolvePath(path);
