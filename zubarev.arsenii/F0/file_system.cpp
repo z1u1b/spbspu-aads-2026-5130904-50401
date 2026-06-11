@@ -1,6 +1,8 @@
 #include "file_system.hpp"
 #include <stdexcept>
 #include "utils.hpp"
+#include "../common/my_queue/queue.hpp"
+
 namespace zubarev
 {
   bool FileSystem::mkdir(const std::string& name_dir)
@@ -131,8 +133,20 @@ namespace zubarev
 
   bool FileSystem::cd(const std::string& path)
   {
-
-    return false;
+    Queue< std::string > dirs = detail::resolvePath(path);
+    if (dirs.top() == "~") {
+      curr_dir_ = root_;
+      current_path_str_ = "~";
+    }
+    while (!dirs.empty()) {
+      if (curr_dir_->children_.has(dirs.top()) && curr_dir_->children_[dirs.top()]->isDirectory()) {
+        curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[dirs.top()]);
+      } else {
+        throw std::runtime_error("cd: " + dirs.top() + ": No such directory");
+      }
+      dirs.drop();
+    }
+    return true;
   }
 
   bool FileSystem::mv(const std::string& from, const std::string& to)

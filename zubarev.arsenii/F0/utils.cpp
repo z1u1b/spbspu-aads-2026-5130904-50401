@@ -47,9 +47,9 @@ namespace zubarev
       return "root";
     }
 
-    Stack< std::string > resolvePath(const std::string& path)
+    Queue< std::string > resolvePath(const std::string& path)
     {
-      Stack< std::string > dirs;
+      Queue< std::string > dirs;
       std::string cur_str = "";
       for (auto it = path.begin(); it != path.end(); ++it) {
         if (*it != '/') {

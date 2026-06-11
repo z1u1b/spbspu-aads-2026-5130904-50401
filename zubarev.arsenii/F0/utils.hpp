@@ -2,14 +2,14 @@
 #define UTILS_HPP
 
 #include <string>
-#include "../common/my_stack/stack.hpp"
+#include "../common/my_queue/queue.hpp"
 namespace zubarev
 {
   namespace detail
   {
     std::string getCurrentDateTime();
     std::string getCurrentUser();
-    Stack< std::string > resolvePath(const std::string& path);
+    Queue< std::string > resolvePath(const std::string& path);
 
   }
 }
