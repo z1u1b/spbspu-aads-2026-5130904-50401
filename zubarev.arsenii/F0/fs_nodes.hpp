@@ -7,7 +7,7 @@
 #include "../common/my_vector/top-it-vector.hpp"
 #include "my_siphash.hpp"
 #include "my_equal.hpp"
-#include "haffman.cpp"
+#include "haffman.hpp"
 namespace zubarev
 {
   struct FileMetaData

@@ -3,6 +3,25 @@
 
 namespace zubarev
 {
+  void destroy(BSTreeNode< size_t, char >* node)
+  {
+    if (!node) {
+      return;
+    }
+
+    destroy(node->left_);
+    destroy(node->right_);
+
+    node->left_ = node->right_ = node->parent_ = nullptr;
+    delete node;
+  }
+  Huffman::Huffman():
+    root_(nullptr)
+  {}
+  Huffman::~Huffman()
+  {
+    destroy(root_);
+  }
   std::string Huffman::encode(const std::string& text)
   {
     BSTree< char, size_t, Comparator< char > > freq_let = calculateLetters(text);
@@ -26,7 +45,7 @@ namespace zubarev
       } else {
         current = current->right_;
       }
-      if (current->data_.second != '/0') {
+      if (current->data_.second != '\0') {
         out_str += current->data_.second;
         current = root_;
       }

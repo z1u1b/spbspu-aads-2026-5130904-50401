@@ -6,6 +6,8 @@ namespace zubarev
   class Huffman
   {
   public:
+    Huffman();
+    ~Huffman();
     std::string encode(const std::string&);
     std::string decode(const std::string&);
 
