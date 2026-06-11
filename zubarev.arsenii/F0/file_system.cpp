@@ -161,8 +161,18 @@ namespace zubarev
 
   bool FileSystem::mv(const std::string& from, const std::string& to)
   {
+    FindResult src_from = navigateTo(from);
+    FindResult src_to = navigateTo(to);
 
-    return false;
+    if (!src_from.target_ || !src_to.target_) {
+      throw std::runtime_error("mv: : No such directory");
+    }
+    if (src_from.parent_dir_ == src_to.parent_dir_) {
+      std::shared_ptr< FSNode > tmp = src_from.target_;
+      src_from.parent_dir_->children_.drop(src_from.target_name_);
+      src_from.parent_dir_->children_.add(src_to.target_name_, tmp);
+    } else if ()
+      return false;
   }
 
   bool FileSystem::cp(const std::string& from, const std::string& to)
