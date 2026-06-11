@@ -151,6 +151,7 @@ namespace zubarev
 
   bool FileSystem::mv(const std::string& from, const std::string& to)
   {
+
     return false;
   }
 
@@ -161,11 +162,13 @@ namespace zubarev
 
   std::string FileSystem::cat(const std::string& name) const
   {
+
     return "";
   }
 
   std::string FileSystem::pwd() const
   {
+
     return "/";
   }
 
