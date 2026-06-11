@@ -46,5 +46,20 @@ namespace zubarev
       // Значение по умолчанию, если переменная окружения не найдена
       return "root";
     }
+
+    Stack< std::string > resolvePath(const std::string& path)
+    {
+      Stack< std::string > dirs;
+      std::string cur_str = "";
+      for (auto it = path.begin(); it != path.end(); ++it) {
+        if (*it != '/') {
+          cur_str += *it;
+        } else {
+          dirs.push(cur_str);
+          cur_str = "";
+        }
+      }
+      return dirs;
+    }
   }
 }

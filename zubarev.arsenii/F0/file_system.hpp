@@ -54,8 +54,6 @@ namespace zubarev
     void ssearch();
 
   private:
-    // std::shared_ptr< FSNode > resolvePath(const std::string& path);
-
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
     std::string current_path_str_;
