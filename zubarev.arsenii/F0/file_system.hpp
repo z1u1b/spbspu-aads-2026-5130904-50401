@@ -59,6 +59,9 @@ namespace zubarev
     void ssearch();
 
   private:
+    std::shared_ptr< FSNode > cloneFile(const std::shared_ptr< File >& old_file);
+    std::shared_ptr< FSNode > cloneDirectory(const std::shared_ptr< Directory >& old_directory);
+
     struct FindResult
     {
       std::shared_ptr< Directory > parent_dir_ = nullptr;

@@ -200,9 +200,76 @@ namespace zubarev
     return false;
   }
 
+  std::shared_ptr< FSNode > FileSystem::cloneFile(const std::shared_ptr< File >& old_file)
+  {
+    auto new_file = std::make_shared< File >(old_file->getMeta());
+    for (auto it = old_file->getBlocks().begin(); it != old_file->getBlocks().end(); ++it) {
+      new_file->addBlock(*it);
+    }
+    return new_file;
+  }
+  std::shared_ptr< FSNode > FileSystem::cloneDirectory(const std::shared_ptr< Directory >& old_dir)
+  {
+    auto new_dir = std::make_shared< Directory >(old_dir->getMeta());
+
+    for (auto it = old_dir->children_.begin(); it != old_dir->children_.end(); ++it) {
+      std::string child_name = it->getKey();
+      std::shared_ptr< FSNode > child_node = it->getValue();
+
+      if (child_node->isDirectory()) {
+        auto sub_dir = std::make_shared< Directory >(child_node->getMeta());
+        new_dir->children_.add(child_name, cloneDirectory(sub_dir));
+
+      } else {
+        auto sub_file = std::make_shared< File >(child_node->getMeta());
+        new_dir->children_.add(child_name, cloneFile(sub_file));
+      }
+    }
+    return new_dir;
+  }
+
   bool FileSystem::cp(const std::string& from, const std::string& to)
   {
 
+    FindResult src_from = navigateTo(from);
+    FindResult src_to = navigateTo(to);
+
+    if (!src_from.target_ || !src_from.parent_dir_) {
+      throw std::runtime_error("cp: : No such directory");
+    }
+    if (src_from.target_ == src_to.target_) {
+      throw std::runtime_error("cp: : identical files");
+    }
+
+    std::shared_ptr< FSNode > clone_node = nullptr;
+
+    if (src_from.target_->isDirectory()) {
+      clone_node = cloneDirectory(std::static_pointer_cast< Directory >(src_from.target_));
+    } else {
+      clone_node = cloneFile(std::static_pointer_cast< File >(src_from.target_));
+    }
+
+    if (src_to.target_ && src_to.target_->isDirectory()) {
+      auto target = std::static_pointer_cast< Directory >(src_to.target_);
+      if (target->children_.has(src_from.target_name_)) {
+        target->children_.drop(src_from.target_name_);
+        target->children_.add(src_from.target_name_, clone_node);
+      }
+
+      target->children_.add(src_from.target_name_, clone_node);
+      return true;
+    } else if (src_to.target_ && !src_to.target_->isDirectory() && !src_from.target_->isDirectory()) {
+      src_to.parent_dir_->children_.drop(src_to.target_name_);
+      src_to.parent_dir_->children_.add(src_to.target_name_, clone_node);
+    }
+
+    if (!src_to.target_) {
+      if (!src_to.parent_dir_) {
+        throw std::runtime_error("cp: : No such directory");
+      }
+      src_to.parent_dir_->children_.add(src_to.target_name_, clone_node);
+      return true;
+    }
     return false;
   }
 
