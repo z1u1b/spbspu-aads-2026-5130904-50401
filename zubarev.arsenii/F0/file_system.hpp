@@ -36,7 +36,7 @@ namespace zubarev
     // Методы чтения (const!)
     std::string cat(const std::string& name) const;
     std::string pwd() const;
-    topit::Vector< std::string > ls() const;
+    topit::Vector< std::string > ls(const std::string& path) const;
     std::string tree(const std::string& path) const;
     topit::Vector< std::string > search(const std::string& name) const;
 

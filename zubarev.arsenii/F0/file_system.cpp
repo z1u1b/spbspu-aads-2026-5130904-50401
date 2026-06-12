@@ -297,9 +297,22 @@ namespace zubarev
     return "/";
   }
 
-  topit::Vector< std::string > FileSystem::ls() const
+  topit::Vector< std::string > FileSystem::ls(const std::string& path) const
   {
-    return {};
+    topit::Vector< std::string > result;
+    FindResult search_node = navigateTo(path);
+    if (!search_node.target_) {
+      return result;
+    }
+    if (search_node.target_->isDirectory()) {
+      auto tmp_dir = std::static_pointer_cast< Directory >(search_node.target_);
+      for (auto it = tmp_dir->children_.begin(); it != tmp_dir->children_.end(); ++it) {
+        result.pushBack(it->getKey());
+      }
+    } else {
+      result.pushBack(search_node.target_name_);
+    }
+    return result;
   }
 
   std::string FileSystem::tree(const std::string& path) const
