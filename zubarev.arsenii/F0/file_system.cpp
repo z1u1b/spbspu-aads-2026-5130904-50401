@@ -321,6 +321,10 @@ namespace zubarev
 
   std::string FileSystem::tree(const std::string& path) const
   {
+    const std::string TRAIT = "─";
+    const std::string COMPOUND = "├";
+    const std::string END_COMPOUND = "└";
+
     return "";
   }
 
