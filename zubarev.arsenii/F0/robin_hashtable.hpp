@@ -170,11 +170,12 @@ namespace zubarev
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(RobinHashTable&& table) noexcept:
     size_(table.size_),
     capacity_(table.capacity_),
-    slots_(table.slots_),
-    hasher_(table.hasher_),
-    equal_(table.equal_)
+    slots_(std::move(table.slots_)),
+    hasher_(std::move(table.hasher_)),
+    equal_(std::move(table.equal_))
   {
-    table.slots_ = topit::Vector< Node >();
+    table.size_ = 0;
+    table.capacity_ = 0;
   }
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >&

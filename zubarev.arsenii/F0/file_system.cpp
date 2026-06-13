@@ -304,7 +304,9 @@ namespace zubarev
   topit::Vector< std::string > FileSystem::ls(const std::string& path) const
   {
     topit::Vector< std::string > result;
+
     FindResult search_node = navigateTo(path);
+
     if (!search_node.target_) {
       return result;
     }

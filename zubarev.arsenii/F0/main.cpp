@@ -61,6 +61,7 @@ int main()
 
   std::string cmd;
   while (std::cin >> cmd) {
+
     try {
       if (!cmds.has(cmd)) {
         throw std::out_of_range("unknown command");
