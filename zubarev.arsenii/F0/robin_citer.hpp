@@ -25,6 +25,9 @@ namespace zubarev
     RobinCIter& operator++();
     RobinCIter operator++(int);
 
+    RobinCIter& operator--();
+    RobinCIter operator--(int);
+
     bool operator!=(const RobinCIter&) const;
     bool operator==(const RobinCIter&) const;
 
@@ -71,6 +74,27 @@ namespace zubarev
   {
     RobinCIter tmp = *this;
     ++(*this);
+    return tmp;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinCIter< Key, Value, Hash, Equal >& RobinCIter< Key, Value, Hash, Equal >::operator--()
+  {
+    if (!table_ || el_idx_ == 0) {
+      throw std::out_of_range("Iterator cannot be decremented");
+    }
+
+    do {
+      --el_idx_;
+    } while (el_idx_ > 0 && !table_->slots_[el_idx_].occupied_);
+
+    return *this;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  RobinCIter< Key, Value, Hash, Equal > RobinCIter< Key, Value, Hash, Equal >::operator--(int)
+  {
+    RobinCIter tmp = *this;
+    --(*this);
     return tmp;
   }
   template< class Key, class Value, class Hash, class Equal >

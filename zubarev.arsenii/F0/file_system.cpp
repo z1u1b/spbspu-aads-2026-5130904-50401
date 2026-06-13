@@ -5,6 +5,44 @@
 
 namespace zubarev
 {
+  FileSystem::FindResult FileSystem::navigateTo(const std::string& path) const
+  {
+    FindResult result;
+    Queue< std::string > dirs = detail::resolvePath(path);
+    if (dirs.empty()) {
+      return result;
+    }
+    std::shared_ptr< Directory > current = curr_dir_;
+    if (path[0] == '/' || dirs.top() == "~") {
+      current = root_;
+      if (dirs.top() == "~") {
+        dirs.drop();
+      }
+    }
+    while (!dirs.empty()) {
+      auto next_name = dirs.top();
+      dirs.drop();
+
+      auto it = current->children_.find(next_name);
+
+      if (dirs.empty()) {
+        result.parent_dir_ = current;
+        result.target_name_ = next_name;
+        if (it != current->children_.end()) {
+          {
+            result.target_ = it->val_;
+          }
+          return result;
+        }
+
+        if (it == current->children_.end() || !it->val_->isDirectory()) {
+          return result;
+        }
+        current = std::static_pointer_cast< Directory >(it->val_);
+      }
+    }
+    return result;
+  }
   FileSystem::FileSystem():
     current_path_str_("~")
   {
@@ -144,17 +182,30 @@ namespace zubarev
   bool FileSystem::cd(const std::string& path)
   {
     Queue< std::string > dirs = detail::resolvePath(path);
+
     if (dirs.top() == "~") {
       curr_dir_ = root_;
       current_path_str_ = "~";
       dirs.drop();
     }
     while (!dirs.empty()) {
+
       std::string next_dir = dirs.top();
       if (next_dir == "..") {
+        if (current_path_str_ == "~") {
+          continue;
+        }
+
         FindResult find_curr_dir = navigateTo(current_path_str_);
         curr_dir_ = find_curr_dir.parent_dir_;
-        current_path_str_ = current_path_str_.substr(0, current_path_str_.rfind('/'));
+
+        auto pos = current_path_str_.rfind('/');
+        if (pos == std::string::npos) {
+          current_path_str_ = "~";
+        } else {
+          current_path_str_ = current_path_str_.substr(0, pos);
+        }
+
       } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_[next_dir]->isDirectory()) {
         curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
         current_path_str_ += "/";
@@ -298,39 +349,91 @@ namespace zubarev
   std::string FileSystem::pwd() const
   {
     return current_path_str_;
-    // return "/";
   }
 
   topit::Vector< std::string > FileSystem::ls(const std::string& path) const
   {
     topit::Vector< std::string > result;
+    std::shared_ptr< Directory > target_dir = nullptr;
 
-    FindResult search_node = navigateTo(path);
-
-    if (!search_node.target_) {
-      return result;
+    if (path.empty()) {
+      target_dir = curr_dir_;
+    } else {
+      FindResult search_node = navigateTo(path);
+      if (!search_node.target_) {
+        return result;
+      }
+      if (search_node.target_->isDirectory()) {
+        target_dir = std::static_pointer_cast< Directory >(search_node.target_);
+      } else {
+        result.pushBack(search_node.target_name_);
+        return result;
+      }
     }
-    if (search_node.target_->isDirectory()) {
-      auto tmp_dir = std::static_pointer_cast< Directory >(search_node.target_);
-      for (auto it = tmp_dir->children_.begin(); it != tmp_dir->children_.end(); ++it) {
+    if (target_dir) {
+      for (auto it = target_dir->children_.begin(); it != target_dir->children_.end(); ++it) {
         result.pushBack(it->key_);
       }
-    } else {
-      result.pushBack(search_node.target_name_);
     }
     return result;
   }
 
-  std::string FileSystem::tree(const std::string& path) const
+  void FileSystem::treeImpl(std::shared_ptr< Directory > dir,
+                            const std::string& prefix,
+                            std::string& tree_str,
+                            size_t& count_files,
+                            size_t& count_dir) const
   {
-    const std::string TRAIT = "─";
+    const std::string TRAIT = "──";
     const std::string COMPOUND = "├";
     const std::string END_COMPOUND = "└";
 
-    if (path.empty()) {
-      return "";
+    for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
+      bool isLast = false;
+      auto next = it;
+      ++next;
+      if (next == dir->children_.end()) {
+        isLast = true;
+      }
+      std::string childPrefix = prefix;
+      if (isLast) {
+        childPrefix += "   ";
+      } else {
+        childPrefix += "│  ";
+      }
+      tree_str += prefix;
+      tree_str += (isLast ? END_COMPOUND : COMPOUND);
+      tree_str += TRAIT;
+      tree_str += " ";
+      tree_str += it->key_;
+      tree_str += '\n';
+      if (!it->val_->isDirectory()) {
+        ++count_dir;
+        auto child_dir = std::static_pointer_cast< Directory >(it->val_);
+        treeImpl(child_dir, childPrefix, tree_str, count_files, count_dir);
+      } else {
+        count_files += 1;
+      }
     }
-    return "";
+  }
+  std::tuple< std::string, size_t, size_t > FileSystem::tree(const std::string& path) const
+  {
+
+    size_t count_dir = 0;
+    size_t count_files = 0;
+    std::string res_str = "";
+    res_str += ".\n";
+
+    FindResult found_target = navigateTo(path);
+    if (found_target.target_->isDirectory()) {
+      throw std::runtime_error("tree: " + path + " [error opening dir]");
+    }
+
+    std::shared_ptr< Directory > target_dir = std::static_pointer_cast< Directory >(found_target.target_);
+    treeImpl(target_dir, "", res_str, count_dir, count_files);
+
+    return {res_str, count_files, count_dir};
+    ;
   }
 
   topit::Vector< std::string > FileSystem::search(const std::string& name) const

@@ -1,6 +1,6 @@
 #include "commands.hpp"
 #include <iostream>
-
+#include <iomanip>
 namespace zubarev
 {
   void cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
@@ -42,7 +42,7 @@ namespace zubarev
   void cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name, text;
-    in >> name >> text;
+    in >> name >> std::quoted(text);
     try {
       file_sys.write(name, text);
     } catch (...) {
@@ -53,7 +53,7 @@ namespace zubarev
   void cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name, text;
-    in >> name >> text;
+    in >> name >> std::quoted(text);
     try {
       file_sys.append(name, text);
     } catch (...) {
@@ -69,7 +69,7 @@ namespace zubarev
     try {
       file_sys.cd(path);
     } catch (...) {
-      out << "<INVALID COMMAND>";
+      out << "<<INVALID COMMAND>";
     }
     // Логика: file_sys.cd(path);
   }
@@ -102,11 +102,13 @@ namespace zubarev
   {
     std::string name;
     in >> name;
-    try {
-      file_sys.cat(name);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
-    }
+    auto text_out = file_sys.cat(name);
+    out << text_out << '\n';
+    // try {
+    //   file_sys.cat(name);
+    // } catch (...) {
+    //   out << "<INVALID COMMAND>";
+    // }
     // out << file_sys.cat(name);
   }
 
@@ -117,24 +119,25 @@ namespace zubarev
 
   void cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
-    std::string path;
-    in >> path;
-    try {
-      file_sys.ls(path);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    std::string path = "";
+    if (in.peek() != '\n' && in.peek() != EOF) {
+      in >> path;
     }
+    auto list = file_sys.ls(path);
+    for (size_t i = 0; i < list.getSize(); ++i) {
+      out << list[i] << " ";
+    }
+    out << "\n";
   }
 
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string path;
     in >> path;
-    try {
-      file_sys.tree(path);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
-    }
+    auto res = file_sys.tree(path);
+    out << std::get< 0 >(res) << "\n";
+    out << std::get< 1 >(res) << ", ";
+    out << std::get< 2 >(res) << "\n";
   }
 
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)

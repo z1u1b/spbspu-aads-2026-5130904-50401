@@ -48,8 +48,12 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   RobinNode< Key, Value >& RobinIter< Key, Value, Hash, Equal >::operator*() const
   {
-    if (el_idx_ > table_->capacity_) {
-      throw std::out_of_range("Invalid node in overflow");
+    if (!table_ || el_idx_ >= table_->capacity_) {
+      throw std::out_of_range("Invalid iterator dereference");
+    }
+
+    if (!table_->slots_[el_idx_].occupied_) {
+      throw std::logic_error("Dereferencing empty slot");
     }
     return table_->slots_[el_idx_];
   }
@@ -76,6 +80,27 @@ namespace zubarev
   {
     RobinIter tmp = *this;
     ++(*this);
+    return tmp;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal >& RobinIter< Key, Value, Hash, Equal >::operator--()
+  {
+    if (!table_ || el_idx_ == 0) {
+      throw std::out_of_range("Iterator cannot be decremented");
+    }
+
+    do {
+      --el_idx_;
+    } while (el_idx_ > 0 && !table_->slots_[el_idx_].occupied_);
+
+    return *this;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator--(int)
+  {
+    RobinIter tmp = *this;
+    --(*this);
     return tmp;
   }
   template< class Key, class Value, class Hash, class Equal >

@@ -59,6 +59,8 @@ namespace zubarev
           cur_str = "";
         }
       }
+      dirs.push(cur_str);
+      cur_str = "";
       return dirs;
     }
 

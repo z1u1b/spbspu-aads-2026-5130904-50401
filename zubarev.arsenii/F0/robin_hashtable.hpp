@@ -6,6 +6,7 @@
 #include "../common/my_vector/top-it-vector.hpp"
 #include "robin_iter.hpp"
 #include "robin_citer.hpp"
+#include <iostream>
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -105,6 +106,10 @@ namespace zubarev
       for (size_t i = 0; i < capacity_; ++i) {
         const Node& cur_node = slots_[index];
         if (cur_node.psl_ == -1) {
+          return {index, nullptr};
+        }
+
+        if (!cur_node.occupied_) {
           return {index, nullptr};
         }
 
@@ -218,6 +223,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
+
     Node* el = find_el(id).second;
     if (el) {
       return el->val_;
@@ -352,8 +358,7 @@ namespace zubarev
         next_id = (next_id + 1) % capacity_;
       }
 
-      slots_[cur_id].occupied_ = false;
-      slots_[cur_id].psl_ = -1;
+      slots_[cur_id] = Node();
       size_--;
       return saved_val;
     }
@@ -365,15 +370,36 @@ namespace zubarev
     auto found_el = find_el(k);
     return found_el.second != nullptr;
   }
+  // template< class Key, class Value, class Hash, class Equal >
+  // void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
+  // {
+  //   Table tmp(slots);
+  //   for (size_t i = 0; i < capacity_; ++i) {
+  //     if (slots_[i].occupied_) {
+  //       tmp.add(slots_[i].key_, slots_[i].val_);
+  //     }
+  //   }
+  //   swap(tmp);
+  // }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
     Table tmp(slots);
+
     for (size_t i = 0; i < capacity_; ++i) {
       if (slots_[i].occupied_) {
-        tmp.add(slots_[i].key_, slots_[i].val_);
+
+        // ВАЖНО: создаём "чистую" вставку без старого psl
+        Node clean_node(slots_[i].key_,
+                        slots_[i].val_,
+                        true,
+                        0 // ОБНУЛЕНИЕ PSL
+        );
+
+        tmp.add(clean_node.key_, clean_node.val_);
       }
     }
+
     swap(tmp);
   }
   template< class Key, class Value, class Hash, class Equal >

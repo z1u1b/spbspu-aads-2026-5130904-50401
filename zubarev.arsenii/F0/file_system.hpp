@@ -37,7 +37,7 @@ namespace zubarev
     std::string cat(const std::string& name) const;
     std::string pwd() const;
     topit::Vector< std::string > ls(const std::string& path) const;
-    std::string tree(const std::string& path) const;
+    std::tuple< std::string, size_t, size_t > tree(const std::string& path) const;
     topit::Vector< std::string > search(const std::string& name) const;
 
     // Работа с постоянным хранилищем сессий и внешними файлами
@@ -69,44 +69,10 @@ namespace zubarev
       std::string target_name_ = "";
     };
 
-    FindResult navigateTo(const std::string& path) const
-    {
-      FindResult result;
-      Queue< std::string > dirs = detail::resolvePath(path);
-      if (dirs.empty()) {
-        return result;
-      }
-      std::shared_ptr< Directory > current = curr_dir_;
-      if (path[0] == '/' || dirs.top() == "~") {
-        current = root_;
-        if (dirs.top() == "~") {
-          dirs.drop();
-        }
-      }
-      while (!dirs.empty()) {
-        auto next_name = dirs.top();
-        dirs.drop();
+    FindResult navigateTo(const std::string& path) const;
 
-        auto it = current->children_.find(next_name);
+    void treeImpl(std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;
 
-        if (dirs.empty()) {
-          result.parent_dir_ = current;
-          result.target_name_ = next_name;
-          if (it != current->children_.end()) {
-            {
-              result.target_ = it->val_;
-            }
-            return result;
-          }
-
-          if (it == current->children_.end() || !it->val_->isDirectory()) {
-            return result;
-          }
-          current = std::static_pointer_cast< Directory >(it->val_);
-        }
-      }
-      return result;
-    }
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
     std::string current_path_str_;
