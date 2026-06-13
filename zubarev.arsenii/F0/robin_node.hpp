@@ -6,10 +6,10 @@ namespace zubarev
   template< class Key, class Value >
   struct RobinNode
   {
-    template< class, class, class, class >
-    friend class RobinHashTable;
+    // template< class, class, class, class >
+    // friend class RobinHashTable;
 
-  public:
+    // public:
     // const Value& getValue() const
     // {
     //   return val_;
@@ -21,7 +21,7 @@ namespace zubarev
     RobinNode();
     RobinNode(Key, Value, bool, int);
 
-  private:
+    // private:
     Key key_;
     Value val_;
     bool occupied_ = false;

@@ -94,15 +94,15 @@ namespace zubarev
           result.target_name_ = next_name;
           if (it != current->children_.end()) {
             {
-              result.target_ = it->getValue();
+              result.target_ = it->val_;
             }
             return result;
           }
 
-          if (it == current->children_.end() || !it->getValue()->isDirectory()) {
+          if (it == current->children_.end() || !it->val_->isDirectory()) {
             return result;
           }
-          current = std::static_pointer_cast< Directory >(it->getValue());
+          current = std::static_pointer_cast< Directory >(it->val_);
         }
       }
       return result;

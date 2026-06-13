@@ -23,6 +23,8 @@ namespace topit
     {}
 
   public:
+    using iterator = CVectIter<T>;
+    using const_iterator = CVectIter<const T>;
     using iterator_category = std::random_access_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;

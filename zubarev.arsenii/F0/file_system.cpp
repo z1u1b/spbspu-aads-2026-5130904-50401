@@ -220,7 +220,7 @@ namespace zubarev
 
     for (auto it = old_dir->children_.begin(); it != old_dir->children_.end(); ++it) {
       std::string child_name = it->key_;
-      std::shared_ptr< FSNode > child_node = it->getValue();
+      std::shared_ptr< FSNode > child_node = it->val_;
 
       if (child_node->isDirectory()) {
         auto sub_dir = std::static_pointer_cast< Directory >(child_node);
@@ -290,7 +290,7 @@ namespace zubarev
     topit::Vector< std::shared_ptr< DataBlock > > blocks = file->getBlocks();
     Huffman huffman;
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-      output_str += huffman.decode(huffman.decompress(*(*it), (*it)->total_bits_count));
+      output_str += huffman.decode(huffman.decompress((*it)->compressed_data, (*it)->total_bits_count));
     }
     return output_str;
   }
@@ -311,7 +311,7 @@ namespace zubarev
     if (search_node.target_->isDirectory()) {
       auto tmp_dir = std::static_pointer_cast< Directory >(search_node.target_);
       for (auto it = tmp_dir->children_.begin(); it != tmp_dir->children_.end(); ++it) {
-        result.pushBack(it->getKey());
+        result.pushBack(it->key_);
       }
     } else {
       result.pushBack(search_node.target_name_);
@@ -328,6 +328,7 @@ namespace zubarev
     if (path.empty()) {
       return "";
     }
+    return "";
   }
 
   topit::Vector< std::string > FileSystem::search(const std::string& name) const
@@ -335,5 +336,6 @@ namespace zubarev
     if (name.empty()) {
       return {};
     }
+    return {};
   }
 }

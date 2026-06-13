@@ -4,6 +4,7 @@
 #include <boost/hash2/get_integral_result.hpp>
 #include <boost/hash2/siphash.hpp>
 #include <cstdint>
+#include <string>
 
 namespace zubarev
 {
@@ -45,6 +46,10 @@ namespace zubarev
       h.update(p.second.data(), p.second.size());
 
       return boost::hash2::get_integral_result< uint64_t >(h);
+    }
+    uint64_t operator()(uint64_t x) const
+    {
+      return (*this)(&x, sizeof(x));
     }
   };
 }

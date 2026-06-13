@@ -31,7 +31,8 @@ namespace zubarev
     Value& operator[](const Key& k);
     Value& at(const Key& id);
     const Value& at(const Key& id) const;
-    Iter find(const Key& id) const;
+    CIter find(const Key& id) const;
+    Iter find(const Key& id);
     void swap(Table& rhs) noexcept;
 
     Iter add(const Key& k, Value v);
@@ -110,7 +111,7 @@ namespace zubarev
         if (cur_psl > cur_node.psl_) {
           return {index, nullptr};
         }
-        if (equal_(k, cur_node.k)) {
+        if (equal_(k, cur_node.key_)) {
           return {index, std::addressof(slots_[index])};
         }
         index = (index + 1) % capacity_;
@@ -234,9 +235,15 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
   {
-    return RobinIter< Key, Value, Hash, Equal >(find_el(id)->second);
+    return CIter(find_el(id).first, this);
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
+
+  {
+    return Iter(find_el(id).first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
@@ -355,7 +362,7 @@ namespace zubarev
   bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
     auto found_el = find_el(k);
-    return found_el != nullptr;
+    return found_el.second != nullptr;
   }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
