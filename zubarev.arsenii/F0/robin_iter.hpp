@@ -34,13 +34,13 @@ namespace zubarev
     bool operator==(const RobinIter&) const;
 
   private:
-    RobinIter(size_t, const Table*);
+    RobinIter(size_t, Table*);
     size_t el_idx_;
-    const Table* table_;
+    Table* table_;
   };
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >::RobinIter(size_t el_idx, const Table* table):
+  RobinIter< Key, Value, Hash, Equal >::RobinIter(size_t el_idx, Table* table):
     el_idx_(el_idx),
     table_(table)
   {}

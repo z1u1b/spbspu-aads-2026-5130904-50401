@@ -10,7 +10,7 @@
 #include "file_system.hpp"
 #include "robin_hashtable.hpp"
 
-int main(int argc, char* argv[])
+int main()
 
 {
 

@@ -52,7 +52,7 @@ namespace zubarev
     }
     return out_str;
   }
-  BSTree< char, size_t, Comparator< char > > calculateLetters(const std::string& text)
+  BSTree< char, size_t, Comparator< char > > Huffman::calculateLetters(const std::string& text)
   {
     BSTree< char, size_t, Comparator< char > > letters;
 
@@ -63,7 +63,7 @@ namespace zubarev
     return letters;
   }
 
-  BSTreeNode< size_t, char >* treeLetters(BSTree< char, size_t, Comparator< char > > frequency)
+  BSTreeNode< size_t, char >* Huffman::treeLetters(BSTree< char, size_t, Comparator< char > > frequency)
   {
     using HuffNode = BSTreeNode< size_t, char >;
 
@@ -95,9 +95,9 @@ namespace zubarev
     return tree.front();
   }
 
-  void generateCodes(const BSTreeNode< size_t, char >* node,
-                     const std::string& code,
-                     BSTree< char, std::string, Comparator< char > >& out_dictionary)
+  void Huffman::generateCodes(const BSTreeNode< size_t, char >* node,
+                              const std::string& code,
+                              BSTree< char, std::string, Comparator< char > >& out_dictionary)
   {
     if (!node) {
       return;
