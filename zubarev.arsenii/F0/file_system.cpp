@@ -6,7 +6,7 @@
 namespace zubarev
 {
   FileSystem::FileSystem():
-    current_path_str_("/")
+    current_path_str_("~")
   {
     FileMetaData root_data;
     root_data.date = detail::getCurrentDateTime();
@@ -31,7 +31,7 @@ namespace zubarev
 
   bool FileSystem::rmdir(const std::string& name_dir)
   {
-    if (curr_dir_->children_.has(name_dir)) {
+    if (!curr_dir_->children_.has(name_dir)) {
       throw std::runtime_error("rmdir: " + name_dir + ": No such file or directory");
     }
     curr_dir_->children_.drop(name_dir);
@@ -39,7 +39,7 @@ namespace zubarev
   }
   bool FileSystem::rm(const std::string& name)
   {
-    if (curr_dir_->children_.has(name)) {
+    if (!curr_dir_->children_.has(name)) {
       throw std::runtime_error("rm: " + name + ": No such file or directory");
     } else if (curr_dir_->children_[name]->isDirectory()) {
       throw std::runtime_error("rm: " + name + ": is a directory");
@@ -89,7 +89,7 @@ namespace zubarev
         auto block = std::make_shared< DataBlock >();
         block->content_hash = cur_hash;
         block->original_size = cur_size;
-        block->compressed_data = huffman.compress(huffman.encode(text));
+        block->compressed_data = huffman.compress(huffman.encode(cur_str));
 
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
@@ -130,7 +130,7 @@ namespace zubarev
         auto block = std::make_shared< DataBlock >();
         block->content_hash = cur_hash;
         block->original_size = cur_size;
-        block->compressed_data = huffman.compress(huffman.encode(text));
+        block->compressed_data = huffman.compress(huffman.encode(cur_str));
 
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
@@ -138,7 +138,7 @@ namespace zubarev
         file_ptr->addBlock(block);
       }
     }
-    return false;
+    return true;
   }
 
   bool FileSystem::cd(const std::string& path)
@@ -147,12 +147,18 @@ namespace zubarev
     if (dirs.top() == "~") {
       curr_dir_ = root_;
       current_path_str_ = "~";
+      dirs.drop();
     }
     while (!dirs.empty()) {
-      if (curr_dir_->children_.has(dirs.top()) && curr_dir_->children_[dirs.top()]->isDirectory()) {
-        curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[dirs.top()]);
+      std::string next_dir = dirs.top();
+      if (next_dir == "..") {
+        FindResult find_curr_dir = navigateTo(current_path_str_);
+        curr_dir_ = find_curr_dir.parent_dir_;
+        current_path_str_ = current_path_str_.substr(0, current_path_str_.rfind('/'));
+      } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_[next_dir]->isDirectory()) {
+        curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
         current_path_str_ += "/";
-        current_path_str_ += dirs.top();
+        current_path_str_ += next_dir;
       } else {
         throw std::runtime_error("cd: " + dirs.top() + ": No such directory");
       }
@@ -217,11 +223,11 @@ namespace zubarev
       std::shared_ptr< FSNode > child_node = it->getValue();
 
       if (child_node->isDirectory()) {
-        auto sub_dir = std::make_shared< Directory >(child_node->getMeta());
+        auto sub_dir = std::static_pointer_cast< Directory >(child_node);
         new_dir->children_.add(child_name, cloneDirectory(sub_dir));
 
       } else {
-        auto sub_file = std::make_shared< File >(child_node->getMeta());
+        auto sub_file = std::static_pointer_cast< File >(child_node);
         new_dir->children_.add(child_name, cloneFile(sub_file));
       }
     }
@@ -253,9 +259,7 @@ namespace zubarev
       auto target = std::static_pointer_cast< Directory >(src_to.target_);
       if (target->children_.has(src_from.target_name_)) {
         target->children_.drop(src_from.target_name_);
-        target->children_.add(src_from.target_name_, clone_node);
       }
-
       target->children_.add(src_from.target_name_, clone_node);
       return true;
     } else if (src_to.target_ && !src_to.target_->isDirectory() && !src_from.target_->isDirectory()) {
@@ -293,8 +297,8 @@ namespace zubarev
 
   std::string FileSystem::pwd() const
   {
-
-    return "/";
+    return current_path_str_;
+    // return "/";
   }
 
   topit::Vector< std::string > FileSystem::ls(const std::string& path) const

@@ -77,8 +77,11 @@ namespace zubarev
         return result;
       }
       std::shared_ptr< Directory > current = curr_dir_;
-      if (path[0] == '/') {
+      if (path[0] == '/' || dirs.top() == "~") {
         current = root_;
+        if (dirs.top() == "~") {
+          dirs.drop();
+        }
       }
       while (!dirs.empty()) {
         auto next_name = dirs.top();
