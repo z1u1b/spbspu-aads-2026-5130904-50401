@@ -148,7 +148,7 @@ namespace zubarev
 
       uint8_t byte = *it;
 
-      for (size_t i = 7; i >= 0; --i) {
+      for (int i = 7; i >= 0; --i) {
         if (few_bits >= total_bits) {
           break;
         }

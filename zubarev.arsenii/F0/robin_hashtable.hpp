@@ -300,7 +300,7 @@ namespace zubarev
     }
 
     size_t index = hasher_(k) % capacity_;
-    size_t cur_psl = 0;
+    // size_t cur_psl = 0;
 
     Node node_to_add(k, v, true, 0);
 

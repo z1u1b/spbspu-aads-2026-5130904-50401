@@ -16,6 +16,7 @@ namespace topit
   {
     ~Vector();
     Vector();
+    explicit Vector(size_t size);
     Vector(const Vector&);
     Vector(Vector&&) noexcept;
     explicit Vector(std::initializer_list< T > il);
@@ -77,7 +78,6 @@ namespace topit
     void clear();
 
   private:
-    explicit Vector(size_t size);
     size_t calcCap(size_t curr, size_t needed);
     T* allocate(size_t n);
     void deallocate(T* ptr);
@@ -109,6 +109,7 @@ topit::Vector< T >::Vector(const Vector& rhs):
 {
   for (size_t i = 0; i < rhs.getSize(); ++i) {
     new (data_ + i) T(rhs[i]);
+    ++size_;
   }
 }
 
@@ -156,10 +157,10 @@ topit::Vector< T >::Vector(size_t size, const T& init):
 }
 
 template< class T >
-topit::Vector< T >::Vector(size_t size):
-  data_(size ? allocate(size) : nullptr),
-  size_(size),
-  capacity_(size)
+topit::Vector< T >::Vector(size_t capacity):
+  data_(capacity ? allocate(capacity) : nullptr),
+  size_(0),
+  capacity_(capacity)
 {}
 
 template< class T >
@@ -214,7 +215,7 @@ void topit::Vector< T >::reserve(size_t n)
     size_t i = 0;
     try {
       for (; i < size_; ++i) {
-        new (newData + i) T(data_[i]);
+        new (newData + i) T(std::move(data_[i]));
       }
     } catch (...) {
       destroy_range(newData, 0, size_);
@@ -241,7 +242,7 @@ void topit::Vector< T >::shrinkToFit()
     size_t i = 0;
     try {
       for (; i < size_; ++i) {
-        new (newData + i) T(data_[i]);
+        new (newData + i) T(std::move(data_[i]));
       }
     } catch (...) {
       for (size_t j = 0; j < i; ++j) {
@@ -652,8 +653,8 @@ void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
 template< class T >
 void topit::Vector< T >::clear()
 {
+  destroy_range(data_, 0, size_);
   size_ = 0;
-  shrinkToFit();
 }
 
 template< class T >

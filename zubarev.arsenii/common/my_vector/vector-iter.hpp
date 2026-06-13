@@ -1,98 +1,181 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
+
 #include <cstddef>
+#include <iterator>
+
 namespace topit
 {
   template< class T >
   struct Vector;
+
   template< class T >
   class VectIter
   {
     friend struct topit::Vector< T >;
+
     VectIter() noexcept:
       ptr_(nullptr)
     {}
+
     VectIter(T* ptr) noexcept:
       ptr_(ptr)
     {}
 
   public:
-    T& operator*();
-    VectIter< T >& operator++();
-    VectIter< T > operator++(int);
-    VectIter< T > operator+(int);
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
 
-    VectIter< T >& operator--();
-    VectIter< T > operator--(int);
-    size_t operator-(const VectIter< T >&) const;
-    VectIter< T > operator-(const size_t& other) const;
-    bool operator!=(const VectIter< T >&) const;
-    bool operator==(const VectIter< T >&) const;
+    T& operator*() const;
+    T* operator->() const;
+
+    VectIter& operator++();
+    VectIter operator++(int);
+
+    VectIter& operator--();
+    VectIter operator--(int);
+
+    VectIter operator+(difference_type n) const;
+    VectIter operator-(difference_type n) const;
+
+    VectIter& operator+=(difference_type n);
+    VectIter& operator-=(difference_type n);
+
+    difference_type operator-(const VectIter& other) const;
+
+    bool operator!=(const VectIter& other) const;
+    bool operator==(const VectIter& other) const;
+
+    bool operator<(const VectIter& other) const;
+    bool operator>(const VectIter& other) const;
+    bool operator<=(const VectIter& other) const;
+    bool operator>=(const VectIter& other) const;
+
+    T& operator[](difference_type index) const;
 
   private:
     T* ptr_;
   };
 
   template< class T >
-  T& topit::VectIter< T >::operator*()
+  T& VectIter< T >::operator*() const
   {
     return *ptr_;
   }
 
   template< class T >
-  VectIter< T >& topit::VectIter< T >::operator++()
+  T* VectIter< T >::operator->() const
+  {
+    return ptr_;
+  }
+
+  template< class T >
+  VectIter< T >& VectIter< T >::operator++()
   {
     ++ptr_;
     return *this;
   }
 
   template< class T >
-  VectIter< T > topit::VectIter< T >::operator++(int)
+  VectIter< T > VectIter< T >::operator++(int)
   {
-    VectIter< T > tmp = *this;
+    VectIter tmp(*this);
     ++ptr_;
     return tmp;
   }
+
   template< class T >
-  VectIter< T > topit::VectIter< T >::operator+(int n)
+  VectIter< T >& VectIter< T >::operator--()
+  {
+    --ptr_;
+    return *this;
+  }
+
+  template< class T >
+  VectIter< T > VectIter< T >::operator--(int)
+  {
+    VectIter tmp(*this);
+    --ptr_;
+    return tmp;
+  }
+
+  template< class T >
+  VectIter< T > VectIter< T >::operator+(difference_type n) const
   {
     return VectIter(ptr_ + n);
   }
+
   template< class T >
-  VectIter< T >& topit::VectIter< T >::operator--()
+  VectIter< T > VectIter< T >::operator-(difference_type n) const
   {
-    --ptr_;
+    return VectIter(ptr_ - n);
+  }
+
+  template< class T >
+  VectIter< T >& VectIter< T >::operator+=(difference_type n)
+  {
+    ptr_ += n;
     return *this;
   }
 
   template< class T >
-  VectIter< T > topit::VectIter< T >::operator--(int)
+  VectIter< T >& VectIter< T >::operator-=(difference_type n)
   {
-    VectIter< T > tmp = *this;
-    --ptr_;
-    return tmp;
+    ptr_ -= n;
+    return *this;
   }
-  template< class T >
-  size_t topit::VectIter< T >::operator-(const VectIter< T >& other) const
-  {
-    return static_cast< size_t >(ptr_ - other.ptr_);
-  }
-  template< class T >
-  VectIter< T > topit::VectIter< T >::operator-(const size_t& other) const
-  {
 
-    return (ptr_ - other);
-  }
   template< class T >
-  bool topit::VectIter< T >::operator!=(const VectIter< T >& other) const
+  typename VectIter< T >::difference_type VectIter< T >::operator-(const VectIter& other) const
+  {
+    return ptr_ - other.ptr_;
+  }
+
+  template< class T >
+  bool VectIter< T >::operator!=(const VectIter& other) const
   {
     return ptr_ != other.ptr_;
   }
+
   template< class T >
-  bool topit::VectIter< T >::operator==(const VectIter< T >& other) const
+  bool VectIter< T >::operator==(const VectIter& other) const
   {
     return ptr_ == other.ptr_;
   }
+
+  template< class T >
+  bool VectIter< T >::operator<(const VectIter& other) const
+  {
+    return ptr_ < other.ptr_;
+  }
+
+  template< class T >
+  bool VectIter< T >::operator>(const VectIter& other) const
+  {
+    return ptr_ > other.ptr_;
+  }
+
+  template< class T >
+  bool VectIter< T >::operator<=(const VectIter& other) const
+  {
+    return ptr_ <= other.ptr_;
+  }
+
+  template< class T >
+  bool VectIter< T >::operator>=(const VectIter& other) const
+  {
+    return ptr_ >= other.ptr_;
+  }
+
+  template< class T >
+  T& VectIter< T >::operator[](difference_type index) const
+  {
+    return *(ptr_ + index);
+  }
+
 }
 
 #endif

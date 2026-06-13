@@ -1,83 +1,181 @@
 #ifndef CITERATOR_HPP
 #define CITERATOR_HPP
+
 #include <cstddef>
+#include <iterator>
+
 namespace topit
 {
   template< class T >
   struct Vector;
+
   template< class T >
   class CVectIter
   {
     friend struct topit::Vector< T >;
+
     CVectIter() noexcept:
       ptr_(nullptr)
     {}
+
     CVectIter(const T* ptr) noexcept:
       ptr_(ptr)
     {}
 
   public:
-    const T& operator*() const;
-    CVectIter< T >& operator++();
-    CVectIter< T > operator++(int);
-    CVectIter< T > operator+(int);
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const T*;
+    using reference = const T&;
 
-    size_t operator-(const CVectIter< T >&) const;
-    CVectIter< T > operator-(const size_t& other) const;
-    bool operator!=(const CVectIter< T >&) const;
-    bool operator==(const CVectIter< T >&) const;
+    const T& operator*() const;
+    const T* operator->() const;
+
+    CVectIter& operator++();
+    CVectIter operator++(int);
+
+    CVectIter& operator--();
+    CVectIter operator--(int);
+
+    CVectIter operator+(difference_type n) const;
+    CVectIter operator-(difference_type n) const;
+
+    CVectIter& operator+=(difference_type n);
+    CVectIter& operator-=(difference_type n);
+
+    difference_type operator-(const CVectIter& other) const;
+
+    bool operator!=(const CVectIter& other) const;
+    bool operator==(const CVectIter& other) const;
+
+    bool operator<(const CVectIter& other) const;
+    bool operator>(const CVectIter& other) const;
+    bool operator<=(const CVectIter& other) const;
+    bool operator>=(const CVectIter& other) const;
+
+    const T& operator[](difference_type index) const;
 
   private:
     const T* ptr_;
   };
 
   template< class T >
-  const T& topit::CVectIter< T >::operator*() const
+  const T& CVectIter< T >::operator*() const
   {
     return *ptr_;
   }
 
   template< class T >
-  CVectIter< T >& topit::CVectIter< T >::operator++()
+  const T* CVectIter< T >::operator->() const
+  {
+    return ptr_;
+  }
+
+  template< class T >
+  CVectIter< T >& CVectIter< T >::operator++()
   {
     ++ptr_;
     return *this;
   }
 
   template< class T >
-  CVectIter< T > topit::CVectIter< T >::operator++(int)
+  CVectIter< T > CVectIter< T >::operator++(int)
   {
-    CVectIter< T > tmp = *this;
+    CVectIter tmp(*this);
     ++ptr_;
     return tmp;
   }
+
   template< class T >
-  CVectIter< T > topit::CVectIter< T >::operator+(int n)
+  CVectIter< T >& CVectIter< T >::operator--()
+  {
+    --ptr_;
+    return *this;
+  }
+
+  template< class T >
+  CVectIter< T > CVectIter< T >::operator--(int)
+  {
+    CVectIter tmp(*this);
+    --ptr_;
+    return tmp;
+  }
+
+  template< class T >
+  CVectIter< T > CVectIter< T >::operator+(difference_type n) const
   {
     return CVectIter(ptr_ + n);
   }
 
   template< class T >
-  size_t topit::CVectIter< T >::operator-(const CVectIter< T >& other) const
+  CVectIter< T > CVectIter< T >::operator-(difference_type n) const
   {
-    return static_cast< size_t >(ptr_ - other.ptr_);
+    return CVectIter(ptr_ - n);
   }
-  template< class T >
-  CVectIter< T > topit::CVectIter< T >::operator-(const size_t& other) const
-  {
 
-    return (ptr_ - other);
-  }
   template< class T >
-  bool topit::CVectIter< T >::operator!=(const CVectIter< T >& other) const
+  CVectIter< T >& CVectIter< T >::operator+=(difference_type n)
   {
-    return ptr_ != other.ptr_;
+    ptr_ += n;
+    return *this;
   }
+
   template< class T >
-  bool topit::CVectIter< T >::operator==(const CVectIter< T >& other) const
+  CVectIter< T >& CVectIter< T >::operator-=(difference_type n)
+  {
+    ptr_ -= n;
+    return *this;
+  }
+
+  template< class T >
+  typename CVectIter< T >::difference_type CVectIter< T >::operator-(const CVectIter& other) const
+  {
+    return ptr_ - other.ptr_;
+  }
+
+  template< class T >
+  bool CVectIter< T >::operator==(const CVectIter& other) const
   {
     return ptr_ == other.ptr_;
   }
+
+  template< class T >
+  bool CVectIter< T >::operator!=(const CVectIter& other) const
+  {
+    return ptr_ != other.ptr_;
+  }
+
+  template< class T >
+  bool CVectIter< T >::operator<(const CVectIter& other) const
+  {
+    return ptr_ < other.ptr_;
+  }
+
+  template< class T >
+  bool CVectIter< T >::operator>(const CVectIter& other) const
+  {
+    return ptr_ > other.ptr_;
+  }
+
+  template< class T >
+  bool CVectIter< T >::operator<=(const CVectIter& other) const
+  {
+    return ptr_ <= other.ptr_;
+  }
+
+  template< class T >
+  bool CVectIter< T >::operator>=(const CVectIter& other) const
+  {
+    return ptr_ >= other.ptr_;
+  }
+
+  template< class T >
+  const T& CVectIter< T >::operator[](difference_type index) const
+  {
+    return *(ptr_ + index);
+  }
+
 }
 
 #endif
