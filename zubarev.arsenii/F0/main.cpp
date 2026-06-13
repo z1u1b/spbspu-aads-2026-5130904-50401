@@ -2,8 +2,6 @@
 #include "commands.hpp"
 #include "my_equal.hpp"
 #include "my_siphash.hpp"
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>

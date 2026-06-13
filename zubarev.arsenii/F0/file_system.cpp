@@ -433,7 +433,6 @@ namespace zubarev
     treeImpl(target_dir, "", res_str, count_dir, count_files);
 
     return {res_str, count_files, count_dir};
-    ;
   }
 
   topit::Vector< std::string > FileSystem::search(const std::string& name) const

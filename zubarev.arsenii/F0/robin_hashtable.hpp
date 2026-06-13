@@ -6,7 +6,6 @@
 #include "../common/my_vector/top-it-vector.hpp"
 #include "robin_iter.hpp"
 #include "robin_citer.hpp"
-#include <iostream>
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >

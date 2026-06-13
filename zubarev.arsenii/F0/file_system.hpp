@@ -9,7 +9,6 @@
 #include "my_siphash.hpp"
 #include "my_equal.hpp"
 #include "fs_nodes.hpp"
-#include "utils.hpp"
 
 namespace zubarev
 {
