@@ -67,13 +67,13 @@ namespace zubarev
       std::string target_name_ = "";
     };
 
-    FindResult navigateTo(const std::string& path) const;
+    std::shared_ptr< FSNode > navigateTo(const std::string& path) const;
 
     void treeImpl(std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;
 
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
-    std::string current_path_str_;
+    // std::string current_path_str_;
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
   };

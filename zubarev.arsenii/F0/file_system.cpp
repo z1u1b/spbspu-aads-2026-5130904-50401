@@ -5,46 +5,58 @@
 
 namespace zubarev
 {
-  FileSystem::FindResult FileSystem::navigateTo(const std::string& path) const
+  std::shared_ptr< FSNode > FileSystem::navigateTo(const std::string& path) const
   {
-    FindResult result;
+    if (path.empty()) {
+      return curr_dir_;
+    }
+
     Queue< std::string > dirs = detail::resolvePath(path);
     if (dirs.empty()) {
-      return result;
+      return curr_dir_;
     }
+
     std::shared_ptr< Directory > current = curr_dir_;
+
     if (path[0] == '/' || dirs.top() == "~") {
       current = root_;
       if (dirs.top() == "~") {
         dirs.drop();
       }
     }
+
     while (!dirs.empty()) {
-      auto next_name = dirs.top();
+      std::string next_name = dirs.top();
       dirs.drop();
+
+      if (next_name == ".") {
+        continue;
+      }
+      if (next_name == "..") {
+        if (current->getParent()) {
+          current = current->getParent();
+        }
+        continue;
+      }
 
       auto it = current->children_.find(next_name);
 
-      if (dirs.empty()) {
-        result.parent_dir_ = current;
-        result.target_name_ = next_name;
-        if (it != current->children_.end()) {
-          {
-            result.target_ = it->val_;
-          }
-          return result;
-        }
-
-        if (it == current->children_.end() || !it->val_->isDirectory()) {
-          return result;
-        }
-        current = std::static_pointer_cast< Directory >(it->val_);
+      if (it == current->children_.end()) {
+        return nullptr;
       }
+
+      if (dirs.empty()) {
+        return it->val_;
+      }
+      if (!it->val_->isDirectory()) {
+        return nullptr;
+      }
+      current = std::static_pointer_cast< Directory >(it->val_);
     }
-    return result;
+
+    return current;
   }
-  FileSystem::FileSystem():
-    current_path_str_("~")
+  FileSystem::FileSystem()
   {
     FileMetaData root_data;
     root_data.date = detail::getCurrentDateTime();
@@ -74,7 +86,7 @@ namespace zubarev
     new_data.owner = detail::getCurrentUser();
 
     auto new_dir = std::make_shared< Directory >(new_data);
-    curr_dir_->children_.add(name_dir, new_dir);
+    curr_dir_->addChild(name_dir, new_dir);
     return true;
   }
 
@@ -101,7 +113,7 @@ namespace zubarev
     if (!dir->children_.empty()) {
       throw std::runtime_error("rmdir: " + name_dir + ": Directory not empty");
     }
-    curr_dir_->children_.drop(name_dir);
+    curr_dir_->removeChild(name_dir);
     return true;
   }
   bool FileSystem::rm(const std::string& name)
@@ -123,7 +135,7 @@ namespace zubarev
       throw std::runtime_error("rm: " + name + ": is a directory");
     }
 
-    curr_dir_->children_.drop(name);
+    curr_dir_->removeChild(name);
     return true;
   }
 
@@ -148,7 +160,7 @@ namespace zubarev
     new_data.owner = detail::getCurrentUser();
 
     auto new_file = std::make_shared< File >(new_data);
-    curr_dir_->children_.add(name_file, new_file);
+    curr_dir_->addChild(name_file, new_file);
     return true;
   }
 
@@ -264,9 +276,9 @@ namespace zubarev
     }
     Queue< std::string > dirs = detail::resolvePath(path);
 
+    std::string current_path_str_ = pwd();
     if (dirs.top() == "~") {
       curr_dir_ = root_;
-      current_path_str_ = "~";
       while (!dirs.empty()) {
         dirs.drop();
       }
@@ -281,21 +293,11 @@ namespace zubarev
           continue;
         }
 
-        FindResult find_curr_dir = navigateTo(current_path_str_);
-        curr_dir_ = find_curr_dir.parent_dir_;
-        auto pos = current_path_str_.rfind('/');
-        if (pos == std::string::npos) {
-          current_path_str_ = "~";
-        } else {
-          current_path_str_ = current_path_str_.substr(0, pos);
-        }
+        // FindResult find_curr_dir = navigateTo(current_path_str_);
+        curr_dir_ = curr_dir_->getParent();
 
       } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_.at(next_dir)->isDirectory()) {
         curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
-        if (current_path_str_.back() != '/') {
-          current_path_str_ += '/';
-        }
-        current_path_str_ += next_dir;
       } else {
         throw std::runtime_error("cd: " + next_dir + ": No such directory");
       }
@@ -311,21 +313,14 @@ namespace zubarev
       return false;
     }
 
-    for (auto it = root->children_.begin(); it != root->children_.end(); ++it) {
+    auto current = candidate;
 
-      if (it->val_ == candidate) {
+    while (current) {
+      if (current == root) {
         return true;
       }
-
-      if (it->val_->isDirectory()) {
-        auto child_dir = std::static_pointer_cast< Directory >(it->val_);
-
-        if (isDescendant(child_dir, candidate)) {
-          return true;
-        }
-      }
+      current = current->getParent();
     }
-
     return false;
   }
 
@@ -342,47 +337,47 @@ namespace zubarev
     if (from == "." || from == ".." || to == "." || to == "..") {
       throw std::runtime_error("mv: invalid path");
     }
-    FindResult src_from = navigateTo(from);
-    FindResult src_to = navigateTo(to);
+    std::shared_ptr< FSNode > src_from = navigateTo(from);
+    std::shared_ptr< FSNode > src_to = navigateTo(to);
 
-    if (!src_from.target_ || !src_from.parent_dir_) {
+    if (!src_from || !src_from->getParent()) {
       throw std::runtime_error("mv: : No such directory");
     }
-    if (src_to.target_ && !src_to.target_->isDirectory()) {
+    if (src_to && !src_to->isDirectory()) {
       throw std::runtime_error("mv: destination already exists");
     }
-    if (src_from.target_->isDirectory()) {
+    if (src_from->isDirectory()) {
 
-      auto moved_dir = std::static_pointer_cast< Directory >(src_from.target_);
+      auto moved_dir = std::static_pointer_cast< Directory >(src_from);
 
-      if (isDescendant(moved_dir, src_to.target_)) {
+      if (isDescendant(moved_dir, src_to)) {
         throw std::runtime_error("mv: cannot move directory into itself");
       }
     }
-    if (src_from.target_ == src_to.target_) {
+    if (src_from == src_to) {
       throw std::runtime_error("mv: Source and destination are the same");
     }
 
-    if (src_to.target_ && src_to.target_->isDirectory()) {
-      auto tmp_dir = std::static_pointer_cast< Directory >(src_to.target_);
+    if (src_to && src_to->isDirectory()) {
+      auto tmp_dir = std::static_pointer_cast< Directory >(src_to);
 
-      if (tmp_dir->children_.has(src_from.target_name_)) {
+      if (tmp_dir->children_.has(src_from->getName())) {
         throw std::runtime_error("mv: : Is already been");
       }
-      std::shared_ptr< FSNode > tmp = src_from.target_;
-      src_from.parent_dir_->children_.drop(src_from.target_name_);
-      tmp_dir->children_.add(src_from.target_name_, tmp);
+      std::shared_ptr< FSNode > tmp = src_from;
+      src_from->getParent()->removeChild(src_from->getName());
+      tmp_dir->addChild(src_from->getName(), tmp);
 
       return true;
     }
 
-    if (!src_to.target_) {
-      if (!src_to.parent_dir_) {
+    if (!src_to) {
+      if (!src_to->getParent()) {
         throw std::runtime_error("mv: : No such directory");
       }
-      std::shared_ptr< FSNode > tmp = src_from.target_;
-      src_from.parent_dir_->children_.drop(src_from.target_name_);
-      src_to.parent_dir_->children_.add(src_to.target_name_, tmp);
+      std::shared_ptr< FSNode > tmp = src_from;
+      src_from->getParent()->removeChild(src_from->getName());
+      src_to->getParent()->addChild(src_to->getName(), tmp);
       return true;
     }
 
@@ -407,11 +402,11 @@ namespace zubarev
 
       if (child_node->isDirectory()) {
         auto sub_dir = std::static_pointer_cast< Directory >(child_node);
-        new_dir->children_.add(child_name, cloneDirectory(sub_dir));
+        new_dir->addChild(child_name, cloneDirectory(sub_dir));
 
       } else {
         auto sub_file = std::static_pointer_cast< File >(child_node);
-        new_dir->children_.add(child_name, cloneFile(sub_file));
+        new_dir->addChild(child_name, cloneFile(sub_file));
       }
     }
     return new_dir;
@@ -429,49 +424,51 @@ namespace zubarev
       throw std::runtime_error("cp: invalid path");
     }
 
-    FindResult src_from = navigateTo(from);
-    FindResult src_to = navigateTo(to);
-    if (!src_from.target_ || !src_from.parent_dir_) {
+    std::shared_ptr< FSNode > src_from = navigateTo(from);
+    std::shared_ptr< FSNode > src_to = navigateTo(to);
+
+    if (!src_from || !src_from->getParent()) {
       throw std::runtime_error("cp: : No such directory");
     }
 
-    if (!src_from.target_ || !src_from.parent_dir_) {
-      throw std::runtime_error("cp: : No such directory");
-    }
-    if (src_from.target_ == src_to.target_) {
+    if (src_from == src_to) {
       throw std::runtime_error("cp: : identical files");
     }
-    if (src_from.target_->isDirectory() && src_to.target_ && !src_to.target_->isDirectory()) {
-
+    if (src_from->isDirectory() && src_to && !src_to->isDirectory()) {
       throw std::runtime_error("cp: cannot overwrite non-directory with directory");
     }
     std::shared_ptr< FSNode > clone_node = nullptr;
-
-    if (src_from.target_->isDirectory()) {
+    if (src_from->isDirectory()) {
       clone_node = cloneDirectory(std::static_pointer_cast< Directory >(src_from.target_));
     } else {
       clone_node = cloneFile(std::static_pointer_cast< File >(src_from.target_));
     }
+    std::shared_ptr< Directory > target_dir = nullptr;
+    if (src_to && src_to->isDirectory()) {
+      target_dir = std::static_pointer_cast< Directory >(src_to);
 
-    if (src_to.target_ && src_to.target_->isDirectory()) {
-      auto target = std::static_pointer_cast< Directory >(src_to.target_);
-      if (target->children_.has(src_from.target_name_)) {
-        target->children_.drop(src_from.target_name_);
-      }
-      target->children_.add(src_from.target_name_, clone_node);
-      return true;
-    } else if (src_to.target_ && !src_to.target_->isDirectory() && !src_from.target_->isDirectory()) {
-      src_to.parent_dir_->children_.drop(src_to.target_name_);
-      src_to.parent_dir_->children_.add(src_to.target_name_, clone_node);
-    }
+    } else {
+      size_t last_slash = to.rfind('/');
+      if (last_slash == std::string::npos) {
+        target_dir = curr_dir_;
 
-    if (!src_to.target_) {
-      if (!src_to.parent_dir_) {
-        throw std::runtime_error("cp: : No such directory");
+      } else {
+        std::string parent_path = to.substr(0, last_slash);
+        if (parent_path.empty()) {
+          parent_path = '/';
+        }
+
+        std::shared_ptr< FSNode > parent_node = navigateTo(parent_path);
+        if (!parent_node || !parent_node->isDirectory()) {
+          throw std::runtime_error("cp: cannot create regular file '" + to + "': No such file or directory");
+        }
+        target_dir = std::static_pointer_cast< Directory >(parent_node);
       }
-      src_to.parent_dir_->children_.add(src_to.target_name_, clone_node);
-      return true;
+      if (src_to && !src_to->isDirectory()) {
+        target_dir->removeChild(src_to->getName());
+      }
     }
+    target_dir->addChild(target_dir->getName(), clone_node);
     return false;
   }
 
@@ -509,7 +506,14 @@ namespace zubarev
 
   std::string FileSystem::pwd() const
   {
-    return current_path_str_;
+    std::string res = "";
+    std::shared_ptr< Directory > current = curr_dir_;
+    std::shared_ptr< Directory > parent = current->getParent();
+    while (parent) {
+      res += parent->getName();
+      res += '/';
+    }
+    return std::reverse(res.begin(), res.end());
   }
 
   topit::Vector< std::string > FileSystem::ls(const std::string& path) const

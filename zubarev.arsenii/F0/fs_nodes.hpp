@@ -29,6 +29,7 @@ namespace zubarev
   };
 
   // 3. Базовый интерфейс для узла ФС
+  class Directory;
   class FSNode
   {
   public:
@@ -38,6 +39,28 @@ namespace zubarev
 
     virtual const FileMetaData& getMeta() const noexcept = 0;
     virtual void setMeta(const FileMetaData& meta) = 0;
+
+    void setParent(std::weak_ptr< Directory > p)
+    {
+      parent_ = p;
+    }
+    std::shared_ptr< Directory > getParent() const
+    {
+      return parent_.lock();
+    }
+
+    void setName(const std::string& n)
+    {
+      name_ = n;
+    }
+    std::string getName() const
+    {
+      return name_;
+    }
+
+  private:
+    std::weak_ptr< Directory > parent_;
+    std::string name_;
   };
 
   // 4. Класс Файла
@@ -81,7 +104,7 @@ namespace zubarev
   };
 
   // 5. Класс Директории
-  class Directory : public FSNode
+  class Directory : public FSNode, public std::enable_shared_from_this< Directory >
   {
     friend class FileSystem;
 
@@ -104,14 +127,16 @@ namespace zubarev
       meta = m;
     }
 
-    // const topit::Vector< std::string >& getSubNodeNames() const noexcept
-    // {
-    //   return sub_nodes_;
-    // }
-    // void addSubNodeName(const std::string& name)
-    // {
-    //   sub_nodes_.push_back(name);
-    // }
+    void addChild(const std::string& name, std::shared_ptr< FSNode > node)
+    {
+      node->setName(name);
+      node->setParent(shared_from_this());
+      children_.add(name, node);
+    }
+    void removeChild(const std::string& name)
+    {
+      children_.drop(name);
+    }
 
   private:
     FileMetaData meta;
