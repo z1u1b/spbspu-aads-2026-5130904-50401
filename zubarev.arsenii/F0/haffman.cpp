@@ -24,32 +24,53 @@ namespace zubarev
   }
   std::string Huffman::encode(const std::string& text)
   {
+
+    destroy(root_);
+    root_ = nullptr;
     codes_ = {};
     BSTree< char, size_t, Comparator< char > > freq_let = calculateLetters(text);
     root_ = treeLetters(freq_let);
 
     generateCodes(root_, "", codes_);
 
-    std::string out_code = "";
+    size_t total_bits = 0;
+    for (auto it = text.begin(); it != text.end(); ++it) {
+      total_bits += codes_[*it].size();
+    }
+    std::string out_code;
+    out_code.reserve(total_bits);
+
     for (auto it = text.begin(); it != text.end(); ++it) {
       out_code += codes_[*it];
     }
     return out_code;
   }
+  bool is_leaf(const BSTreeNode< size_t, char >* n)
+  {
+    return n && !n->left_ && !n->right_;
+  }
   std::string Huffman::decode(const std::string& code)
   {
     auto current = root_;
     std::string out_str = "";
+    out_str.reserve(code.size() / 2);
     for (auto it = code.begin(); it != code.end(); ++it) {
+
       if (*it == '0') {
         current = current->left_;
       } else {
         current = current->right_;
       }
-      if (current->data_.second != '\0') {
+      if (!current) {
+        throw std::runtime_error("Invalid huffman code");
+      }
+      if (is_leaf(current)) {
         out_str += current->data_.second;
         current = root_;
       }
+    }
+    if (current != root_) {
+      throw std::runtime_error("Trailing bits do not form a complete code");
     }
     return out_str;
   }
@@ -75,6 +96,13 @@ namespace zubarev
 
     auto tree_comp = [](const HuffNode* a, const HuffNode* b) { return a->data_.first > b->data_.first; };
 
+    if (tree.getSize() == 1) {
+      HuffNode* root = tree.back();
+      HuffNode* fake_parent = new HuffNode(root->data_.first, '\0');
+      fake_parent->left_ = root;
+      root->parent_ = fake_parent;
+      return fake_parent;
+    }
     while (tree.getSize() > 1) {
       std::sort(tree.begin(), tree.end(), tree_comp);
 
@@ -93,6 +121,8 @@ namespace zubarev
 
       tree.pushBack(parent_node);
     }
+    if (tree.isEmpty())
+      return nullptr;
     return tree.front();
   }
 
@@ -103,7 +133,7 @@ namespace zubarev
     if (!node) {
       return;
     }
-    if (node->data_.second != '\0') {
+    if (is_leaf(node)) {
       out_dictionary[node->data_.second] = code;
     }
 
@@ -119,6 +149,9 @@ namespace zubarev
 
     for (auto it = text.begin(); it != text.end(); ++it) {
       // cur_byte=*it;
+      if (*it != '0' && *it != '1') {
+        throw std::invalid_argument("compress: input must contain only '0' and '1'");
+      }
       cur_byte <<= 1;
 
       if (*it == '1') {
@@ -140,7 +173,7 @@ namespace zubarev
 
     return packed_bytes;
   }
-  std::string Huffman::decompress(topit::Vector< uint8_t >& compress_bytes, size_t total_bits)
+  std::string Huffman::decompress(const topit::Vector< uint8_t >& compress_bytes, size_t total_bits)
   {
     std::string bit_string = "";
     size_t few_bits = 0;
@@ -165,8 +198,40 @@ namespace zubarev
     }
     return bit_string;
   }
-  BSTree< char, std::string, Comparator< char > > Huffman::getCodes() const
+  const BSTree< char, std::string, Comparator< char > >& Huffman::getCodes() const
   {
     return codes_;
+  }
+  void Huffman::buildTreeFromDictionary(const BSTree< char, std::string, Comparator< char > >& dictionary)
+  {
+    destroy(root_);
+    root_ = nullptr;
+    codes_ = dictionary;
+
+    using HuffNode = BSTreeNode< size_t, char >;
+    root_ = new HuffNode(0, '\0');
+
+    for (auto it = dictionary.begin(); it != dictionary.end(); ++it) {
+      char symbol = (*it).first;
+      const std::string& code = (*it).second;
+
+      HuffNode* current = root_;
+      for (char bit : code) {
+        if (bit == '0') {
+          if (!current->left_) {
+            current->left_ = new HuffNode(0, '\0');
+            current->left_->parent_ = current;
+          }
+          current = current->left_;
+        } else {
+          if (!current->right_) {
+            current->right_ = new HuffNode(0, '\0');
+            current->right_->parent_ = current;
+          }
+          current = current->right_;
+        }
+      }
+      current->data_.second = symbol;
+    }
   }
 }

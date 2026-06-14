@@ -12,8 +12,9 @@ namespace zubarev
     std::string encode(const std::string& text);
     std::string decode(const std::string& code);
     topit::Vector< uint8_t > compress(const std::string& text_bit);
-    std::string decompress(topit::Vector< uint8_t >& compress_bytes, size_t total_bits);
-    BSTree< char, std::string, Comparator< char > > getCodes() const;
+    std::string decompress(const topit::Vector< uint8_t >& compress_bytes, size_t total_bits);
+    const BSTree< char, std::string, Comparator< char > >& getCodes() const;
+    void buildTreeFromDictionary(const BSTree< char, std::string, Comparator< char > >& dictionary);
 
   private:
     BSTree< char, std::string, Comparator< char > > codes_;

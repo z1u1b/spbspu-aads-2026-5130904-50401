@@ -176,11 +176,12 @@ namespace zubarev
         file_ptr->addBlock(data_block_[cur_hash]);
       } else {
         Huffman huffman;
+        std::string bit_string = huffman.encode(cur_str);
         auto block = std::make_shared< DataBlock >();
         block->content_hash = cur_hash;
-        block->original_size = cur_size;
-        block->compressed_data = huffman.compress(huffman.encode(cur_str));
-
+        block->original_size = cur_str.size();
+        block->total_bits_count = bit_string.size();
+        block->compressed_data = huffman.compress(bit_string);
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
         data_block_.add(cur_hash, block);
@@ -221,7 +222,7 @@ namespace zubarev
         block->content_hash = cur_hash;
         block->original_size = cur_size;
         block->compressed_data = huffman.compress(huffman.encode(cur_str));
-
+        block->total_bits_count = cur_size;
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
         data_block_.add(cur_hash, block);
@@ -393,7 +394,10 @@ namespace zubarev
     topit::Vector< std::shared_ptr< DataBlock > > blocks = file->getBlocks();
     Huffman huffman;
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-      output_str += huffman.decode(huffman.decompress((*it)->compressed_data, (*it)->total_bits_count));
+      Huffman huffman;
+      huffman.buildTreeFromDictionary(*(*it)->out_dictionary); // ✅ Восстанавливаем дерево
+      std::string bit_string = huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
+      output_str += huffman.decode(bit_string);
     }
     return output_str;
   }
@@ -499,4 +503,5 @@ namespace zubarev
     }
     return {};
   }
+
 }
