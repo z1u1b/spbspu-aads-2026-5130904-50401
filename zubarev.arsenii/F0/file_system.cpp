@@ -170,21 +170,25 @@ namespace zubarev
       std::string cur_str = text.substr(offset, cur_size);
       offset += cur_size;
 
-      SipHash hasher;
-      uint64_t cur_hash = hasher(cur_str);
-      if (data_block_.has(cur_hash)) {
-        file_ptr->addBlock(data_block_[cur_hash]);
+      SipHash sip_hasher;
+      XXHash xx_hasher;
+      uint64_t sip_hash = sip_hasher(cur_str);
+      uint64_t xx_hash = xx_hasher(cur_str);
+      BlockKey key{sip_hash, xx_hash};
+      // uint64_t cur_hash = sip_hasher(cur_str);
+      if (data_block_.has(key)) {
+        file_ptr->addBlock(data_block_[key]);
       } else {
         Huffman huffman;
         std::string bit_string = huffman.encode(cur_str);
         auto block = std::make_shared< DataBlock >();
-        block->content_hash = cur_hash;
+        block->content_hash = key;
         block->original_size = cur_str.size();
         block->total_bits_count = bit_string.size();
         block->compressed_data = huffman.compress(bit_string);
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
-        data_block_.add(cur_hash, block);
+        data_block_.add(key, block);
         file_ptr->addBlock(block);
       }
     }
@@ -212,20 +216,25 @@ namespace zubarev
       std::string cur_str = text.substr(offset, cur_size);
       offset += cur_size;
 
-      SipHash hasher;
-      uint64_t cur_hash = hasher(cur_str);
-      if (data_block_.has(cur_hash)) {
-        file_ptr->addBlock(data_block_[cur_hash]);
+      SipHash sip_hasher;
+      XXHash xx_hasher;
+      uint64_t sip_hash = sip_hasher(cur_str);
+      uint64_t xx_hash = xx_hasher(cur_str);
+      BlockKey key{sip_hash, xx_hash};
+      // uint64_t cur_hash = sip_hasher(cur_str);
+      if (data_block_.has(key)) {
+        file_ptr->addBlock(data_block_[key]);
       } else {
         Huffman huffman;
+        std::string bit_string = huffman.encode(cur_str);
         auto block = std::make_shared< DataBlock >();
-        block->content_hash = cur_hash;
-        block->original_size = cur_size;
-        block->compressed_data = huffman.compress(huffman.encode(cur_str));
-        block->total_bits_count = cur_size;
+        block->content_hash = key;
+        block->original_size = cur_str.size();
+        block->total_bits_count = bit_string.size();
+        block->compressed_data = huffman.compress(bit_string);
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
-        data_block_.add(cur_hash, block);
+        data_block_.add(key, block);
         file_ptr->addBlock(block);
       }
     }

@@ -6,6 +6,7 @@
 #include "robin_hashtable.hpp"
 #include "../common/my_vector/top-it-vector.hpp"
 #include "my_siphash.hpp"
+#include "blockkey.hpp"
 #include "my_equal.hpp"
 #include "haffman.hpp"
 namespace zubarev
@@ -22,7 +23,7 @@ namespace zubarev
     topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
     std::shared_ptr< BSTree< char, std::string, Comparator< char > > >
         out_dictionary;      // Таблица частот / дерево Хаффмана для распаковки
-    uint64_t content_hash;   // Хэш исходных данных
+    BlockKey content_hash;   // Хэш исходных данных
     size_t original_size;    // Размер до сжатия (полезно для контроля)
     size_t total_bits_count; // Важно: сколько ИМЕННО значащих бит в сжатом потоке
   };

@@ -7,8 +7,10 @@
 #include "robin_hashtable.hpp"
 
 #include "my_siphash.hpp"
+#include "my_xxhash.hpp"
 #include "my_equal.hpp"
 #include "fs_nodes.hpp"
+#include "blockkey.hpp"
 
 namespace zubarev
 {
@@ -76,7 +78,7 @@ namespace zubarev
     std::shared_ptr< Directory > curr_dir_;
     std::string current_path_str_;
 
-    RobinHashTable< uint64_t, std::shared_ptr< DataBlock >, SipHash, Equaler< uint64_t > > data_block_;
+    RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
   };
 
 }
