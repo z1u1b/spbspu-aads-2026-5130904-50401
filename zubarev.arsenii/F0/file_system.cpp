@@ -381,8 +381,8 @@ namespace zubarev
   void FileSystem::treeImpl(std::shared_ptr< Directory > dir,
                             const std::string& prefix,
                             std::string& tree_str,
-                            size_t& count_files,
-                            size_t& count_dir) const
+                            size_t& count_dir,
+                            size_t& count_files) const
   {
     const std::string TRAIT = "──";
     const std::string COMPOUND = "├";
@@ -397,9 +397,9 @@ namespace zubarev
       }
       std::string childPrefix = prefix;
       if (isLast) {
-        childPrefix += "   ";
+        childPrefix += "    ";
       } else {
-        childPrefix += "│  ";
+        childPrefix += "│   ";
       }
       tree_str += prefix;
       tree_str += (isLast ? END_COMPOUND : COMPOUND);
@@ -407,10 +407,10 @@ namespace zubarev
       tree_str += " ";
       tree_str += it->key_;
       tree_str += '\n';
-      if (!it->val_->isDirectory()) {
+      if (it->val_->isDirectory()) {
         ++count_dir;
         auto child_dir = std::static_pointer_cast< Directory >(it->val_);
-        treeImpl(child_dir, childPrefix, tree_str, count_files, count_dir);
+        treeImpl(child_dir, childPrefix, tree_str, count_dir, count_files);
       } else {
         count_files += 1;
       }
@@ -418,21 +418,26 @@ namespace zubarev
   }
   std::tuple< std::string, size_t, size_t > FileSystem::tree(const std::string& path) const
   {
-
     size_t count_dir = 0;
     size_t count_files = 0;
     std::string res_str = "";
     res_str += ".\n";
 
-    FindResult found_target = navigateTo(path);
-    if (found_target.target_->isDirectory()) {
-      throw std::runtime_error("tree: " + path + " [error opening dir]");
+    std::shared_ptr< Directory > target_dir = nullptr;
+    if (path.empty()) {
+      target_dir = curr_dir_;
+
+    } else {
+      FindResult found_target = navigateTo(path);
+      if (found_target.target_->isDirectory()) {
+        throw std::runtime_error("tree: " + path + " [error opening dir]");
+      }
+      target_dir = std::static_pointer_cast< Directory >(found_target.target_);
     }
 
-    std::shared_ptr< Directory > target_dir = std::static_pointer_cast< Directory >(found_target.target_);
     treeImpl(target_dir, "", res_str, count_dir, count_files);
 
-    return {res_str, count_files, count_dir};
+    return {res_str, count_dir, count_files};
   }
 
   topit::Vector< std::string > FileSystem::search(const std::string& name) const

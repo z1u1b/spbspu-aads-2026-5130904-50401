@@ -132,12 +132,15 @@ namespace zubarev
 
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
-    std::string path;
-    in >> path;
+    std::string path = "";
+    if (in.peek() != '\n' && in.peek() != EOF) {
+      in >> path;
+    }
+
     auto res = file_sys.tree(path);
     out << std::get< 0 >(res) << "\n";
-    out << std::get< 1 >(res) << ", ";
-    out << std::get< 2 >(res) << "\n";
+    out << std::get< 1 >(res) << " directories, ";
+    out << std::get< 2 >(res) << " files\n";
   }
 
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
