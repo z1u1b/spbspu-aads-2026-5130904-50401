@@ -4,7 +4,6 @@
 #include <cctype>
 #include "list.hpp"
 
-
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
   zubarev::List< zubarev::Data > list;
@@ -26,7 +25,6 @@ zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
     }
 
     in.clear();
-
 
     // char ch;
     // if (in >> ch) {

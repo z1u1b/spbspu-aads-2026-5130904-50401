@@ -15,7 +15,6 @@ namespace zubarev
   class LIter
   {
 
-
   public:
     T& operator*();
     T* operator->();
