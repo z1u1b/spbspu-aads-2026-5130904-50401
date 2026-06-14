@@ -304,6 +304,31 @@ namespace zubarev
     return true;
   }
 
+  bool FileSystem::isDescendant(const std::shared_ptr< Directory >& root,
+                                const std::shared_ptr< FSNode >& candidate) const
+  {
+    if (!root) {
+      return false;
+    }
+
+    for (auto it = root->children_.begin(); it != root->children_.end(); ++it) {
+
+      if (it->val_ == candidate) {
+        return true;
+      }
+
+      if (it->val_->isDirectory()) {
+        auto child_dir = std::static_pointer_cast< Directory >(it->val_);
+
+        if (isDescendant(child_dir, candidate)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   bool FileSystem::mv(const std::string& from, const std::string& to)
   {
     if (from.empty() || to.empty()) {
@@ -326,7 +351,14 @@ namespace zubarev
     if (src_to.target_ && !src_to.target_->isDirectory()) {
       throw std::runtime_error("mv: destination already exists");
     }
+    if (src_from.target_->isDirectory()) {
 
+      auto moved_dir = std::static_pointer_cast< Directory >(src_from.target_);
+
+      if (isDescendant(moved_dir, src_to.target_)) {
+        throw std::runtime_error("mv: cannot move directory into itself");
+      }
+    }
     if (src_from.target_ == src_to.target_) {
       throw std::runtime_error("mv: Source and destination are the same");
     }
