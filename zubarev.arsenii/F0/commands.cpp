@@ -1,6 +1,8 @@
 #include "commands.hpp"
+
 #include <iostream>
 #include <iomanip>
+#include "utils.hpp"
 namespace zubarev
 {
   void cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
@@ -123,11 +125,9 @@ namespace zubarev
     if (in.peek() != '\n' && in.peek() != EOF) {
       in >> path;
     }
-    auto list = file_sys.ls(path);
-    for (size_t i = 0; i < list.getSize(); ++i) {
-      out << list[i] << " ";
-    }
-    out << "\n";
+    auto names = file_sys.ls(path);
+    std::sort(names.begin(), names.end());
+    out << detail::formatLsColumns(names);
   }
 
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
