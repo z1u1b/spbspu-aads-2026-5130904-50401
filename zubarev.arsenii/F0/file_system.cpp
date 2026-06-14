@@ -58,6 +58,17 @@ namespace zubarev
     if (curr_dir_->children_.has(name_dir)) {
       throw std::runtime_error("mkdir: " + name_dir + ": File exists");
     }
+    if (name_dir.empty()) {
+      throw std::runtime_error("mkdir: empty file name");
+    }
+
+    if (name_dir == "." || name_dir == "..") {
+      throw std::runtime_error("mkdir: invalid directory name");
+    }
+
+    if (name_dir.find('/') != std::string::npos) {
+      throw std::runtime_error("mkdir: invalid character '/'");
+    }
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();
     new_data.owner = detail::getCurrentUser();
@@ -69,27 +80,68 @@ namespace zubarev
 
   bool FileSystem::rmdir(const std::string& name_dir)
   {
+    if (name_dir.empty()) {
+      throw std::runtime_error("rmdir: empty file name");
+    }
+
+    if (name_dir == "." || name_dir == "..") {
+      throw std::runtime_error("rmdir: invalid directory name");
+    }
+
     if (!curr_dir_->children_.has(name_dir)) {
       throw std::runtime_error("rmdir: " + name_dir + ": No such file or directory");
+    }
+
+    auto node = curr_dir_->children_.at(name_dir);
+    if (!node->isDirectory()) {
+      throw std::runtime_error("rmdir: " + name_dir + ": Not a directory");
+    }
+
+    auto dir = std::static_pointer_cast< Directory >(node);
+    if (!dir->children_.empty()) {
+      throw std::runtime_error("rmdir: " + name_dir + ": Directory not empty");
     }
     curr_dir_->children_.drop(name_dir);
     return true;
   }
   bool FileSystem::rm(const std::string& name)
   {
-    if (!curr_dir_->children_.has(name)) {
-      throw std::runtime_error("rm: " + name + ": No such file or directory");
-    } else if (curr_dir_->children_[name]->isDirectory()) {
+    if (name.empty()) {
+      throw std::runtime_error("rm: empty file name");
+    }
+
+    if (name == "." || name == "..") {
       throw std::runtime_error("rm: " + name + ": is a directory");
     }
+
+    if (!curr_dir_->children_.has(name)) {
+      throw std::runtime_error("rm: " + name + ": No such file or directory");
+    }
+
+    auto node = curr_dir_->children_.at(name);
+    if (node->isDirectory()) {
+      throw std::runtime_error("rm: " + name + ": is a directory");
+    }
+
     curr_dir_->children_.drop(name);
     return true;
   }
 
   bool FileSystem::touch(const std::string& name_file)
   {
+    if (name_file.empty()) {
+      throw std::runtime_error("touch: empty file name");
+    }
+
+    if (name_file == "." || name_file == "..") {
+      throw std::runtime_error("touch: invalid file name");
+    }
+
+    if (name_file.find('/') != std::string::npos) {
+      throw std::runtime_error("touch: invalid character '/'");
+    }
     if (curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("mkdir: " + name_file + ": File exists");
+      throw std::runtime_error("touch: " + name_file + ": File exists");
     }
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();

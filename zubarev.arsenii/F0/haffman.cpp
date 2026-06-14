@@ -24,6 +24,7 @@ namespace zubarev
   }
   std::string Huffman::encode(const std::string& text)
   {
+    codes_ = {};
     BSTree< char, size_t, Comparator< char > > freq_let = calculateLetters(text);
     root_ = treeLetters(freq_let);
 
