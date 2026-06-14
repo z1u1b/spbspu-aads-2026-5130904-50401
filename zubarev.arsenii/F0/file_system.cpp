@@ -419,9 +419,21 @@ namespace zubarev
 
   bool FileSystem::cp(const std::string& from, const std::string& to)
   {
+    if (from.empty() || to.empty()) {
+      throw std::runtime_error("cp: empty path");
+    }
+    if (from == "~" || to == "~") {
+      throw std::runtime_error("cp: cannot copy root directory");
+    }
+    if (from == "." || from == ".." || to == "." || to == "..") {
+      throw std::runtime_error("cp: invalid path");
+    }
 
     FindResult src_from = navigateTo(from);
     FindResult src_to = navigateTo(to);
+    if (!src_from.target_ || !src_from.parent_dir_) {
+      throw std::runtime_error("cp: : No such directory");
+    }
 
     if (!src_from.target_ || !src_from.parent_dir_) {
       throw std::runtime_error("cp: : No such directory");
@@ -429,7 +441,10 @@ namespace zubarev
     if (src_from.target_ == src_to.target_) {
       throw std::runtime_error("cp: : identical files");
     }
+    if (src_from.target_->isDirectory() && src_to.target_ && !src_to.target_->isDirectory()) {
 
+      throw std::runtime_error("cp: cannot overwrite non-directory with directory");
+    }
     std::shared_ptr< FSNode > clone_node = nullptr;
 
     if (src_from.target_->isDirectory()) {
@@ -464,17 +479,28 @@ namespace zubarev
   {
     FindResult src = navigateTo(name);
     if (!src.target_) {
-      throw std::runtime_error("cat: " + name + ": No such directory");
+      throw std::runtime_error("cat: " + name + ": No such file or directory");
     } else if (src.target_->isDirectory()) {
       throw std::runtime_error("cat: " + name + ": Is a directory");
     }
     std::shared_ptr< File > file = std::static_pointer_cast< File >(src.target_);
     std::string output_str = "";
-    topit::Vector< std::shared_ptr< DataBlock > > blocks = file->getBlocks();
+    const auto& blocks = file->getBlocks();
     Huffman huffman;
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-      Huffman huffman;
-      huffman.buildTreeFromDictionary(*(*it)->out_dictionary); // ✅ Восстанавливаем дерево
+      if (!(*it)) {
+        throw std::runtime_error("cat: corrupted block");
+      }
+
+      if (!(*it)->out_dictionary) {
+        throw std::runtime_error("cat: corrupted dictionary");
+      }
+
+      size_t max_bits = (*it)->compressed_data.getSize() * 8;
+      if ((*it)->total_bits_count > max_bits) {
+        throw std::runtime_error("cat: corrupted block");
+      }
+      huffman.buildTreeFromDictionary(*(*it)->out_dictionary);
       std::string bit_string = huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
       output_str += huffman.decode(bit_string);
     }

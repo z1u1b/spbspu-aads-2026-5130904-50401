@@ -62,7 +62,6 @@ namespace zubarev
       meta_ = m;
     }
 
-    // Геттеры и сеттеры для блоков данных (для Хаффмана и дедупликации)
     const topit::Vector< std::shared_ptr< DataBlock > >& getBlocks() const noexcept
     {
       return blocks_;
