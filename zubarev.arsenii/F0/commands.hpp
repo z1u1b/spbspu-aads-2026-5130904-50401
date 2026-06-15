@@ -18,6 +18,7 @@ namespace zubarev
   void cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  void printPrompt(const FileSystem& fs, std::ostream& out);
 }
 
 #endif

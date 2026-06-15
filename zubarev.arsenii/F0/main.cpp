@@ -77,6 +77,7 @@ int main()
   // }
 
   std::string cmd;
+  zub::printPrompt(file_sys, std::cout);
   while (std::cin >> cmd) {
 
     try {
@@ -92,6 +93,7 @@ int main()
     } catch (const std::logic_error& e) {
       std::cout << "<<INVALID COMMAND: " << e.what() << '\n';
     }
+    zub::printPrompt(file_sys, std::cout);
   }
   std::cin.clear();
   std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
