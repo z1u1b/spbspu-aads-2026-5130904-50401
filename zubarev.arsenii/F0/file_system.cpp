@@ -634,4 +634,58 @@ namespace zubarev
     return {};
   }
 
+  // Работа с постоянным хранилищем сессий и внешними файлами
+  bool FileSystem::save(const std::string& path)
+  {
+    std::shared_ptr< FSNode > found_node = navigateTo(path);
+    if (!found_node) {
+      throw std::runtime_error("save: " + path + " [error opening dir]");
+    }
+
+    const std::string& save_name = found_node->getName();
+    if (session_storage_.find(save_name) != session_storage_.end()) {
+      throw std::runtime_error("save: " + path + " is already exists");
+    }
+
+    if (found_node->isDirectory()) {
+      session_storage_.add(save_name, cloneDirectory(std::static_pointer_cast< Directory >(found_node)));
+    } else {
+      session_storage_.add(save_name, cloneFile(std::static_pointer_cast< File >(found_node)));
+    }
+
+    return true;
+  }
+  bool FileSystem::load(const std::string& path)
+  {
+    std::shared_ptr< FSNode > found_node = navigateTo(path);
+    if (!found_node) {
+      throw std::runtime_error("load: " + path + " [error opening dir]");
+    }
+
+    const std::string& save_name = found_node->getName();
+    auto save_node = session_storage_.find(save_name);
+    if (save_node == session_storage_.end()) {
+      throw std::runtime_error("load: " + path + " is already exists");
+    }
+
+    std::shared_ptr< FSNode > new_node = save_node->val_;
+    if (new_node->isDirectory()) {
+      curr_dir_->addChild(save_name, cloneDirectory(std::static_pointer_cast< Directory >(new_node)));
+    } else {
+      curr_dir_->addChild(save_name, cloneFile(std::static_pointer_cast< File >(new_node)));
+    }
+
+    return true;
+  }
+  bool FileSystem::archive(const std::string& name_dir)
+  {}
+  bool FileSystem::start_state()
+  {}
+  bool FileSystem::import_file(const std::string& real_path, const std::string& virtual_name)
+  {}
+  bool FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
+  {}
+  bool FileSystem::start_state(const std::string& file_name, bool force)
+  {}
+
 }

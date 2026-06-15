@@ -38,13 +38,21 @@ namespace zubarev
     topit::Vector< std::string > search(const std::string& name) const;
 
     // Работа с постоянным хранилищем сессий и внешними файлами
-    void save();
-    void load();
-    void archive();
-    void states();
-    void import();
-    void export_s();
-    void start_state();
+    bool save(const std::string& name_node);
+    bool load(const std::string& name_node);
+    bool archive(const std::string& name_dir);
+    bool start_state();
+    bool import_file(const std::string& real_path, const std::string& virtual_name);
+    bool export_file(const std::string& virtual_name, const std::string& real_path);
+    bool start_state(const std::string& file_name, bool force = false);
+
+    struct StateInfo
+    {
+      std::string name;
+      size_t size_kb;
+      std::string date;
+    };
+    std::vector< StateInfo > states(const std::string& path = ".") const;
 
     // Управление кэшированием (LRU)
     void cache_size();
@@ -76,6 +84,7 @@ namespace zubarev
     // std::string current_path_str_;
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
+    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > session_storage_;
   };
 
 }
