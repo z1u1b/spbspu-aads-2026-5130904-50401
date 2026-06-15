@@ -52,11 +52,17 @@ namespace zubarev
         if (*it != '/') {
           cur_str += *it;
         } else {
-          dirs.push(cur_str);
+          // std::cout<<cur_str<<'\n';
+          if (cur_str != "") {
+            dirs.push(cur_str);
+          }
+
           cur_str = "";
         }
       }
-      dirs.push(cur_str);
+      if (cur_str != "") {
+        dirs.push(cur_str);
+      }
       cur_str = "";
       return dirs;
     }
