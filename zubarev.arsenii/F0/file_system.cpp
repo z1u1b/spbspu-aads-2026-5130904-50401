@@ -3,6 +3,11 @@
 #include "utils.hpp"
 #include "../common/my_queue/queue.hpp"
 
+#include <dirent.h>
+#include <sys/stat.h>
+#include <ctime>
+#include <cstring>
+
 namespace zubarev
 {
   std::shared_ptr< FSNode > FileSystem::navigateTo(const std::string& path) const
@@ -677,15 +682,67 @@ namespace zubarev
 
     return true;
   }
-  bool FileSystem::archive(const std::string& name_dir)
-  {}
-  bool FileSystem::start_state()
-  {}
-  bool FileSystem::import_file(const std::string& real_path, const std::string& virtual_name)
-  {}
-  bool FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
-  {}
-  bool FileSystem::start_state(const std::string& file_name, bool force)
-  {}
+
+  std::vector< FileSystem::StateInfo > FileSystem::states(const std::string& path) const
+  {
+    std::vector< StateInfo > result;
+
+    DIR* dir = opendir(path.c_str());
+    if (!dir) {
+      std::cout << "here" << '\n';
+      return result;
+    }
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+      std::string filename = entry->d_name;
+
+      if (filename == "." || filename == "..") {
+        continue;
+      }
+
+      if (filename.size() < 6) {
+        continue;
+      }
+
+      std::string extension = filename.substr(filename.size() - 6);
+      if (extension != ".state") {
+        continue;
+      }
+
+      std::string full_path = path;
+      if (!full_path.empty() && full_path.back() != '/') {
+        full_path += '/';
+      }
+      full_path += filename;
+
+      struct stat file_stat;
+      if (stat(full_path.c_str(), &file_stat) == 0) {
+        if (S_ISREG(file_stat.st_mode)) {
+          StateInfo info;
+          info.name = filename;
+          info.size_kb = file_stat.st_size / 1024;
+
+          struct tm* tm_info = localtime(&file_stat.st_mtime);
+          char time_buf[20];
+          strftime(time_buf, sizeof(time_buf), "%Y-%m-%d", tm_info);
+          info.date = time_buf;
+
+          result.push_back(info);
+        }
+      }
+    }
+    closedir(dir);
+    return result;
+  }
+
+  // bool FileSystem::archive(const std::string& path)
+  // {}
+  // bool FileSystem::import_file(const std::string& real_path, const std::string& virtual_name)
+  // {}
+  // bool FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
+  // {}
+  // bool FileSystem::start_state(const std::string& file_name, bool force)
+  // {}
 
 }

@@ -37,22 +37,22 @@ namespace zubarev
     std::tuple< std::string, size_t, size_t > tree(const std::string& path) const;
     topit::Vector< std::string > search(const std::string& name) const;
 
-    // Работа с постоянным хранилищем сессий и внешними файлами
-    bool save(const std::string& name_node);
-    bool load(const std::string& name_node);
-    bool archive(const std::string& name_dir);
-    bool start_state();
-    bool import_file(const std::string& real_path, const std::string& virtual_name);
-    bool export_file(const std::string& virtual_name, const std::string& real_path);
-    bool start_state(const std::string& file_name, bool force = false);
-
     struct StateInfo
     {
       std::string name;
       size_t size_kb;
       std::string date;
     };
+    // Работа с постоянным хранилищем сессий и внешними файлами
+    bool save(const std::string& name_node);
+    bool load(const std::string& name_node);
     std::vector< StateInfo > states(const std::string& path = ".") const;
+    //     bool archive(const std::string& name_dir);
+
+    // bool start_state();
+    // bool import_file(const std::string& real_path, const std::string& virtual_name);
+    // bool export_file(const std::string& virtual_name, const std::string& real_path);
+    // bool start_state(const std::string& file_name, bool force = false);
 
     // Управление кэшированием (LRU)
     void cache_size();
@@ -62,6 +62,16 @@ namespace zubarev
 
     // Поисковый движок
     void ssearch();
+
+    // void setStatesDirectory(const std::string& path) {
+    //     states_directory_ = path;
+    //     // Создать директорию, если не существует
+    //     std::filesystem::create_directories(states_directory_);
+    // }
+
+    // std::string getStatesDirectory() const {
+    //     return states_directory_;
+    // }
 
   private:
     bool isDescendant(const std::shared_ptr< Directory >& root, const std::shared_ptr< FSNode >& candidate) const;
@@ -85,6 +95,7 @@ namespace zubarev
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
     RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > session_storage_;
+    // std::string states_directory_ = "./states/";
   };
 
 }

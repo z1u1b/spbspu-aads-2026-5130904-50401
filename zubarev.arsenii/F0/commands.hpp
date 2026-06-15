@@ -18,6 +18,15 @@ namespace zubarev
   void cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  void cmd_save(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  void cmd_load(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  void cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys);
+
+  // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  // void cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  // void cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  // void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys);
+
   void printPrompt(const FileSystem& fs, std::ostream& out);
 }
 

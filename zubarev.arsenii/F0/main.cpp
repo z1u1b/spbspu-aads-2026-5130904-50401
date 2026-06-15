@@ -39,42 +39,24 @@ int main()
   cmds["cd"] = zub::cmd_cd;
   cmds["mv"] = zub::cmd_mv;
   cmds["cp"] = zub::cmd_cp;
-  std::cout << (cmds.at("cp") == zub::cmd_cp) << '\n';
   cmds["cat"] = zub::cmd_cat;
   cmds["pwd"] = zub::cmd_pwd;
   cmds["ls"] = zub::cmd_ls;
   cmds["ls"] = zub::cmd_ls;
-  std::cout << (cmds.at("ls") == zub::cmd_ls) << '\n';
   cmds["tree"] = zub::cmd_tree;
   cmds["ls"] = zub::cmd_ls;
 
-  std::cout << (cmds.at("tree") == zub::cmd_tree) << '\n';
   cmds["search"] = zub::cmd_search;
-  std::cout << "mkdir  = " << reinterpret_cast< const void* >(cmds.at("mkdir")) << '\n';
-  std::cout << "rm     = " << reinterpret_cast< const void* >(cmds.at("rm")) << '\n';
-  std::cout << "touch  = " << reinterpret_cast< const void* >(cmds.at("touch")) << '\n';
-  std::cout << "write  = " << reinterpret_cast< const void* >(cmds.at("write")) << '\n';
-  std::cout << "append = " << reinterpret_cast< const void* >(cmds.at("append")) << '\n';
-  std::cout << "cd     = " << reinterpret_cast< const void* >(cmds.at("cd")) << '\n';
-  std::cout << "mv     = " << reinterpret_cast< const void* >(cmds.at("mv")) << '\n';
-  std::cout << "cp     = " << reinterpret_cast< const void* >(cmds.at("cp")) << '\n';
-  std::cout << "cat    = " << reinterpret_cast< const void* >(cmds.at("cat")) << '\n';
-  std::cout << "pwd    = " << reinterpret_cast< const void* >(cmds.at("pwd")) << '\n';
-  std::cout << "ls     = " << reinterpret_cast< const void* >(cmds.at("ls")) << '\n';
-  std::cout << "tree   = " << reinterpret_cast< const void* >(cmds.at("tree")) << '\n';
-  std::cout << "search = " << reinterpret_cast< const void* >(cmds.at("search")) << '\n';
+  cmds["save"] = zub::cmd_save;
+  cmds["load"] = zub::cmd_load;
+
+  cmds["states"] = zub::cmd_states;
+  // cmds["archive"] = zub::cmd_archive;
+  // cmds["import"] = zub::cmd_import;
+  // cmds["export"] = zub::cmd_export;
+  // cmds["start-state"] = zub::cmd_start_state;
 
   zub::FileSystem file_sys;
-
-  // try {
-
-  //   zub::inputGraphs(input, std::cout, graph);
-  // }
-
-  // catch (const std::exception& e) {
-  //   std::cerr << e.what() << '\n';
-  //   return 1;
-  // }
 
   std::string cmd;
   zub::printPrompt(file_sys, std::cout);

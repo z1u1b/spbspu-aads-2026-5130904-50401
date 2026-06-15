@@ -154,6 +154,127 @@ namespace zubarev
     }
   }
 
+  void cmd_save(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string path;
+    if (!(in >> path)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    if (file_sys.save(path)) {
+      out << "<SAVED>\n";
+    } else {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+
+  void cmd_load(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string name;
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    if (file_sys.load(name)) {
+      out << "<LOADED>\n";
+    } else {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+
+  void cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string path = "";
+    // Читаем путь, если он есть (аналогично твоему cmd_tree)
+    if (in.peek() != '\n' && in.peek() != EOF) {
+      in >> path;
+    }
+
+    auto states_list = file_sys.states(path);
+
+    if (states_list.empty()) {
+      out << "<NO STATES FOUND>\n";
+    } else {
+      for (const auto& info : states_list) {
+        out << info.name << " [" << info.size_kb << "KB, " << info.date << "]\n";
+      }
+    }
+  }
+
+  // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   std::string path;
+  //   if (!(in >> path)) {
+  //     out << "<INVALID COMMAND>\n";
+  //     return;
+  //   }
+
+  //   if (file_sys.archive(path)) {
+  //     out << "<ARCHIVED: " << path << ".zip>\n";
+  //   } else {
+  //     out << "<INVALID COMMAND>\n";
+  //   }
+  // }
+
+  // void cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   std::string real_path, virtual_name;
+  //   // Требуется ровно два аргумента
+  //   if (!(in >> real_path >> virtual_name)) {
+  //     out << "<INVALID COMMAND>\n";
+  //     return;
+  //   }
+
+  //   // Примечание: метод в FileSystem лучше назвать import_file,
+  //   // чтобы не конфликтовать с ключевым словом export/import в некоторых компиляторах
+  //   if (file_sys.import_file(real_path, virtual_name)) {
+  //     out << "<IMPORTED: " << real_path << " -> " << virtual_name << ">\n";
+  //   } else {
+  //     out << "<INVALID COMMAND>\n";
+  //   }
+  // }
+
+  // void cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   std::string virtual_name, real_path;
+  //   // Требуется ровно два аргумента
+  //   if (!(in >> virtual_name >> real_path)) {
+  //     out << "<INVALID COMMAND>\n";
+  //     return;
+  //   }
+
+  //   // Примечание: метод в FileSystem лучше назвать export_file
+  //   if (file_sys.export_file(virtual_name, real_path)) {
+  //     out << "<EXPORTED: " << virtual_name << " -> " << real_path << ">\n";
+  //   } else {
+  //     out << "<INVALID COMMAND>\n";
+  //   }
+  // }
+
+  // void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   std::string filename;
+  //   if (!(in >> filename)) {
+  //     out << "<INVALID COMMAND>\n";
+  //     return;
+  //   }
+
+  //   bool force = false;
+  //   std::string force_str;
+  //   // Проверяем, передан ли второй аргумент (true/false)
+  //   if (in >> force_str) {
+  //     force = (force_str == "true");
+  //   }
+
+  //   if (file_sys.start_state(filename, force)) {
+  //     out << "<STATE LOADED: " << filename << ">\n";
+  //   } else {
+  //     out << "<INVALID COMMAND>\n";
+  //   }
+  // }
+
   void printPrompt(const FileSystem& fs, std::ostream& out)
   {
     // ANSI коды для цветов
