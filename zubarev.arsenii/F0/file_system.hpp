@@ -47,12 +47,14 @@ namespace zubarev
     bool save(const std::string& name_node);
     bool load(const std::string& name_node);
     std::vector< StateInfo > states(const std::string& path = ".") const;
-    bool save_state();
-    //bool archive(const std::string& name_dir);
+    bool import_file(const std::string& real_path, const std::string& virtual_name);
+    bool export_file(const std::string& virtual_name, const std::string& real_path);
+
+    // bool save_state();
+
+    // bool archive(const std::string& name_dir);
 
     // bool start_state();
-    // bool import_file(const std::string& real_path, const std::string& virtual_name);
-    // bool export_file(const std::string& virtual_name, const std::string& real_path);
     // bool start_state(const std::string& file_name, bool force = false);
 
     // Управление кэшированием (LRU)

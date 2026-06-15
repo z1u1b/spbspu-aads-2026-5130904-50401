@@ -50,10 +50,10 @@ int main()
   cmds["save"] = zub::cmd_save;
   cmds["load"] = zub::cmd_load;
   cmds["states"] = zub::cmd_states;
+  cmds["import"] = zub::cmd_import;
+  cmds["export"] = zub::cmd_export;
   // cmds["save_state"] = zub::cmd_save_state;
   // cmds["archive"] = zub::cmd_archive;
-  // cmds["import"] = zub::cmd_import;
-  // cmds["export"] = zub::cmd_export;
   // cmds["start-state"] = zub::cmd_start_state;
 
   zub::FileSystem file_sys;

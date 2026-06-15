@@ -243,6 +243,41 @@ namespace zubarev
     }
   }
 
+  void cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string real_path, virtual_name;
+    // Требуется ровно два аргумента
+    if (!(in >> real_path >> virtual_name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    try {
+      if (file_sys.import_file(real_path, virtual_name)) {
+        out << "<IMPORTED: " << real_path << " -> " << virtual_name << ">\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
+
+  void cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string virtual_name, real_path;
+    if (!(in >> virtual_name >> real_path)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    try {
+      if (file_sys.export_file(virtual_name, real_path)) {
+        out << "<EXPORTED: " << virtual_name << " -> " << real_path << ">\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
+
   // void cmd_save_state(std::istream&, std::ostream& out, FileSystem& file_sys)
   // {
   //   // std::string path = "";
@@ -266,41 +301,6 @@ namespace zubarev
 
   //   if (file_sys.archive(path)) {
   //     out << "<ARCHIVED: " << path << ".zip>\n";
-  //   } else {
-  //     out << "<INVALID COMMAND>\n";
-  //   }
-  // }
-
-  // void cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   std::string real_path, virtual_name;
-  //   // Требуется ровно два аргумента
-  //   if (!(in >> real_path >> virtual_name)) {
-  //     out << "<INVALID COMMAND>\n";
-  //     return;
-  //   }
-
-  //   // Примечание: метод в FileSystem лучше назвать import_file,
-  //   // чтобы не конфликтовать с ключевым словом export/import в некоторых компиляторах
-  //   if (file_sys.import_file(real_path, virtual_name)) {
-  //     out << "<IMPORTED: " << real_path << " -> " << virtual_name << ">\n";
-  //   } else {
-  //     out << "<INVALID COMMAND>\n";
-  //   }
-  // }
-
-  // void cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   std::string virtual_name, real_path;
-  //   // Требуется ровно два аргумента
-  //   if (!(in >> virtual_name >> real_path)) {
-  //     out << "<INVALID COMMAND>\n";
-  //     return;
-  //   }
-
-  //   // Примечание: метод в FileSystem лучше назвать export_file
-  //   if (file_sys.export_file(virtual_name, real_path)) {
-  //     out << "<EXPORTED: " << virtual_name << " -> " << real_path << ">\n";
   //   } else {
   //     out << "<INVALID COMMAND>\n";
   //   }

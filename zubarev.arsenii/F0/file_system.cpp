@@ -8,6 +8,13 @@
 #include <ctime>
 #include <cstring>
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <memory>
+#include <sstream>
+// #include <sstream>
+
 namespace zubarev
 {
   std::shared_ptr< FSNode > FileSystem::navigateTo(const std::string& path) const
@@ -736,12 +743,56 @@ namespace zubarev
     return result;
   }
 
+  bool FileSystem::import_file(const std::string& real_path, const std::string& virtual_name)
+  {
+    std::ifstream input(real_path, std::ios::binary);
+
+    if (!input) {
+      throw std::runtime_error("import: " + real_path + " [error opening file]");
+    }
+    std::string new_file_name = "";
+    if (virtual_name.empty()) {
+      size_t pos = real_path.find_last_of("/\\");
+      if (pos != std::string::npos) {
+        new_file_name = real_path.substr(pos + 1);
+      } else {
+        new_file_name = real_path;
+      }
+    } else {
+      new_file_name = virtual_name;
+    }
+    FileMetaData new_data;
+    new_data.date = detail::getCurrentDateTime();
+    new_data.owner = detail::getCurrentUser();
+
+    auto new_file = std::make_shared< File >(new_data);
+    std::ostringstream buffer;
+    buffer << input.rdbuf();
+
+    append(new_file_name, buffer.str());
+
+    curr_dir_->addChild(new_file_name, new_file);
+    return true;
+  }
+  bool FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
+  {
+
+    if (virtual_name.empty() || !navigateTo(virtual_name)) {
+      throw std::runtime_error("export: " + virtual_name + " [error opening file]");
+    }
+
+    std::ofstream output_file(real_path);
+    if (!output_file) {
+      throw std::runtime_error("export: " + real_path + " [error creating file on disk]");
+    }
+    output_file << cat(virtual_name);
+    output_file.close();
+    return true;
+  }
+
   // bool FileSystem::archive(const std::string& path)
   // {}
-  // bool FileSystem::import_file(const std::string& real_path, const std::string& virtual_name)
-  // {}
-  // bool FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
-  // {}
+
   // bool FileSystem::start_state(const std::string& file_name, bool force)
   // {}
 
