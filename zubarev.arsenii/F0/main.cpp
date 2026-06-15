@@ -49,8 +49,8 @@ int main()
   cmds["search"] = zub::cmd_search;
   cmds["save"] = zub::cmd_save;
   cmds["load"] = zub::cmd_load;
-
   cmds["states"] = zub::cmd_states;
+  // cmds["save_state"] = zub::cmd_save_state;
   // cmds["archive"] = zub::cmd_archive;
   // cmds["import"] = zub::cmd_import;
   // cmds["export"] = zub::cmd_export;

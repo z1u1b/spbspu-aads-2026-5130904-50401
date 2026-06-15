@@ -745,4 +745,6 @@ namespace zubarev
   // bool FileSystem::start_state(const std::string& file_name, bool force)
   // {}
 
+  //   bool FileSystem::save_state()
+  // {}
 }

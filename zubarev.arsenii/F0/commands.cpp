@@ -5,118 +5,141 @@
 #include "utils.hpp"
 namespace zubarev
 {
+
   void cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.mkdir(name);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.mkdir(name);
   }
 
   void cmd_rm(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.rm(name);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.rm(name);
   }
 
   void cmd_touch(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name;
-    in >> name;
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.touch(name);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.touch(name);
   }
 
   void cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name, text;
-    in >> name >> std::quoted(text);
+    if (!(in >> name >> std::quoted(text))) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.write(name, text);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
   }
 
   void cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name, text;
-    in >> name >> std::quoted(text);
+    if (!(in >> name >> std::quoted(text))) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.append(name, text);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.append(name, text);
   }
 
   void cmd_cd(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string path;
-    in >> path;
+    if (!(in >> path)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.cd(path);
-    } catch (...) {
-      out << "<<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.cd(path);
   }
 
   void cmd_mv(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string from, to;
-    in >> from >> to;
+    if (!(in >> from >> to)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.mv(from, to);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.mv(from, to);
   }
 
   void cmd_cp(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string from, to;
-    in >> from >> to;
+    if (!(in >> from >> to)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.cp(from, to);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
-    // Логика: file_sys.cp(from, to);
   }
 
   void cmd_cat(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string name;
-    in >> name;
-    auto text_out = file_sys.cat(name);
-    out << text_out << '\n';
-    // try {
-    //   file_sys.cat(name);
-    // } catch (...) {
-    //   out << "<INVALID COMMAND>";
-    // }
-    // out << file_sys.cat(name);
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    try {
+      auto text_out = file_sys.cat(name);
+      out << text_out << '\n';
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
   }
 
   void cmd_pwd(std::istream&, std::ostream& out, FileSystem& file_sys)
   {
-    out << file_sys.pwd() << "\n";
+    try {
+      out << file_sys.pwd() << "\n";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
   }
 
   void cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
@@ -125,9 +148,13 @@ namespace zubarev
     if (in.peek() != '\n' && in.peek() != EOF) {
       in >> path;
     }
-    auto names = file_sys.ls(path);
-    std::sort(names.begin(), names.end());
-    out << detail::formatLsColumns(names);
+    try {
+      auto names = file_sys.ls(path);
+      std::sort(names.begin(), names.end());
+      out << detail::formatLsColumns(names);
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
   }
 
   void cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
@@ -136,21 +163,27 @@ namespace zubarev
     if (in.peek() != '\n' && in.peek() != EOF) {
       in >> path;
     }
-
-    auto res = file_sys.tree(path);
-    out << std::get< 0 >(res) << "\n";
-    out << std::get< 1 >(res) << " directories, ";
-    out << std::get< 2 >(res) << " files\n";
+    try {
+      auto res = file_sys.tree(path);
+      out << std::get< 0 >(res) << "\n";
+      out << std::get< 1 >(res) << " directories, ";
+      out << std::get< 2 >(res) << " files\n";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
   }
 
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string path;
-    in >> path;
+    if (!(in >> path)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     try {
       file_sys.search(path);
-    } catch (...) {
-      out << "<INVALID COMMAND>";
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
   }
 
@@ -161,11 +194,14 @@ namespace zubarev
       out << "<INVALID COMMAND>\n";
       return;
     }
-
-    if (file_sys.save(path)) {
-      out << "<SAVED>\n";
-    } else {
-      out << "<INVALID COMMAND>\n";
+    try {
+      if (file_sys.save(path)) {
+        out << "<SAVED>\n";
+      } else {
+        out << "<INVALID COMMAND>\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
   }
 
@@ -176,32 +212,49 @@ namespace zubarev
       out << "<INVALID COMMAND>\n";
       return;
     }
-
-    if (file_sys.load(name)) {
-      out << "<LOADED>\n";
-    } else {
-      out << "<INVALID COMMAND>\n";
+    try {
+      if (file_sys.load(name)) {
+        out << "<LOADED>\n";
+      } else {
+        out << "<INVALID COMMAND>\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
   }
 
   void cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string path = "";
-    // Читаем путь, если он есть (аналогично твоему cmd_tree)
     if (in.peek() != '\n' && in.peek() != EOF) {
       in >> path;
     }
-
-    auto states_list = file_sys.states(path);
-
-    if (states_list.empty()) {
-      out << "<NO STATES FOUND>\n";
-    } else {
-      for (const auto& info : states_list) {
-        out << info.name << " [" << info.size_kb << "KB, " << info.date << "]\n";
+    try {
+      auto states_list = file_sys.states(path);
+      if (states_list.empty()) {
+        out << "<NO STATES FOUND>\n";
+      } else {
+        for (const auto& info : states_list) {
+          out << info.name << " [" << info.size_kb << "KB, " << info.date << "]\n";
+        }
       }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
     }
   }
+
+  // void cmd_save_state(std::istream&, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   // std::string path = "";
+  //   // // Читаем путь, если он есть (аналогично твоему cmd_tree)
+  //   // if (in.peek() != '\n' && in.peek() != EOF) {
+  //   //   in >> path;
+  //   // }
+
+  //   auto states_list = file_sys.save_state();
+
+  //   out<<"<STATE SAVED COMPLETE>";
+  // }
 
   // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
   // {
