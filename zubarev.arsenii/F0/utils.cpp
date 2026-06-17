@@ -113,5 +113,29 @@ namespace zubarev
 
       return result;
     }
+    void printBannerColored()
+    {
+      // ANSI escape codes для цветов
+      const std::string RESET = "\033[0m";
+      const std::string WHITE = "\033[97m";
+      const std::string BOLD = "\033[1m";
+
+      std::cout << BOLD << WHITE;
+      std::cout << "███████╗██╗██╗     ███████╗███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗\n";
+      std::cout << "██╔════╝██║██║     ██╔════╝██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║\n";
+      std::cout << "█████╗  ██║██║     █████╗  ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║\n";
+      std::cout << "██╔══╝  ██║██║     ██╔══╝  ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║\n";
+      std::cout << "██║     ██║███████╗███████╗███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║\n";
+      std::cout << "╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝\n";
+      std::cout << RESET << "\n";
+
+      std::cout << "        Custom Virtual File System\n";
+      std::cout << "        Powered by Robin Hood Hashing\n";
+      std::cout << "        Built with custom data structures\n";
+      std::cout << "        and handcrafted container implementations\n\n";
+
+      std::cout << "        Type 'help' to view all commands\n\n";
+    }
   }
+
 }

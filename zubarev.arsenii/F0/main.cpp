@@ -7,6 +7,7 @@
 #include <string>
 #include "file_system.hpp"
 #include "robin_hashtable.hpp"
+#include "utils.hpp"
 
 int main()
 
@@ -25,6 +26,7 @@ int main()
   //   std::cerr << "Cannot open file\n";
   //   return 1;
   // }
+  zubarev::detail::printBannerColored();
 
   using Hash = zub::SipHash;
   using Equal = zub::Equaler< std::string >;
