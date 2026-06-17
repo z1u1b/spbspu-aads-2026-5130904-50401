@@ -15,17 +15,6 @@ int main()
 
   namespace zub = zubarev;
 
-  // if (argc != 2) {
-  //   std::cerr << "Wrong arguments\n";
-  //   return 1;
-  // }
-
-  // std::ifstream input(argv[1]);
-
-  // if (!input) {
-  //   std::cerr << "Cannot open file\n";
-  //   return 1;
-  // }
   zubarev::detail::printBannerColored();
 
   using Hash = zub::SipHash;
@@ -56,7 +45,8 @@ int main()
   cmds["export"] = zub::cmd_export;
   cmds["save-state"] = zub::cmd_save_state;
   cmds["start-state"] = zub::cmd_start_state;
-  // cmds["archive"] = zub::cmd_archive;
+  cmds["archive"] = zub::cmd_archive;
+  // cmds["extract"] = zub::cmd_extract;
   cmds["help"] = zub::cmd_help;
   cmds["exit"] = zub::cmd_exit;
   zub::FileSystem file_sys;
@@ -87,4 +77,5 @@ int main()
     std::cerr << "Bad input";
     return 1;
   }
+  zub::cmd_exit(std::cin, std::cout, file_sys);
 }

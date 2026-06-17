@@ -196,7 +196,7 @@ namespace zubarev
       throw std::runtime_error("write: invalid path in file name");
     }
     if (!curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("write: " + name_file + ": No such file");
+      touch(name_file);
     }
 
     auto node = curr_dir_->children_.find(name_file);
@@ -794,11 +794,6 @@ namespace zubarev
     return true;
   }
 
-  // bool FileSystem::archive(const std::string& path)
-  // {}
-
-  // bool FileSystem::start_state(const std::string& file_name, bool force)
-  // {}
   void FileSystem::traverse_dir(std::ostream& out, std::shared_ptr< Directory >* dir)
   {
     for (auto it = (*dir)->children_.begin(); it != (*dir)->children_.end(); ++it) {
@@ -912,6 +907,65 @@ namespace zubarev
     }
     input.close();
     this->cd("~");
+    return true;
+  }
+  void FileSystem::packUint32(uint32_t value, std::string& out)
+  {
+    out.push_back((value >> 24) & 0xFF);
+    out.push_back((value >> 16) & 0xFF);
+    out.push_back((value >> 8) & 0xFF);
+    out.push_back(value & 0xFF);
+  }
+  void
+  FileSystem::archiveImpl(const std::string& base_path, std::shared_ptr< Directory > dir, std::string& archive_data)
+  {
+    for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
+      std::string child_name = it->key_;
+      std::string full_virt_path_ = base_path.empty() ? child_name : base_path + "/" + child_name;
+      auto node = it->val_;
+      if (node->isDirectory()) {
+        auto sub_dir = std::static_pointer_cast< Directory >(node);
+        archiveImpl(full_virt_path_, sub_dir, archive_data);
+      } else {
+        auto file = std::static_pointer_cast< File >(node);
+        std::string content = "";
+
+        const auto& blocks = file->getBlocks();
+        Huffman huffman;
+        for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+          huffman.buildTreeFromDictionary(*(*it)->out_dictionary);
+          std::string bit_string = huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
+          content += huffman.decode(bit_string);
+        }
+
+        packUint32(full_virt_path_.size(), archive_data);
+        archive_data += full_virt_path_;
+
+        packUint32(content.size(), archive_data);
+        archive_data += content;
+      }
+    }
+  }
+
+  bool FileSystem::archive(const std::string& archive_name, const std::string& dir_path)
+  {
+    if (archive_name.empty() || dir_path.empty()) {
+      throw std::runtime_error("archive: empty path");
+    }
+    if (curr_dir_->children_.has(archive_name)) {
+      throw std::runtime_error("archive: file '" + archive_name + "' already exists");
+    }
+
+    auto target_node = navigateTo(dir_path);
+    if (!target_node->isDirectory()) {
+      throw std::runtime_error("archive: target is not a directory or not found");
+    }
+    auto target_dir = std::static_pointer_cast< Directory >(target_node);
+    std::string archived_data = "";
+
+    archiveImpl("", target_dir, archived_data);
+    touch(archive_name);
+    write(archive_name, archived_data);
     return true;
   }
 

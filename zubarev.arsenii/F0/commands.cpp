@@ -51,11 +51,34 @@ namespace zubarev
 
   void cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
-    std::string name, text;
-    if (!(in >> name >> std::quoted(text))) {
+
+    std::string line;
+    std::getline(in, line);
+
+    std::istringstream iss(line);
+    std::string name;
+
+    if (!(iss >> name)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+
+    std::string rest;
+    std::getline(iss, rest);
+
+    size_t start = rest.find_first_not_of(" \t");
+    if (start == std::string::npos) {
+      out << "write: missing text\n";
+      return;
+    }
+    rest = rest.substr(start);
+
+    if (rest.size() < 2 || rest.front() != '"' || rest.back() != '"') {
+      out << "write: text must be in quotes\n";
+      return;
+    }
+
+    std::string text = rest.substr(1, rest.size() - 2);
     try {
       file_sys.write(name, text);
     } catch (const std::exception& e) {
@@ -65,11 +88,33 @@ namespace zubarev
 
   void cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
-    std::string name, text;
-    if (!(in >> name >> std::quoted(text))) {
+    std::string line;
+    std::getline(in, line);
+
+    std::istringstream iss(line);
+    std::string name;
+
+    if (!(iss >> name)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+
+    std::string rest;
+    std::getline(iss, rest);
+
+    size_t start = rest.find_first_not_of(" \t");
+    if (start == std::string::npos) {
+      out << "append: missing text\n";
+      return;
+    }
+    rest = rest.substr(start);
+
+    if (rest.size() < 2 || rest.front() != '"' || rest.back() != '"') {
+      out << "append: text must be in quotes\n";
+      return;
+    }
+
+    std::string text = rest.substr(1, rest.size() - 2);
     try {
       file_sys.append(name, text);
     } catch (const std::exception& e) {
@@ -305,20 +350,34 @@ namespace zubarev
     }
   }
 
-  // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   std::string path;
-  //   if (!(in >> path)) {
-  //     out << "<INVALID COMMAND>\n";
-  //     return;
-  //   }
+  void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string line;
+    std::getline(in, line);
 
-  //   if (file_sys.archive(path)) {
-  //     out << "<ARCHIVED: " << path << ".zip>\n";
-  //   } else {
-  //     out << "<INVALID COMMAND>\n";
-  //   }
-  // }
+    std::istringstream iss(line);
+
+    std::string arhive_name = "";
+    std::string dir_path = "";
+
+    if (!(iss >> arhive_name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    iss >> dir_path;
+    if (dir_path.empty()) {
+      dir_path = file_sys.pwd();
+    }
+
+    try {
+      if (file_sys.archive(arhive_name, dir_path)) {
+        out << "<ARCHIVED: " << dir_path << " -> " << arhive_name << ">\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
 
   void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
