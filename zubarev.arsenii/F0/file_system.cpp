@@ -824,6 +824,9 @@ namespace zubarev
 
   bool FileSystem::save_state(const std::string& state_name, bool rewrite)
   {
+    if (root_->children_.empty()) {
+      throw std::runtime_error("save-state: file system is empty, nothing to save.");
+    }
     const std::string state_path = "zubarev.arsenii/F0/states/" + state_name;
     std::cout << state_name.substr(state_name.rfind('.')) << '\n';
     std::cout << rewrite << '\n';
