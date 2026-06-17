@@ -590,31 +590,39 @@ namespace zubarev
     const std::string COMPOUND = "├";
     const std::string END_COMPOUND = "└";
 
+    std::vector< std::pair< std::string, std::shared_ptr< FSNode > > > sorted_children;
     for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
-      bool isLast = false;
-      auto next = it;
-      ++next;
-      if (next == dir->children_.end()) {
-        isLast = true;
-      }
-      std::string childPrefix = prefix;
-      if (isLast) {
-        childPrefix += "    ";
-      } else {
-        childPrefix += "│   ";
-      }
-      tree_str += prefix;
-      tree_str += (isLast ? END_COMPOUND : COMPOUND);
-      tree_str += TRAIT;
-      tree_str += " ";
-      tree_str += it->key_;
-      tree_str += '\n';
-      if (it->val_->isDirectory()) {
-        ++count_dir;
-        auto child_dir = std::static_pointer_cast< Directory >(it->val_);
-        treeImpl(child_dir, childPrefix, tree_str, count_dir, count_files);
-      } else {
-        count_files += 1;
+      sorted_children.push_back({it->key_, it->val_});
+    }
+
+    std::sort(
+        sorted_children.begin(), sorted_children.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+
+    for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
+      for (size_t i = 0; i < sorted_children.size(); ++i) {
+        const auto& child = sorted_children[i];
+        bool isLast = (i == sorted_children.size() - 1);
+
+        std::string childPrefix = prefix;
+        if (isLast) {
+          childPrefix += "    ";
+        } else {
+          childPrefix += "│   ";
+        }
+        tree_str += prefix;
+        tree_str += (isLast ? END_COMPOUND : COMPOUND);
+        tree_str += TRAIT;
+        tree_str += " ";
+        tree_str += it->key_;
+        tree_str += '\n';
+
+        if (child.second->isDirectory()) {
+          ++count_dir;
+          auto child_dir = std::static_pointer_cast< Directory >(child.second);
+          treeImpl(child_dir, childPrefix, tree_str, count_dir, count_files);
+        } else {
+          count_files += 1;
+        }
       }
     }
   }
@@ -631,6 +639,9 @@ namespace zubarev
 
     } else {
       std::shared_ptr< FSNode > found_target = navigateTo(path);
+      if (!found_target) {
+        throw std::runtime_error("tree: " + path + ": No such file or directory");
+      }
       if (found_target->isDirectory()) {
         throw std::runtime_error("tree: " + path + " [error opening dir]");
       }
