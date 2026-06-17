@@ -324,18 +324,62 @@ namespace zubarev
   {
     std::string line;
     std::getline(in, line);
-
     std::istringstream iss(line);
 
-    std::string name = "";
-    bool rewrite = false;
-
+    std::string name;
     if (!(iss >> name)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    if (!file_sys.isEmpty()) {
+      out << "WARNING: Current file system is not empty.\n";
+      out << "Loading a new state will affect your current files.\n";
+      out << "Choose an option:\n";
+      out << "  1. Save current state to a new file, then load\n";
+      out << "  2. Discard current state and load new\n";
+      out << "  3. Cancel loading\n";
+      out << "Enter choice (1/2/3): ";
+      out.flush();
 
-    iss >> std::boolalpha >> rewrite;
+      std::string choice_line;
+      std::getline(in, choice_line);
+
+      std::istringstream choice_stream(choice_line);
+      int choice = 0;
+      choice_stream >> choice;
+      if (choice == 1) {
+        out << "Enter filename to save current state (e.g., backup.state): ";
+        out.flush();
+
+        std::string backup_name;
+        std::getline(in, backup_name);
+        std::istringstream name_stream(backup_name);
+        name_stream >> backup_name;
+
+        if (backup_name.empty()) {
+          out << "<INVALID COMMAND>: empty backup filename\n";
+          return;
+        }
+
+        try {
+          file_sys.save_state(backup_name, false);
+          out << "<STATE SAVED: " << backup_name << ">\n";
+        } catch (const std::exception& e) {
+          out << "Failed to save backup: " << e.what() << "\n";
+          out << "Loading cancelled.\n";
+          return;
+        }
+      } else if (choice == 2) {
+        out << "Discarding current state...\n";
+
+      } else if (choice == 3) {
+        out << "<LOADING CANCELLED>\n";
+        return;
+      } else {
+        out << "<INVALID COMMAND>: invalid choice\n";
+        return;
+      }
+    }
 
     try {
       file_sys.start_state(name);

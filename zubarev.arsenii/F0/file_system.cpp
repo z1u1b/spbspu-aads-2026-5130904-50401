@@ -17,6 +17,10 @@
 
 namespace zubarev
 {
+  bool FileSystem::isEmpty() const
+  {
+    return root_->children_.empty();
+  }
   std::shared_ptr< FSNode > FileSystem::navigateTo(const std::string& path) const
   {
     if (path.empty()) {
@@ -812,7 +816,6 @@ namespace zubarev
         out << "cd .." << '\n';
       } else {
         out << "touch " << name << '\n';
-        out << "write " << name << " ";
 
         std::string content = this->cat(name);
         out << "write " << name << " " << content.size() << "\n";
@@ -862,6 +865,11 @@ namespace zubarev
     if (!input) {
       throw std::runtime_error("start-state: " + state_path + " [error opening file]");
     }
+    FileMetaData root_data;
+    root_data.date = detail::getCurrentDateTime();
+    root_data.owner = detail::getCurrentUser();
+    root_ = std::make_shared< Directory >(root_data);
+    curr_dir_ = root_;
     std::string line;
     while (std::getline(input, line)) {
       if (line.empty()) {
@@ -884,13 +892,9 @@ namespace zubarev
         this->cd(path);
       } else if (command == "write") {
         std::string name;
-        input >> name;
-
         size_t content_size;
-        input >> name;
-        input.ignore(std::numeric_limits< std::streamsize >::max(), '\n'); // убираем перенос строки после числа
+        iss >> name >> content_size;
 
-        iss >> content_size;
         std::string content(content_size, '\0');
         input.read(&content[0], content_size);
 

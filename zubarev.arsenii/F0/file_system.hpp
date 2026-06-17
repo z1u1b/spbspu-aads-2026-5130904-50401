@@ -18,6 +18,8 @@ namespace zubarev
     ~FileSystem() = default;
     FileSystem(const FileSystem&) = delete;
     FileSystem& operator=(const FileSystem&) = delete;
+    bool isEmpty() const;
+
     // Основные операции файловой системы
     // Модифицирующие методы (возвращают bool для обработки ошибок в контроллере)
     bool mkdir(const std::string& name_dir);
@@ -37,15 +39,14 @@ namespace zubarev
     std::tuple< std::string, size_t, size_t > tree(const std::string& path) const;
     topit::Vector< std::string > search(const std::string& name) const;
 
+    bool save(const std::string& name_node);
+    bool load(const std::string& name_node);
     struct StateInfo
     {
       std::string name;
       size_t size_kb;
       std::string date;
     };
-    // Работа с постоянным хранилищем сессий и внешними файлами
-    bool save(const std::string& name_node);
-    bool load(const std::string& name_node);
     std::vector< StateInfo > states(const std::string& path = ".") const;
     bool import_file(const std::string& real_path, const std::string& virtual_name);
     bool export_file(const std::string& virtual_name, const std::string& real_path);
@@ -53,9 +54,8 @@ namespace zubarev
     void traverse_dir(std::ostream& out, std::shared_ptr< Directory >* dir);
     bool save_state(const std::string& state_name, bool rewrite);
     bool start_state(const std::string& state_name);
-    // bool archive(const std::string& name_dir);
 
-    // bool start_state(const std::string& file_name, bool force = false);
+    // bool archive(const std::string& name_dir);
 
     // Управление кэшированием (LRU)
     void cache_size();
@@ -65,16 +65,6 @@ namespace zubarev
 
     // Поисковый движок
     void ssearch();
-
-    // void setStatesDirectory(const std::string& path) {
-    //     states_directory_ = path;
-    //     // Создать директорию, если не существует
-    //     std::filesystem::create_directories(states_directory_);
-    // }
-
-    // std::string getStatesDirectory() const {
-    //     return states_directory_;
-    // }
 
   private:
     bool isDescendant(const std::shared_ptr< Directory >& root, const std::shared_ptr< FSNode >& candidate) const;
@@ -87,7 +77,6 @@ namespace zubarev
 
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
-    // std::string current_path_str_;
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
     RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > session_storage_;
