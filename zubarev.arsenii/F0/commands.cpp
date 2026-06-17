@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include "utils.hpp"
+#include <sstream>
 namespace zubarev
 {
 
@@ -278,18 +279,31 @@ namespace zubarev
     }
   }
 
-  // void cmd_save_state(std::istream&, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   // std::string path = "";
-  //   // // Читаем путь, если он есть (аналогично твоему cmd_tree)
-  //   // if (in.peek() != '\n' && in.peek() != EOF) {
-  //   //   in >> path;
-  //   // }
+  void cmd_save_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string line;
+    std::getline(in, line);
 
-  //   auto states_list = file_sys.save_state();
+    std::istringstream iss(line);
 
-  //   out<<"<STATE SAVED COMPLETE>";
-  // }
+    std::string name = "";
+    bool rewrite = false;
+
+    if (!(iss >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    iss >> std::boolalpha >> rewrite;
+
+    try {
+      file_sys.save_state(name, rewrite);
+      out << "<STATE SAVED COMPLETE>" << '\n';
+
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
 
   // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
   // {

@@ -50,11 +50,11 @@ namespace zubarev
     bool import_file(const std::string& real_path, const std::string& virtual_name);
     bool export_file(const std::string& virtual_name, const std::string& real_path);
 
-    // bool save_state();
-
+    void traverse_dir(std::ostream& out, std::shared_ptr< Directory >* dir);
+    bool save_state(const std::string& state_name, bool rewrite);
+    bool start_state(const std::string& state_name);
     // bool archive(const std::string& name_dir);
 
-    // bool start_state();
     // bool start_state(const std::string& file_name, bool force = false);
 
     // Управление кэшированием (LRU)

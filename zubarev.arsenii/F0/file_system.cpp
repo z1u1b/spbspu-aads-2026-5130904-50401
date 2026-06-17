@@ -795,7 +795,56 @@ namespace zubarev
 
   // bool FileSystem::start_state(const std::string& file_name, bool force)
   // {}
+  void FileSystem::traverse_dir(std::ostream& out, std::shared_ptr< Directory >* dir)
+  {
+    for (auto it = (*dir)->children_.begin(); it != (*dir)->children_.end(); ++it) {
+      std::string name = it->key_;
+      std::shared_ptr< FSNode > node = it->val_;
 
-  //   bool FileSystem::save_state()
-  // {}
+      if (node->isDirectory()) {
+        out << "mkdir " << name << '\n';
+        out << "cd " << name << '\n';
+        auto sub_dir = std::static_pointer_cast< Directory >(node);
+        auto old_curr = curr_dir_;
+        curr_dir_ = sub_dir;
+        traverse_dir(out, &sub_dir);
+        curr_dir_ = old_curr;
+        out << "cd .." << '\n';
+      } else {
+        out << "touch " << name << '\n';
+        out << "write " << name << " ";
+
+        std::string content = this->cat(name);
+        out << content.size();
+        out << content;
+        out << "end_write";
+      }
+    }
+  }
+
+  bool FileSystem::save_state(const std::string& state_name, bool rewrite)
+  {
+    const std::string state_path = "zubarev.arsenii/F0/states/" + state_name;
+    std::cout << state_name.substr(state_name.rfind('.')) << '\n';
+    std::cout << rewrite << '\n';
+    if (state_name.substr(state_name.rfind('.')) != ".state") {
+      throw std::runtime_error("save-state: " + state_name + " invalid extension");
+    }
+    std::ifstream input(state_path, std::ios::binary);
+    if (input && !rewrite) {
+      throw std::runtime_error("save-state: " + state_name + " already exists. Use force=true to overwrite.");
+    }
+    input.close();
+
+    std::ofstream output_file(state_path);
+    if (!output_file) {
+      throw std::runtime_error("save-state: " + state_path + " [error creating file on disk]");
+    }
+    auto old_curr_dir = curr_dir_;
+    curr_dir_ = root_;
+    traverse_dir(output_file, &root_);
+    curr_dir_ = old_curr_dir;
+    output_file.close();
+    return true;
+  }
 }
