@@ -320,27 +320,31 @@ namespace zubarev
   //   }
   // }
 
-  // void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   std::string filename;
-  //   if (!(in >> filename)) {
-  //     out << "<INVALID COMMAND>\n";
-  //     return;
-  //   }
+  void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string line;
+    std::getline(in, line);
 
-  //   bool force = false;
-  //   std::string force_str;
-  //   // Проверяем, передан ли второй аргумент (true/false)
-  //   if (in >> force_str) {
-  //     force = (force_str == "true");
-  //   }
+    std::istringstream iss(line);
 
-  //   if (file_sys.start_state(filename, force)) {
-  //     out << "<STATE LOADED: " << filename << ">\n";
-  //   } else {
-  //     out << "<INVALID COMMAND>\n";
-  //   }
-  // }
+    std::string name = "";
+    bool rewrite = false;
+
+    if (!(iss >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    iss >> std::boolalpha >> rewrite;
+
+    try {
+      file_sys.start_state(name);
+      out << "<STATE START COMPLETE>" << '\n';
+
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
 
   void printPrompt(const FileSystem& fs, std::ostream& out)
   {

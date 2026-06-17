@@ -81,13 +81,6 @@ namespace zubarev
     std::shared_ptr< FSNode > cloneFile(const std::shared_ptr< File >& old_file);
     std::shared_ptr< FSNode > cloneDirectory(const std::shared_ptr< Directory >& old_directory);
 
-    struct FindResult
-    {
-      std::shared_ptr< Directory > parent_dir_ = nullptr;
-      std::shared_ptr< FSNode > target_ = nullptr;
-      std::string target_name_ = "";
-    };
-
     std::shared_ptr< FSNode > navigateTo(const std::string& path) const;
 
     void treeImpl(std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;

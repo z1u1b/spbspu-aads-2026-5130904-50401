@@ -815,24 +815,26 @@ namespace zubarev
         out << "write " << name << " ";
 
         std::string content = this->cat(name);
-        out << content.size();
+        out << "write " << name << " " << content.size() << "\n";
         out << content;
-        out << "end_write";
+        out << "\nend_write\n";
       }
     }
   }
 
   bool FileSystem::save_state(const std::string& state_name, bool rewrite)
   {
+    const std::string dir_path = "zubarev.arsenii/F0/states"; // или "/zubarev..."
+    system(("mkdir -p " + dir_path).c_str());
     if (root_->children_.empty()) {
       throw std::runtime_error("save-state: file system is empty, nothing to save.");
     }
     const std::string state_path = "zubarev.arsenii/F0/states/" + state_name;
-    std::cout << state_name.substr(state_name.rfind('.')) << '\n';
-    std::cout << rewrite << '\n';
-    if (state_name.substr(state_name.rfind('.')) != ".state") {
+    size_t dot_pos = state_name.rfind('.');
+    if (dot_pos == std::string::npos || state_name.substr(dot_pos) != ".state") {
       throw std::runtime_error("save-state: " + state_name + " invalid extension");
     }
+
     std::ifstream input(state_path, std::ios::binary);
     if (input && !rewrite) {
       throw std::runtime_error("save-state: " + state_name + " already exists. Use force=true to overwrite.");
@@ -850,4 +852,63 @@ namespace zubarev
     output_file.close();
     return true;
   }
+
+  bool FileSystem::start_state(const std::string& state_name)
+  {
+    const std::string state_path = "zubarev.arsenii/F0/states/" + state_name;
+
+    std::ifstream input(state_path, std::ios::binary);
+
+    if (!input) {
+      throw std::runtime_error("start-state: " + state_path + " [error opening file]");
+    }
+    std::string line;
+    while (std::getline(input, line)) {
+      if (line.empty()) {
+        continue;
+      }
+      std::istringstream iss(line);
+      std::string command;
+      iss >> command;
+      if (command == "mkdir") {
+        std::string name;
+        iss >> name;
+        this->mkdir(name);
+      } else if (command == "touch") {
+        std::string name;
+        iss >> name;
+        this->touch(name);
+      } else if (command == "cd") {
+        std::string path;
+        iss >> path;
+        this->cd(path);
+      } else if (command == "write") {
+        std::string name;
+        input >> name;
+
+        size_t content_size;
+        input >> name;
+        input.ignore(std::numeric_limits< std::streamsize >::max(), '\n'); // убираем перенос строки после числа
+
+        iss >> content_size;
+        std::string content(content_size, '\0');
+        input.read(&content[0], content_size);
+
+        char dummy;
+        input.get(dummy);
+
+        std::string end_marker;
+        std::getline(input, end_marker);
+        if (end_marker != "end_write") {
+          throw std::runtime_error("start-state: corrupted state file");
+        }
+
+        this->write(name, content);
+      }
+    }
+    input.close();
+    this->cd("~");
+    return true;
+  }
+
 }

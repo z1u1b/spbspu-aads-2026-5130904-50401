@@ -1,0 +1,5 @@
+mkdir t
+cd t
+cd ..
+touch main.cpp
+write main.cpp 5helloend_write
