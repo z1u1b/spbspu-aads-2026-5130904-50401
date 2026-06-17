@@ -26,8 +26,10 @@ namespace zubarev
   void cmd_save_state(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys);
   // void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys);
-
   void printPrompt(const FileSystem& fs, std::ostream& out);
+  void cmd_help(std::istream&, std::ostream& out, FileSystem&);
+  void cmd_exit(std::istream&, std::ostream& out, FileSystem&);
+
 }
 
 #endif

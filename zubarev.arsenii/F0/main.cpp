@@ -57,8 +57,8 @@ int main()
   cmds["save-state"] = zub::cmd_save_state;
   cmds["start-state"] = zub::cmd_start_state;
   // cmds["archive"] = zub::cmd_archive;
-  //
-
+  cmds["help"] = zub::cmd_help;
+  cmds["exit"] = zub::cmd_exit;
   zub::FileSystem file_sys;
 
   std::string cmd;

@@ -404,4 +404,93 @@ namespace zubarev
     out << GREEN << user << RESET << ":" << BLUE << path << RESET << YELLOW << " $ " << RESET;
   }
 
+  void cmd_help(std::istream&, std::ostream& out, FileSystem&)
+  {
+    const std::string RESET = "\033[0m";
+    const std::string BOLD = "\033[1m";
+    const std::string YELLOW = "\033[33m";
+    const std::string GREEN = "\033[32m";
+    const std::string CYAN = "\033[36m";
+    const std::string MAGENTA = "\033[35m";
+
+    out << "\n";
+    out << BOLD << YELLOW << "╔══════════════════════════════════════════════════════════════════╗\n";
+    out << "║                     FILE SYSTEM HELP                             ║\n";
+    out << "╚══════════════════════════════════════════════════════════════════╝" << RESET << "\n\n";
+
+    // === КАТЕГОРИЯ 1: ФАЙЛЫ И ДИРЕКТОРИИ ===
+    out << BOLD << GREEN << "  [FILES AND DIRECTORIES]" << RESET << "\n";
+    out << CYAN << "  mkdir <dir-name>" << RESET << "           Create a new directory\n";
+    out << CYAN << "  rmdir <dir-name>" << RESET << "           Remove an empty directory\n";
+    out << CYAN << "  rm <file-name>" << RESET << "             Remove a file\n";
+    out << CYAN << "  touch <file-name>" << RESET << "          Create an empty file\n";
+    out << CYAN << "  write <file> \"<text>\"" << RESET << "      Write text to a file (replace content)\n";
+    out << CYAN << "  cat <file-name>" << RESET << "            Display file content\n";
+    out << CYAN << "  append <file> \"<text>\"" << RESET << "     Append text to the end of a file\n";
+    out << CYAN << "  mv <from> <to>" << RESET << "             Move or rename a file/directory\n";
+    out << CYAN << "  cp <from> <to>" << RESET << "             Copy a file/directory\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 2: НАВИГАЦИЯ ===
+    out << BOLD << GREEN << "  [NAVIGATION]" << RESET << "\n";
+    out << CYAN << "  cd <path>" << RESET << "                  Change current directory\n";
+    out << CYAN << "  pwd" << RESET << "                        Print current working directory\n";
+    out << CYAN << "  ls [path]" << RESET << "                  List directory contents\n";
+    out << CYAN << "  tree [path]" << RESET << "                Display directory tree structure\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 3: ПОИСК ===
+    out << BOLD << GREEN << "  [SEARCH]" << RESET << "\n";
+    out << CYAN << "  search <name>" << RESET << "              Search files/dirs by exact name\n";
+    out << CYAN << "  ssearch <type> <text>" << RESET << "      Smart search (name/content/ext)\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 4: СЕССИИ И СОСТОЯНИЯ ===
+    out << BOLD << GREEN << "  [SESSIONS AND STATES]" << RESET << "\n";
+    out << CYAN << "  save <name>" << RESET << "                Save object to in-memory session storage\n";
+    out << CYAN << "  load <name>" << RESET << "                Load object from session storage\n";
+    out << CYAN << "  states [path]" << RESET << "              List available .state files on disk\n";
+    out << CYAN << "  save-state <file> [true]" << RESET << "   Save current FS to disk (.state file)\n";
+    out << CYAN << "  start-state <file>" << RESET << "         Load FS state from disk (replaces current)\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 5: ИМПОРТ/ЭКСПОРТ ===
+    out << BOLD << GREEN << "  [IMPORT / EXPORT]" << RESET << "\n";
+    out << CYAN << "  import <real-path> <virtual-name>" << RESET << "   Import file from real disk to VFS\n";
+    out << CYAN << "  export <virtual-name> <real-path>" << RESET << "   Export file from VFS to real disk\n";
+    out << CYAN << "  archive <dir-name>" << RESET << "               Create compressed archive (TODO)\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 6: КЭШИРОВАНИЕ ===
+    out << BOLD << GREEN << "  [CACHING (LRU)]" << RESET << "\n";
+    out << CYAN << "  cache_size <size>" << RESET << "         Set cache size (e.g., 512MB)\n";
+    out << CYAN << "  cache_on" << RESET << "                  Enable caching system\n";
+    out << CYAN << "  cache_off" << RESET << "                 Disable caching and flush data\n";
+    out << CYAN << "  cache_stats" << RESET << "               Show cache usage statistics\n";
+    out << "\n";
+
+    // === КАТЕГОРИЯ 7: СИСТЕМНЫЕ ===
+    out << BOLD << GREEN << "  [SYSTEM]" << RESET << "\n";
+    out << CYAN << "  help" << RESET << "                      Show this help message\n";
+    out << CYAN << "  exit" << RESET << "                      Exit the file system\n";
+    out << "\n";
+
+    out << BOLD << MAGENTA << "  NOTES:" << RESET << "\n";
+    out << "  • Use quotes for text with spaces: write file.txt \"Hello World\"\n";
+    out << "  • Paths support ~ (root), . (current), .. (parent)\n";
+    out << "  • Data is compressed with Huffman algorithm and deduplicated via SipHash+XXHash\n";
+    out << "\n";
+  }
+  void cmd_exit(std::istream&, std::ostream& out, FileSystem&)
+  {
+    out << "\n";
+    out << "\033[1;32m";
+    out << "╔══════════════════════════════════════════════════════════════════╗\n";
+    out << "║                  GOODBYE! SEE YOU SOON!                          ║\n";
+    out << "╚══════════════════════════════════════════════════════════════════╝\n";
+    out << "\033[0m";
+    out << "\n";
+
+    std::exit(0);
+  }
 }
