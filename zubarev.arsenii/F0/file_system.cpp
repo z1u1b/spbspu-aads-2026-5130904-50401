@@ -13,7 +13,6 @@
 #include <string>
 #include <memory>
 #include <sstream>
-// #include <sstream>
 
 namespace zubarev
 {
@@ -85,19 +84,17 @@ namespace zubarev
   }
   bool FileSystem::mkdir(const std::string& name_dir)
   {
-    if (curr_dir_->children_.has(name_dir)) {
-      throw std::runtime_error("mkdir: " + name_dir + ": File exists");
-    }
     if (name_dir.empty()) {
-      throw std::runtime_error("mkdir: empty file name");
+      throw std::runtime_error("mkdir: missing operand");
     }
-
     if (name_dir == "." || name_dir == "..") {
-      throw std::runtime_error("mkdir: invalid directory name");
+      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': Invalid argument");
     }
-
     if (name_dir.find('/') != std::string::npos) {
-      throw std::runtime_error("mkdir: invalid character '/'");
+      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': No such file or directory");
+    }
+    if (curr_dir_->children_.has(name_dir)) {
+      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': File exists");
     }
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();
@@ -111,25 +108,23 @@ namespace zubarev
   bool FileSystem::rmdir(const std::string& name_dir)
   {
     if (name_dir.empty()) {
-      throw std::runtime_error("rmdir: empty file name");
+      throw std::runtime_error("rmdir: missing operand");
     }
-
     if (name_dir == "." || name_dir == "..") {
-      throw std::runtime_error("rmdir: invalid directory name");
+      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Invalid argument");
     }
-
     if (!curr_dir_->children_.has(name_dir)) {
-      throw std::runtime_error("rmdir: " + name_dir + ": No such file or directory");
+      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': No such file or directory");
     }
 
     auto node = curr_dir_->children_.at(name_dir);
     if (!node->isDirectory()) {
-      throw std::runtime_error("rmdir: " + name_dir + ": Not a directory");
+      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Not a directory");
     }
 
     auto dir = std::static_pointer_cast< Directory >(node);
     if (!dir->children_.empty()) {
-      throw std::runtime_error("rmdir: " + name_dir + ": Directory not empty");
+      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Directory not empty");
     }
     curr_dir_->removeChild(name_dir);
     return true;
@@ -137,20 +132,18 @@ namespace zubarev
   bool FileSystem::rm(const std::string& name)
   {
     if (name.empty()) {
-      throw std::runtime_error("rm: empty file name");
+      throw std::runtime_error("rm: missing operand");
     }
-
     if (name == "." || name == "..") {
-      throw std::runtime_error("rm: " + name + ": is a directory");
+      throw std::runtime_error("rm: cannot remove '" + name + "': Is a directory");
     }
-
     if (!curr_dir_->children_.has(name)) {
-      throw std::runtime_error("rm: " + name + ": No such file or directory");
+      throw std::runtime_error("rm: cannot remove '" + name + "': No such file or directory");
     }
 
     auto node = curr_dir_->children_.at(name);
     if (node->isDirectory()) {
-      throw std::runtime_error("rm: " + name + ": is a directory");
+      throw std::runtime_error("rm: cannot remove '" + name + "': Is a directory");
     }
 
     curr_dir_->removeChild(name);
@@ -160,18 +153,16 @@ namespace zubarev
   bool FileSystem::touch(const std::string& name_file)
   {
     if (name_file.empty()) {
-      throw std::runtime_error("touch: empty file name");
+      throw std::runtime_error("touch: missing file operand");
     }
-
     if (name_file == "." || name_file == "..") {
-      throw std::runtime_error("touch: invalid file name");
+      throw std::runtime_error("touch: cannot touch '" + name_file + "': Invalid argument");
     }
-
     if (name_file.find('/') != std::string::npos) {
-      throw std::runtime_error("touch: invalid character '/'");
+      throw std::runtime_error("touch: cannot touch '" + name_file + "': No such file or directory");
     }
     if (curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("touch: " + name_file + ": File exists");
+      throw std::runtime_error("touch: cannot touch '" + name_file + "': File exists");
     }
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();
@@ -185,15 +176,13 @@ namespace zubarev
   bool FileSystem::write(const std::string& name_file, const std::string& text)
   {
     if (name_file.empty()) {
-      throw std::runtime_error("write: empty file name");
+      throw std::runtime_error("write: missing file operand");
     }
-
     if (name_file == "." || name_file == "..") {
-      throw std::runtime_error("write: invalid file name");
+      throw std::runtime_error("write: cannot write '" + name_file + "': Invalid argument");
     }
-
     if (name_file.find('/') != std::string::npos) {
-      throw std::runtime_error("write: invalid path in file name");
+      throw std::runtime_error("write: cannot write '" + name_file + "': No such file or directory");
     }
     if (!curr_dir_->children_.has(name_file)) {
       touch(name_file);
@@ -202,7 +191,7 @@ namespace zubarev
     auto node = curr_dir_->children_.find(name_file);
 
     if (node->val_->isDirectory()) {
-      throw std::runtime_error("write: " + name_file + ": is a directory");
+      throw std::runtime_error("write: cannot write '" + name_file + "': Is a directory");
     }
     auto file_ptr = std::static_pointer_cast< File >(curr_dir_->children_[name_file]);
     file_ptr->clearBlocks();
@@ -244,11 +233,11 @@ namespace zubarev
   bool FileSystem::append(const std::string& name_file, const std::string& text)
   {
     if (!curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("append: " + name_file + ": No such file");
+      throw std::runtime_error("append: cannot append to '" + name_file + "': No such file or directory");
     } else if (curr_dir_->children_[name_file]->isDirectory()) {
-      throw std::runtime_error("append: " + name_file + ": is a directory");
-    } else if (text == "") {
-      throw std::runtime_error("append: " + name_file + ": Without next");
+      throw std::runtime_error("append: cannot append to '" + name_file + "': Is a directory");
+    } else if (text.empty()) {
+      throw std::runtime_error("append: cannot append to '" + name_file + "': No data provided");
     }
 
     auto file_ptr = std::static_pointer_cast< File >(curr_dir_->children_[name_file]);
@@ -315,7 +304,7 @@ namespace zubarev
       } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_.at(next_dir)->isDirectory()) {
         curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
       } else {
-        throw std::runtime_error("cd: " + next_dir + ": No such directory");
+        throw std::runtime_error("cd: '" + next_dir + "': No such file or directory");
       }
       dirs.drop();
     }
@@ -343,7 +332,7 @@ namespace zubarev
   bool FileSystem::mv(const std::string& from, const std::string& to)
   {
     if (from.empty() || to.empty()) {
-      throw std::runtime_error("mv: empty path");
+      throw std::runtime_error("mv: missing file operand");
     }
 
     if (from == "~" || to == "~") {
@@ -351,23 +340,22 @@ namespace zubarev
     }
 
     if (from == "." || from == ".." || to == "." || to == "..") {
-      throw std::runtime_error("mv: invalid path");
+      throw std::runtime_error("mv: cannot move '" + from + "': Invalid argument");
     }
     std::shared_ptr< FSNode > src_from = navigateTo(from);
     std::shared_ptr< FSNode > src_to = navigateTo(to);
 
     if (!src_from || !src_from->getParent()) {
-      throw std::runtime_error("mv: : No such directory");
+      throw std::runtime_error("mv: cannot stat '" + from + "': No such file or directory");
     }
     if (src_to && !src_to->isDirectory()) {
-      throw std::runtime_error("mv: destination already exists");
+      throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': Not a directory");
     }
-
     if (src_from->isDirectory() && isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
-      throw std::runtime_error("mv: cannot move directory into itself");
+      throw std::runtime_error("mv: cannot move '" + from + "' to a subdirectory of itself '" + to + "'");
     }
     if (src_from == src_to) {
-      throw std::runtime_error("mv: Source and destination are the same");
+      throw std::runtime_error("mv: '" + from + "' and '" + to + "' are the same file");
     }
 
     std::shared_ptr< Directory > target_dir = nullptr;
@@ -377,7 +365,7 @@ namespace zubarev
       target_dir = std::static_pointer_cast< Directory >(src_to);
       target_name = src_from->getName();
       if (target_dir->children_.has(target_name)) {
-        throw std::runtime_error("mv: destination already exists");
+        throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "/" + target_name + "': File exists");
       }
     } else {
       size_t last_slash = to.rfind('/');
@@ -393,7 +381,8 @@ namespace zubarev
 
         std::shared_ptr< FSNode > parent_node = navigateTo(parent_path);
         if (!parent_node || !parent_node->isDirectory()) {
-          throw std::runtime_error("cp: cannot create regular file '" + to + "': No such file or directory");
+          throw std::runtime_error("mv: cannot create regular file '" + to +
+                                   "': No such file or directory"); // <-- ИСПРАВЛЕНО
         }
         target_dir = std::static_pointer_cast< Directory >(parent_node);
         target_name = to.substr(last_slash + 1);
@@ -401,7 +390,7 @@ namespace zubarev
       if (src_to && !src_to->isDirectory()) {
         target_dir->removeChild(src_to->getName());
       } else if (target_dir->children_.has(target_name)) {
-        throw std::runtime_error("mv: destination already exists");
+        throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': File exists");
       }
     }
     src_from->getParent()->removeChild(src_from->getName());
@@ -441,27 +430,26 @@ namespace zubarev
   bool FileSystem::cp(const std::string& from, const std::string& to)
   {
     if (from.empty() || to.empty()) {
-      throw std::runtime_error("cp: empty path");
+      throw std::runtime_error("cp: missing file operand");
     }
     if (from == "~" || to == "~") {
       throw std::runtime_error("cp: cannot copy root directory");
     }
     if (from == "." || from == ".." || to == "." || to == "..") {
-      throw std::runtime_error("cp: invalid path");
+      throw std::runtime_error("cp: cannot copy '" + from + "': Invalid argument");
     }
 
     std::shared_ptr< FSNode > src_from = navigateTo(from);
     std::shared_ptr< FSNode > src_to = navigateTo(to);
 
     if (!src_from || !src_from->getParent()) {
-      throw std::runtime_error("cp: : No such directory");
+      throw std::runtime_error("cp: cannot stat '" + from + "': No such file or directory");
     }
-
     if (src_from == src_to) {
-      throw std::runtime_error("cp: : identical files");
+      throw std::runtime_error("cp: '" + from + "' and '" + to + "' are the same file");
     }
     if (src_from->isDirectory() && src_to && !src_to->isDirectory()) {
-      throw std::runtime_error("cp: cannot overwrite non-directory with directory");
+      throw std::runtime_error("cp: cannot overwrite non-directory '" + to + "' with directory '" + from + "'");
     }
     std::shared_ptr< FSNode > clone_node = nullptr;
     if (src_from->isDirectory()) {
@@ -506,9 +494,9 @@ namespace zubarev
   {
     std::shared_ptr< FSNode > src = navigateTo(name);
     if (!src) {
-      throw std::runtime_error("cat: " + name + ": No such file or directory");
+      throw std::runtime_error("cat: '" + name + "': No such file or directory");
     } else if (src->isDirectory()) {
-      throw std::runtime_error("cat: " + name + ": Is a directory");
+      throw std::runtime_error("cat: '" + name + "': Is a directory");
     }
     std::shared_ptr< File > file = std::static_pointer_cast< File >(src);
     std::string output_str = "";
@@ -516,16 +504,16 @@ namespace zubarev
     Huffman huffman;
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
       if (!(*it)) {
-        throw std::runtime_error("cat: corrupted block");
+        throw std::runtime_error("cat: '" + name + "': corrupted block");
       }
 
       if (!(*it)->out_dictionary) {
-        throw std::runtime_error("cat: corrupted dictionary");
+        throw std::runtime_error("cat: '" + name + "': corrupted dictionary");
       }
 
       size_t max_bits = (*it)->compressed_data.getSize() * 8;
       if ((*it)->total_bits_count > max_bits) {
-        throw std::runtime_error("cat: corrupted block");
+        throw std::runtime_error("cat: '" + name + "': corrupted block");
       }
       huffman.buildTreeFromDictionary(*(*it)->out_dictionary);
       std::string bit_string = huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
@@ -642,8 +630,8 @@ namespace zubarev
       if (!found_target) {
         throw std::runtime_error("tree: " + path + ": No such file or directory");
       }
-      if (found_target->isDirectory()) {
-        throw std::runtime_error("tree: " + path + " [error opening dir]");
+      if (!found_target->isDirectory()) {
+        throw std::runtime_error("tree: '" + path + "': Not a directory");
       }
       target_dir = std::static_pointer_cast< Directory >(found_target);
     }
@@ -666,12 +654,12 @@ namespace zubarev
   {
     std::shared_ptr< FSNode > found_node = navigateTo(path);
     if (!found_node) {
-      throw std::runtime_error("save: " + path + " [error opening dir]");
+      throw std::runtime_error("save: '" + path + "': No such file or directory");
     }
 
     const std::string& save_name = found_node->getName();
     if (session_storage_.find(save_name) != session_storage_.end()) {
-      throw std::runtime_error("save: " + path + " is already exists");
+      throw std::runtime_error("save: '" + path + "': already exists in storage");
     }
 
     if (found_node->isDirectory()) {
@@ -686,13 +674,13 @@ namespace zubarev
   {
     std::shared_ptr< FSNode > found_node = navigateTo(path);
     if (!found_node) {
-      throw std::runtime_error("load: " + path + " [error opening dir]");
+      throw std::runtime_error("load: '" + path + "': No such file or directory");
     }
 
     const std::string& save_name = found_node->getName();
     auto save_node = session_storage_.find(save_name);
     if (save_node == session_storage_.end()) {
-      throw std::runtime_error("load: " + path + " is already exists");
+      throw std::runtime_error("load: '" + path + "': no such state saved");
     }
 
     std::shared_ptr< FSNode > new_node = save_node->val_;
@@ -763,7 +751,7 @@ namespace zubarev
     std::ifstream input(real_path, std::ios::binary);
 
     if (!input) {
-      throw std::runtime_error("import: " + real_path + " [error opening file]");
+      throw std::runtime_error("import: cannot open '" + real_path + "': No such file or directory");
     }
     std::string new_file_name = "";
     if (virtual_name.empty()) {
@@ -793,12 +781,12 @@ namespace zubarev
   {
 
     if (virtual_name.empty() || !navigateTo(virtual_name)) {
-      throw std::runtime_error("export: " + virtual_name + " [error opening file]");
+      throw std::runtime_error("export: cannot open '" + virtual_name + "': No such file or directory");
     }
 
     std::ofstream output_file(real_path);
     if (!output_file) {
-      throw std::runtime_error("export: " + real_path + " [error creating file on disk]");
+      throw std::runtime_error("export: cannot create '" + real_path + "': Permission denied");
     }
     output_file << cat(virtual_name);
     output_file.close();
@@ -836,23 +824,23 @@ namespace zubarev
     const std::string dir_path = "zubarev.arsenii/F0/states"; // или "/zubarev..."
     system(("mkdir -p " + dir_path).c_str());
     if (root_->children_.empty()) {
-      throw std::runtime_error("save-state: file system is empty, nothing to save.");
+      throw std::runtime_error("save-state: file system is empty, nothing to save");
     }
     const std::string state_path = "zubarev.arsenii/F0/states/" + state_name;
     size_t dot_pos = state_name.rfind('.');
     if (dot_pos == std::string::npos || state_name.substr(dot_pos) != ".state") {
-      throw std::runtime_error("save-state: " + state_name + " invalid extension");
+      throw std::runtime_error("save-state: '" + state_name + "': invalid extension");
     }
 
     std::ifstream input(state_path, std::ios::binary);
     if (input && !rewrite) {
-      throw std::runtime_error("save-state: " + state_name + " already exists. Use force=true to overwrite.");
+      throw std::runtime_error("save-state: '" + state_name + "': File exists");
     }
     input.close();
 
     std::ofstream output_file(state_path);
-    if (!output_file) {
-      throw std::runtime_error("save-state: " + state_path + " [error creating file on disk]");
+    if (input && !rewrite) {
+      throw std::runtime_error("save-state: '" + state_name + "': File exists");
     }
     auto old_curr_dir = curr_dir_;
     curr_dir_ = root_;
@@ -869,7 +857,7 @@ namespace zubarev
     std::ifstream input(state_path, std::ios::binary);
 
     if (!input) {
-      throw std::runtime_error("start-state: " + state_path + " [error opening file]");
+      throw std::runtime_error("start-state: cannot open '" + state_path + "': No such file or directory");
     }
     FileMetaData root_data;
     root_data.date = detail::getCurrentDateTime();
@@ -961,15 +949,15 @@ namespace zubarev
   bool FileSystem::archive(const std::string& archive_name, const std::string& dir_path)
   {
     if (archive_name.empty() || dir_path.empty()) {
-      throw std::runtime_error("archive: empty path");
+      throw std::runtime_error("archive: missing operand");
     }
     if (curr_dir_->children_.has(archive_name)) {
-      throw std::runtime_error("archive: file '" + archive_name + "' already exists");
+      throw std::runtime_error("archive: cannot create '" + archive_name + "': File exists");
     }
 
     auto target_node = navigateTo(dir_path);
-    if (!target_node->isDirectory()) {
-      throw std::runtime_error("archive: target is not a directory or not found");
+    if (!target_node || !target_node->isDirectory()) {
+      throw std::runtime_error("archive: cannot access '" + dir_path + "': Not a directory");
     }
     auto target_dir = std::static_pointer_cast< Directory >(target_node);
     std::string archived_data = "";
