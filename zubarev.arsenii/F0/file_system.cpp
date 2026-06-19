@@ -586,31 +586,29 @@ namespace zubarev
     std::sort(
         sorted_children.begin(), sorted_children.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
 
-    for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
-      for (size_t i = 0; i < sorted_children.size(); ++i) {
-        const auto& child = sorted_children[i];
-        bool isLast = (i == sorted_children.size() - 1);
+    for (size_t i = 0; i < sorted_children.size(); ++i) {
+      const auto& child = sorted_children[i];
+      bool isLast = (i == sorted_children.size() - 1);
 
-        std::string childPrefix = prefix;
-        if (isLast) {
-          childPrefix += "    ";
-        } else {
-          childPrefix += "│   ";
-        }
-        tree_str += prefix;
-        tree_str += (isLast ? END_COMPOUND : COMPOUND);
-        tree_str += TRAIT;
-        tree_str += " ";
-        tree_str += it->key_;
-        tree_str += '\n';
+      std::string childPrefix = prefix;
+      if (isLast) {
+        childPrefix += "    ";
+      } else {
+        childPrefix += "│   ";
+      }
+      tree_str += prefix;
+      tree_str += (isLast ? END_COMPOUND : COMPOUND);
+      tree_str += TRAIT;
+      tree_str += " ";
+      tree_str += sorted_children[i].first;
+      tree_str += '\n';
 
-        if (child.second->isDirectory()) {
-          ++count_dir;
-          auto child_dir = std::static_pointer_cast< Directory >(child.second);
-          treeImpl(child_dir, childPrefix, tree_str, count_dir, count_files);
-        } else {
-          count_files += 1;
-        }
+      if (child.second->isDirectory()) {
+        ++count_dir;
+        auto child_dir = std::static_pointer_cast< Directory >(child.second);
+        treeImpl(child_dir, childPrefix, tree_str, count_dir, count_files);
+      } else {
+        count_files += 1;
       }
     }
   }
@@ -965,6 +963,94 @@ namespace zubarev
     archiveImpl("", target_dir, archived_data);
     touch(archive_name);
     write(archive_name, archived_data);
+    return true;
+  }
+  uint32_t FileSystem::unpackUint32(const std::string& data, size_t& offset)
+  {
+    uint32_t value = 0;
+    value = (value << 8) | static_cast< uint8_t >(data[offset++]);
+    value = (value << 8) | static_cast< uint8_t >(data[offset++]);
+    value = (value << 8) | static_cast< uint8_t >(data[offset++]);
+    value = (value << 8) | static_cast< uint8_t >(data[offset++]);
+    return value;
+  }
+
+  void FileSystem::ensurePathExists(const std::string& path)
+  {
+    std::string current_path_ = "";
+    std::string part;
+    std::istringstream iss(path);
+
+    // std::string old_pwd = pwd();
+    while (std::getline(iss, part, '/')) {
+      if (part.empty()) {
+        continue;
+      }
+      if (!curr_dir_->children_.has(part)) {
+        mkdir(part);
+      }
+      cd(part);
+    }
+  }
+
+  bool FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
+  {
+
+    auto archive_node = navigateTo(archive_path);
+    if (!archive_node || !archive_node->isDirectory()) {
+      throw std::runtime_error("extract: archive not found or is a directory");
+    }
+    std::string data = cat(archive_path);
+    size_t offset = 0;
+    std::string original_pwd = pwd();
+
+    if (!dir_path_after.empty()) {
+      auto target_dir = navigateTo(dir_path_after);
+      if (!target_dir || !target_dir->isDirectory()) {
+        throw std::runtime_error("extract: target directory not found");
+      }
+      cd(dir_path_after);
+    }
+    std::string extract_base = pwd();
+
+    while (offset < data.size()) {
+      if (offset + 4 > data.size()) {
+        break;
+      }
+      uint32_t name_len = unpackUint32(data, offset);
+      if (name_len + offset > data.size()) {
+        break;
+      }
+      std::string file_path = data.substr(offset, name_len);
+      offset += name_len;
+
+      uint32_t content_len = unpackUint32(data, offset);
+      if (content_len + offset > data.size()) {
+        break;
+      }
+      std::string content = data.substr(offset, content_len);
+      offset += content_len;
+
+      size_t last_slash = file_path.rfind('/');
+      std::string dir_path = "";
+      std::string file_name = file_path;
+
+      if (last_slash != std::string::npos) {
+        std::string dir_path = file_path.substr(0, last_slash);
+        file_name = file_path.substr(last_slash + 1);
+        cd(extract_base);
+        ensurePathExists(dir_path);
+
+      } else {
+        cd(extract_base);
+      }
+
+      if (curr_dir_->children_.has(file_name)) {
+        touch(file_name);
+      }
+      write(file_name, content);
+    }
+    cd(original_pwd);
     return true;
   }
 

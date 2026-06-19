@@ -56,6 +56,7 @@ namespace zubarev
     bool start_state(const std::string& state_name);
 
     bool archive(const std::string& archive_name, const std::string& dir_path);
+    bool extract(const std::string& archive_path, const std::string& dir_path);
 
     // Управление кэшированием (LRU)
     void cache_size();
@@ -76,6 +77,9 @@ namespace zubarev
     void treeImpl(std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;
     void packUint32(uint32_t value, std::string& out);
     void archiveImpl(const std::string& base_path, std::shared_ptr< Directory > dir, std::string& archive_data);
+    void ensurePathExists(const std::string& path);
+    uint32_t unpackUint32(const std::string& data, size_t& offset);
+
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;
 

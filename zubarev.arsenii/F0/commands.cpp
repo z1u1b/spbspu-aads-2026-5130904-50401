@@ -378,6 +378,35 @@ namespace zubarev
     }
   }
 
+  void cmd_extract(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string line;
+    std::getline(in, line);
+
+    std::istringstream iss(line);
+
+    std::string arhive_name = "";
+    std::string dir_path = "";
+
+    if (!(iss >> arhive_name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    iss >> dir_path;
+    if (dir_path.empty()) {
+      dir_path = file_sys.pwd();
+    }
+
+    try {
+      if (file_sys.archive(arhive_name, dir_path)) {
+        out << "<ARCHIVED: " << dir_path << " -> " << arhive_name << ">\n";
+      }
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
+
   void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string line;
