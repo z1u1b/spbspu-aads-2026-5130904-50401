@@ -161,6 +161,7 @@ namespace zubarev
     if (name_file.find('/') != std::string::npos) {
       throw std::runtime_error("touch: cannot touch '" + name_file + "': No such file or directory");
     }
+
     if (curr_dir_->children_.has(name_file)) {
       throw std::runtime_error("touch: cannot touch '" + name_file + "': File exists");
     }
@@ -639,12 +640,68 @@ namespace zubarev
     return {res_str, count_dir, count_files};
   }
 
-  topit::Vector< std::string > FileSystem::search(const std::string& name) const
+  topit::Vector< std::string > getNodes(const std::string& name)
+  {
+    topit::Vector< std::string > trigrams;
+    if (name.size() > 3) {
+      for (size_t i = 0; i <= name.size() - 3; ++i) {
+        trigrams.pushBack(name.substr(i, 3));
+      }
+    } else {
+      trigrams.pushBack(name);
+    }
+    return trigrams;
+  }
+  bool equal_nodes(const topit::Vector< std::string >& node_trigrams,
+                   const topit::Vector< std::string >& query_trigrams)
+  {
+    if (query_trigrams.isEmpty()) {
+      return false;
+    }
+
+    size_t matched = 0;
+    for (size_t i = 0; i < query_trigrams.getSize(); ++i) {
+      for (size_t j = 0; j < node_trigrams.getSize(); ++j) {
+        if (query_trigrams[i] == node_trigrams[j]) {
+          ++matched;
+          break;
+        }
+      }
+    }
+    return matched * 2 >= query_trigrams.getSize();
+  }
+  void FileSystem::search_impl(const std::shared_ptr< Directory > root,
+                               topit::Vector< std::shared_ptr< FSNode > >& results,
+                               const topit::Vector< std::string >& nodes) const
+  {
+    for (auto it = root->children_.begin(); it != root->children_.end(); ++it) {
+      if (equal_nodes(getNodes(it->key_), nodes)) {
+        results.pushBack(it->val_);
+      }
+      if (it->val_->isDirectory()) {
+        search_impl(std::dynamic_pointer_cast< Directory >(it->val_), results, nodes);
+      }
+    }
+  }
+
+  topit::Vector< std::shared_ptr< FSNode > > FileSystem::search(const std::string& name) const
   {
     if (name.empty()) {
-      return {};
+      throw std::runtime_error("search: Empty name");
     }
-    return {};
+
+    topit::Vector< std::string > nodes;
+    if (name.size() > 3) {
+      for (size_t i = 0; i <= name.size() - 3; ++i) {
+        nodes.pushBack(name.substr(i, 3));
+      }
+    } else {
+      nodes.pushBack(name);
+    }
+
+    topit::Vector< std::shared_ptr< FSNode > > results;
+    search_impl(root_, results, nodes);
+    return results;
   }
 
   // Работа с постоянным хранилищем сессий и внешними файлами

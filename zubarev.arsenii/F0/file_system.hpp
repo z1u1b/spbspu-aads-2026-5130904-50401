@@ -37,7 +37,7 @@ namespace zubarev
     std::string pwd() const;
     topit::Vector< std::string > ls(const std::string& path) const;
     std::tuple< std::string, size_t, size_t > tree(const std::string& path) const;
-    topit::Vector< std::string > search(const std::string& name) const;
+    topit::Vector< std::shared_ptr< FSNode > > search(const std::string& name) const;
 
     bool save(const std::string& name_node);
     bool load(const std::string& name_node);
@@ -79,6 +79,10 @@ namespace zubarev
     void archiveImpl(const std::string& base_path, std::shared_ptr< Directory > dir, std::string& archive_data);
     void ensurePathExists(const std::string& path);
     uint32_t unpackUint32(const std::string& data, size_t& offset);
+
+    void search_impl(const std::shared_ptr< Directory > root,
+                     topit::Vector< std::shared_ptr< FSNode > >& results,
+                     const topit::Vector< std::string >& nodes) const;
 
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;

@@ -232,17 +232,294 @@ namespace zubarev
     }
   }
 
+  // void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  // {
+  //   std::string query;
+
+  //   std::getline(in >> std::ws, query);
+
+  //   topit::Vector< std::shared_ptr< FSNode > > results = file_sys.search(query);
+
+  //   if (results.isEmpty()) {
+  //     out << "No matches found.\n";
+  //     return;
+  //   }
+
+  //   auto buildPath = [](std::shared_ptr< FSNode > node) -> std::string {
+  //     std::string path = node->getName();
+  //     std::shared_ptr< Directory > parent = node->getParent();
+  //     while (parent) {
+  //       path = parent->getName() + "/" + path;
+  //       parent = parent->getParent();
+  //     }
+  //     return path;
+  //   };
+
+  //   auto handleFileActions = [&](std::shared_ptr< FSNode > node) {
+  //     std::string path = buildPath(node);
+  //     out << "Selected: " << path << "\n";
+  //     out << "What would you like to do?\n"
+  //         << "  [1] Read (cat)\n"
+  //         << "  [2] Overwrite\n"
+  //         << "  [3] Append\n"
+  //         << "  [4] Cancel\n"
+  //         << "Select: ";
+
+  //     std::string choice;
+  //     std::getline(std::cin, choice);
+
+  //     if (choice == "1") {
+  //       out<<file_sys.cat(path)<<'\n';
+  //     } else if (choice == "2") {
+  //       out << "Enter new content (end with empty line):\n";
+  //       std::string content;
+  //       std::string line;
+  //       while (std::getline(std::cin, line) && !line.empty()) {
+  //         if (!content.empty())
+  //           content += "\n";
+  //         content += line;
+  //       }
+  //       // Предположим, что в FileSystem есть метод overwrite(path, content)
+  //       file_sys.write(path, content);
+  //       out << "File overwritten.\n";
+  //     } else if (choice == "3") {
+  //       out << "Enter content to append (end with empty line):\n";
+  //       std::string content;
+  //       std::string line;
+  //       while (std::getline(std::cin, line)) {
+  //   if (line.empty() || line == "q")
+  //       break;
+  //         if (!content.empty())
+  //           content += "\n";
+  //         content += line;
+  //       }
+  //       // Предположим, что в FileSystem есть метод append(path, content)
+  //       file_sys.append(path, content);
+  //       out << "Content appended.\n";
+  //     } else if (choice == "4" || choice.empty()) {
+  //       out << "Cancelled.\n";
+  //     } else {
+  //       out << "Invalid choice.\n";
+  //     }
+  //   };
+
+  //   // --- Найден ровно один файл ---
+  //   if (results.getSize() == 1) {
+  //     out << "Found 1 file.\n";
+  //     handleFileActions(results[0]);
+  //     return;
+  //   }
+
+  //   // --- Найдено несколько файлов: выводим список ---
+  //   out << "Found " << results.getSize() << " files:\n";
+  //   for (size_t i = 0; i < results.getSize(); ++i) {
+  //     std::string path = buildPath(results[i]);
+  //     out << "  [" << i + 1 << "] " << path << "\n";
+  //   }
+
+  //   out << "Select (number or prefix): "<< std::flush;
+  //   std::string choice;
+  //   std::getline(std::cin, choice);
+
+  //   if (choice.empty() || choice == "q")
+  //     return;
+
+  //   try {
+  //     size_t idx = std::stoul(choice);
+  //     if (idx >= 1 && idx <= results.getSize()) {
+  //       handleFileActions(results[idx - 1]);
+  //       return;
+  //     }
+  //   } catch (...) {
+  //     std::cin.clear();
+  //   }
+
+  //   topit::Vector< std::shared_ptr< FSNode > > filtered;
+  //   for (size_t i = 0; i < results.getSize(); ++i) {
+  //     const std::string& name = results[i]->getName();
+  //     if (name.size() >= choice.size() && name.substr(0, choice.size()) == choice) {
+  //       filtered.pushBack(results[i]);
+  //     }
+  //   }
+
+  //   if (filtered.isEmpty()) {
+  //     out << "No match for '" << choice << "'\n";
+  //   } else if (filtered.getSize() == 1) {
+  //     handleFileActions(filtered[0]);
+  //     return;
+  //   } else {
+  //     // Префикс отфильтровал, но осталось несколько — показываем и даем выбрать номер
+  //     out << "Found " << filtered.getSize() << " matches for prefix '" << choice << "':\n";
+  //     for (size_t i = 0; i < filtered.getSize(); ++i) {
+  //       std::string path = buildPath(filtered[i]);
+  //       out << "  [" << i + 1 << "] " << path << "\n";
+  //     }
+  //     out << "Select number: ";
+  //     std::string numChoice;
+  //     std::getline(std::cin, numChoice);
+  //     try {
+  //       size_t idx = std::stoul(numChoice);
+  //       if (idx >= 1 && idx <= filtered.getSize()) {
+  //         handleFileActions(filtered[idx - 1]);
+  //         return;
+  //       } else {
+  //         out << "Invalid selection.\n";
+  //       }
+  //     } catch (...) {
+  //       std::cin.clear();
+  //       out << "Invalid input.\n";
+  //     }
+  //   }
+  // }
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
-    std::string path;
-    if (!(in >> path)) {
-      out << "<INVALID COMMAND>\n";
+    std::string query;
+    std::getline(in >> std::ws, query);
+
+    topit::Vector< std::shared_ptr< FSNode > > results = file_sys.search(query);
+
+    if (results.isEmpty()) {
+      out << "No matches found.\n";
       return;
     }
+
+    auto buildPath = [](std::shared_ptr< FSNode > node) -> std::string {
+      std::string path = node->getName();
+      std::shared_ptr< Directory > parent = node->getParent();
+      while (parent) {
+        path = parent->getName() + "/" + path;
+        parent = parent->getParent();
+      }
+      return path;
+    };
+
+    auto handleFileActions = [&](std::shared_ptr< FSNode > node) {
+      std::string path = buildPath(node);
+      out << "Selected: " << path << "\n";
+
+      // Защита: Если это папка, не даем делать файловые операции
+      if (node->isDirectory()) {
+        out << "<This is a directory. File operations are not allowed>\n";
+        return;
+      }
+
+      out << "What would you like to do?\n"
+          << "  [1] Read (cat)\n"
+          << "  [2] Overwrite\n"
+          << "  [3] Append\n"
+          << "  [4] Cancel\n"
+          << "Select: ";
+
+      std::string choice;
+      std::getline(std::cin, choice); // Используем in вместо std::cin
+
+      try {
+        if (choice == "1") {
+          out << file_sys.cat(path) << '\n';
+        } else if (choice == "2") {
+          out << "Enter new content (end with empty line):\n";
+          std::string content;
+          std::string line;
+          while (std::getline(std::cin, line) && !line.empty()) {
+            if (!content.empty())
+              content += "\n";
+            content += line;
+          }
+          file_sys.write(path, content);
+          out << "File overwritten.\n";
+        } else if (choice == "3") {
+          out << "Enter content to append (end with empty line or 'q'):\n";
+          std::string content;
+          std::string line;
+          while (std::getline(std::cin, line)) {
+            if (line.empty() || line == "q")
+              break;
+            if (!content.empty())
+              content += "\n";
+            content += line;
+          }
+          file_sys.append(path, content);
+          out << "Content appended.\n";
+        } else if (choice == "4" || choice.empty()) {
+          out << "Cancelled.\n";
+        } else {
+          out << "Invalid choice.\n";
+        }
+      } catch (const std::exception& e) {
+        // Теперь ошибки ядра ФС будут красиво выводиться пользователю!
+        out << "<ERROR: " << e.what() << ">\n";
+      }
+    };
+
+    // --- Найден ровно один файл ---
+    if (results.getSize() == 1) {
+      out << "Found 1 file.\n";
+      handleFileActions(results[0]);
+      return;
+    }
+
+    // --- Найдено несколько файлов: выводим список ---
+    out << "Found " << results.getSize() << " files:\n";
+    for (size_t i = 0; i < results.getSize(); ++i) {
+      std::string path = buildPath(results[i]);
+      out << "  [" << i + 1 << "] " << path << "\n";
+    }
+
+    out << "Select (number or prefix): " << std::flush;
+    std::string choice;
+    std::getline(std::cin, choice);
+
+    if (choice.empty() || choice == "q")
+      return;
+
+    // Пытаемся обработать как номер
     try {
-      file_sys.search(path);
-    } catch (const std::exception& e) {
-      out << e.what() << '\n';
+      size_t idx = std::stoul(choice);
+      if (idx >= 1 && idx <= results.getSize()) {
+        handleFileActions(results[idx - 1]);
+        return;
+      }
+    } catch (const std::invalid_argument&) {
+      // Не число, значит префикс. Продолжаем выполнение.
+    } catch (const std::out_of_range&) {
+      // Слишком большое число. Продолжаем выполнение.
+    }
+    // Убрали catch(...), чтобы не глотать чужие исключения
+
+    topit::Vector< std::shared_ptr< FSNode > > filtered;
+    for (size_t i = 0; i < results.getSize(); ++i) {
+      const std::string& name = results[i]->getName();
+      if (name.size() >= choice.size() && name.substr(0, choice.size()) == choice) {
+        filtered.pushBack(results[i]);
+      }
+    }
+
+    if (filtered.isEmpty()) {
+      out << "No match for '" << choice << "'\n";
+    } else if (filtered.getSize() == 1) {
+      handleFileActions(filtered[0]);
+      return;
+    } else {
+      out << "Found " << filtered.getSize() << " matches for prefix '" << choice << "':\n";
+      for (size_t i = 0; i < filtered.getSize(); ++i) {
+        std::string path = buildPath(filtered[i]);
+        out << "  [" << i + 1 << "] " << path << "\n";
+      }
+      out << "Select number: ";
+      std::string numChoice;
+      std::getline(std::cin, numChoice);
+      try {
+        size_t idx = std::stoul(numChoice);
+        if (idx >= 1 && idx <= filtered.getSize()) {
+          handleFileActions(filtered[idx - 1]);
+          return;
+        } else {
+          out << "Invalid selection.\n";
+        }
+      } catch (...) {
+        // Тут можно оставить catch(...), так как внутри нет сложной логики ФС
+        out << "Invalid input.\n";
+      }
     }
   }
 
