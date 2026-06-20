@@ -48,22 +48,24 @@ namespace zubarev
     {
       Queue< std::string > dirs;
       std::string cur_str = "";
-      for (auto it = path.begin(); it != path.end(); ++it) {
-        if (*it != '/') {
-          cur_str += *it;
-        } else {
-          // std::cout<<cur_str<<'\n';
-          if (cur_str != "") {
-            dirs.push(cur_str);
-          }
 
-          cur_str = "";
+      for (char c : path) {
+        if (c == '/') {
+          if (!cur_str.empty()) {
+            if (cur_str != "~") {
+              dirs.push(cur_str);
+            }
+            cur_str.clear();
+          }
+        } else {
+          cur_str += c;
         }
       }
-      if (cur_str != "") {
+
+      if (!cur_str.empty() && cur_str != "~") {
         dirs.push(cur_str);
       }
-      cur_str = "";
+
       return dirs;
     }
 

@@ -22,57 +22,72 @@ namespace zubarev
   }
   std::shared_ptr< FSNode > FileSystem::navigateTo(const std::string& path) const
   {
-    if (path.empty()) {
-      return curr_dir_;
-    }
-
     Queue< std::string > dirs = detail::resolvePath(path);
+
     if (dirs.empty()) {
       return curr_dir_;
     }
 
     std::shared_ptr< Directory > current = curr_dir_;
 
-    if (path[0] == '/' || dirs.top() == "~") {
+    if (path[0] == '/') {
       current = root_;
-      if (dirs.top() == "~") {
-        dirs.drop();
-      }
     }
 
     while (!dirs.empty()) {
-      std::string next_name = dirs.top();
+      std::string name = dirs.top();
       dirs.drop();
 
-      if (next_name == "." || next_name.empty()) {
+      if (name == "." || name.empty()) {
         continue;
       }
-      if (next_name == "..") {
+
+      if (name == "..") {
         if (current->getParent()) {
           current = current->getParent();
         }
         continue;
       }
-      if (!current->children_.has(next_name)) {
-        return nullptr;
-      }
-      auto it = current->children_.find(next_name);
 
+      auto it = current->children_.find(name);
       if (it == current->children_.end()) {
         return nullptr;
       }
 
-      if (dirs.empty()) {
-        return it->val_;
-      }
-      if (!it->val_->isDirectory()) {
+      if (!it->val_->isDirectory() && !dirs.empty()) {
         return nullptr;
       }
+
       current = std::static_pointer_cast< Directory >(it->val_);
     }
 
     return current;
   }
+
+  std::pair< std::shared_ptr< Directory >, std::string > FileSystem::resolveParent(const std::string& path) const
+  {
+    size_t pos = path.rfind('/');
+
+    std::string parent_path;
+    std::string name;
+
+    if (pos == std::string::npos) {
+      parent_path = "";
+      name = path;
+    } else {
+      parent_path = path.substr(0, pos);
+      name = path.substr(pos + 1);
+    }
+
+    auto parent = navigateTo(parent_path);
+
+    if (!parent || !parent->isDirectory()) {
+      throw std::runtime_error("cannot resolve parent directory");
+    }
+
+    return {std::static_pointer_cast< Directory >(parent), name};
+  }
+
   FileSystem::FileSystem()
   {
     FileMetaData root_data;
@@ -82,119 +97,139 @@ namespace zubarev
     root_ = std::make_shared< Directory >(root_dir);
     curr_dir_ = root_;
   }
-  bool FileSystem::mkdir(const std::string& name_dir)
+  bool FileSystem::mkdir(const std::string& path_dir)
   {
-    if (name_dir.empty()) {
+    if (path_dir.empty()) {
       throw std::runtime_error("mkdir: missing operand");
     }
-    if (name_dir == "." || name_dir == "..") {
-      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': Invalid argument");
+    if (path_dir == "." || path_dir == "..") {
+      throw std::runtime_error("mkdir: cannot create directory '" + path_dir + "': Invalid argument");
     }
-    if (name_dir.find('/') != std::string::npos) {
-      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': No such file or directory");
-    }
-    if (curr_dir_->children_.has(name_dir)) {
-      throw std::runtime_error("mkdir: cannot create directory '" + name_dir + "': File exists");
+
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(path_dir);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (parent->children_.has(name)) {
+      throw std::runtime_error("mkdir: cannot create directory '" + name + "': File exists");
     }
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();
     new_data.owner = detail::getCurrentUser();
 
     auto new_dir = std::make_shared< Directory >(new_data);
-    curr_dir_->addChild(name_dir, new_dir);
+    parent->addChild(name, new_dir);
     return true;
   }
 
-  bool FileSystem::rmdir(const std::string& name_dir)
+  bool FileSystem::rmdir(const std::string& path_dir)
   {
-    if (name_dir.empty()) {
+    if (path_dir.empty()) {
       throw std::runtime_error("rmdir: missing operand");
     }
-    if (name_dir == "." || name_dir == "..") {
-      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Invalid argument");
-    }
-    if (!curr_dir_->children_.has(name_dir)) {
-      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': No such file or directory");
+    if (path_dir == "." || path_dir == "..") {
+      throw std::runtime_error("rmdir: failed to remove '" + path_dir + "': Invalid argument");
     }
 
-    auto node = curr_dir_->children_.at(name_dir);
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(path_dir);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (!parent->children_.has(name)) {
+      throw std::runtime_error("rmdir: failed to remove '" + path_dir + "': No such file or directory");
+    }
+
+    auto node = parent->children_.at(name);
     if (!node->isDirectory()) {
-      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Not a directory");
+      throw std::runtime_error("rmdir: failed to remove '" + path_dir + "': Not a directory");
     }
 
     auto dir = std::static_pointer_cast< Directory >(node);
     if (!dir->children_.empty()) {
-      throw std::runtime_error("rmdir: failed to remove '" + name_dir + "': Directory not empty");
+      throw std::runtime_error("rmdir: failed to remove '" + path_dir + "': Directory not empty");
     }
-    curr_dir_->removeChild(name_dir);
+    parent->removeChild(name);
     return true;
   }
-  bool FileSystem::rm(const std::string& name)
+
+  bool FileSystem::rm(const std::string& file_path)
   {
-    if (name.empty()) {
+    if (file_path.empty()) {
       throw std::runtime_error("rm: missing operand");
     }
-    if (name == "." || name == "..") {
-      throw std::runtime_error("rm: cannot remove '" + name + "': Is a directory");
-    }
-    if (!curr_dir_->children_.has(name)) {
-      throw std::runtime_error("rm: cannot remove '" + name + "': No such file or directory");
+    if (file_path == "." || file_path == "..") {
+      throw std::runtime_error("rm: cannot remove '" + file_path + "': Is a directory");
     }
 
-    auto node = curr_dir_->children_.at(name);
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (!parent->children_.has(name)) {
+      throw std::runtime_error("rm: failed to remove '" + file_path + "': No such file or directory");
+    }
+
+    auto node = parent->children_.at(name);
     if (node->isDirectory()) {
-      throw std::runtime_error("rm: cannot remove '" + name + "': Is a directory");
+      throw std::runtime_error("rm: cannot remove '" + file_path + "': Is a directory");
     }
 
-    curr_dir_->removeChild(name);
+    parent->removeChild(file_path);
     return true;
   }
 
-  bool FileSystem::touch(const std::string& name_file)
+  bool FileSystem::touch(const std::string& file_path)
   {
-    if (name_file.empty()) {
+    if (file_path.empty()) {
       throw std::runtime_error("touch: missing file operand");
     }
-    if (name_file == "." || name_file == "..") {
-      throw std::runtime_error("touch: cannot touch '" + name_file + "': Invalid argument");
-    }
-    if (name_file.find('/') != std::string::npos) {
-      throw std::runtime_error("touch: cannot touch '" + name_file + "': No such file or directory");
+    if (file_path == "." || file_path == "..") {
+      throw std::runtime_error("touch: cannot touch '" + file_path + "': Invalid argument");
     }
 
-    if (curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("touch: cannot touch '" + name_file + "': File exists");
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (parent->children_.has(name)) {
+      throw std::runtime_error("rm: failed to touch '" + file_path + "': File already exists");
     }
+
     FileMetaData new_data;
     new_data.date = detail::getCurrentDateTime();
     new_data.owner = detail::getCurrentUser();
 
     auto new_file = std::make_shared< File >(new_data);
-    curr_dir_->addChild(name_file, new_file);
+    parent->addChild(name, new_file);
     return true;
   }
 
-  bool FileSystem::write(const std::string& name_file, const std::string& text)
+  bool FileSystem::write(const std::string& file_path, const std::string& text)
   {
-    if (name_file.empty()) {
+    if (file_path.empty()) {
       throw std::runtime_error("write: missing file operand");
     }
-    if (name_file == "." || name_file == "..") {
-      throw std::runtime_error("write: cannot write '" + name_file + "': Invalid argument");
-    }
-    if (name_file.find('/') != std::string::npos) {
-      throw std::runtime_error("write: cannot write '" + name_file + "': No such file or directory");
-    }
-    if (!curr_dir_->children_.has(name_file)) {
-      touch(name_file);
+    if (file_path == "." || file_path == "..") {
+      throw std::runtime_error("write: cannot write '" + file_path + "': Invalid argument");
     }
 
-    auto node = curr_dir_->children_.find(name_file);
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (!parent->children_.has(name)) {
+      touch(file_path);
+    }
+
+    auto node = parent->children_.find(name);
+    if (node == parent->children_.end()) {
+      throw std::runtime_error("write: file creation failed");
+    }
 
     if (node->val_->isDirectory()) {
-      throw std::runtime_error("write: cannot write '" + name_file + "': Is a directory");
+      throw std::runtime_error("write: cannot write '" + file_path + "': Is a directory");
     }
-    auto file_ptr = std::static_pointer_cast< File >(curr_dir_->children_[name_file]);
+    auto file_ptr = std::static_pointer_cast< File >(parent->children_[name]);
     file_ptr->clearBlocks();
 
     const size_t BLOCK_SIZE = 4096;
@@ -231,17 +266,34 @@ namespace zubarev
     return true;
   }
 
-  bool FileSystem::append(const std::string& name_file, const std::string& text)
+  bool FileSystem::append(const std::string& file_path, const std::string& text)
   {
-    if (!curr_dir_->children_.has(name_file)) {
-      throw std::runtime_error("append: cannot append to '" + name_file + "': No such file or directory");
-    } else if (curr_dir_->children_[name_file]->isDirectory()) {
-      throw std::runtime_error("append: cannot append to '" + name_file + "': Is a directory");
-    } else if (text.empty()) {
-      throw std::runtime_error("append: cannot append to '" + name_file + "': No data provided");
+    if (text.empty()) {
+      throw std::runtime_error("append: cannot append to '" + file_path + "': No data provided");
+    }
+    if (file_path.empty()) {
+      throw std::runtime_error("write: missing file operand");
+    }
+    if (file_path == "." || file_path == "..") {
+      throw std::runtime_error("write: cannot write '" + file_path + "': Invalid argument");
     }
 
-    auto file_ptr = std::static_pointer_cast< File >(curr_dir_->children_[name_file]);
+    std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
+
+    std::shared_ptr< Directory > parent = result.first;
+    std::string name = result.second;
+    if (!parent->children_.has(name)) {
+      touch(name);
+    }
+
+    auto node = parent->children_.find(name);
+    if (node == parent->children_.end()) {
+      throw std::runtime_error("write: file creation failed");
+    }
+    if (node->val_->isDirectory()) {
+      throw std::runtime_error("append: cannot append '" + file_path + "': Is a directory");
+    }
+    auto file_ptr = std::static_pointer_cast< File >(parent->children_[name]);
 
     const size_t BLOCK_SIZE = 4096;
     size_t total_size = text.size();
@@ -276,39 +328,54 @@ namespace zubarev
     return true;
   }
 
+  // bool FileSystem::cd(const std::string& path)
+  // {
+  //   if (path.empty()) {
+  //     return true;
+  //   }
+  //   Queue< std::string > dirs = detail::resolvePath(path);
+  //   std::string current_path_str_ = pwd();
+  //   if (dirs.top() == "~") {
+  //     curr_dir_ = root_;
+  //     while (!dirs.empty()) {
+  //       dirs.drop();
+  //     }
+  //     return true;
+  //   }
+  //   while (!dirs.empty()) {
+
+  //     std::string next_dir = dirs.top();
+  //     if (next_dir == "..") {
+  //       if (current_path_str_ == "~") {
+  //         dirs.drop();
+  //         continue;
+  //       }
+
+  //       // FindResult find_curr_dir = navigateTo(current_path_str_);
+  //       curr_dir_ = curr_dir_->getParent();
+
+  //     } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_.at(next_dir)->isDirectory()) {
+  //       curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
+  //     } else {
+  //       throw std::runtime_error("cd: '" + next_dir + "': No such file or directory");
+  //     }
+  //     dirs.drop();
+  //   }
+  //   return true;
+  // }
   bool FileSystem::cd(const std::string& path)
   {
     if (path.empty()) {
       return true;
     }
-    Queue< std::string > dirs = detail::resolvePath(path);
-    std::string current_path_str_ = pwd();
-    if (dirs.top() == "~") {
-      curr_dir_ = root_;
-      while (!dirs.empty()) {
-        dirs.drop();
-      }
-      return true;
+
+    auto node = navigateTo(path);
+
+    if (!node || !node->isDirectory()) {
+      throw std::runtime_error("cd: '" + path + "': No such file or directory");
     }
-    while (!dirs.empty()) {
 
-      std::string next_dir = dirs.top();
-      if (next_dir == "..") {
-        if (current_path_str_ == "~") {
-          dirs.drop();
-          continue;
-        }
-
-        // FindResult find_curr_dir = navigateTo(current_path_str_);
-        curr_dir_ = curr_dir_->getParent();
-
-      } else if (curr_dir_->children_.has(next_dir) && curr_dir_->children_.at(next_dir)->isDirectory()) {
-        curr_dir_ = std::static_pointer_cast< Directory >(curr_dir_->children_[next_dir]);
-      } else {
-        throw std::runtime_error("cd: '" + next_dir + "': No such file or directory");
-      }
-      dirs.drop();
-    }
+    curr_dir_ = std::static_pointer_cast< Directory >(node);
     return true;
   }
 

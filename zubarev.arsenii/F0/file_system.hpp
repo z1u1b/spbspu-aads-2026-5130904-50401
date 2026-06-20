@@ -73,6 +73,7 @@ namespace zubarev
     std::shared_ptr< FSNode > cloneDirectory(const std::shared_ptr< Directory >& old_directory);
 
     std::shared_ptr< FSNode > navigateTo(const std::string& path) const;
+    std::pair< std::shared_ptr< Directory >, std::string > resolveParent(const std::string& path) const;
 
     void treeImpl(std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;
     void packUint32(uint32_t value, std::string& out);
