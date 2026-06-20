@@ -3,6 +3,7 @@
 #include <iostream>
 #include "utils.hpp"
 #include <sstream>
+#include <fstream>
 namespace zubarev
 {
 
@@ -15,6 +16,19 @@ namespace zubarev
     }
     try {
       file_sys.mkdir(name);
+    } catch (const std::exception& e) {
+      out << e.what() << '\n';
+    }
+  }
+  void cmd_rmdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string name;
+    if (!(in >> name)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    try {
+      file_sys.rmdir(name);
     } catch (const std::exception& e) {
       out << e.what() << '\n';
     }
@@ -399,8 +413,8 @@ namespace zubarev
     }
 
     try {
-      if (file_sys.archive(arhive_name, dir_path)) {
-        out << "<ARCHIVED: " << dir_path << " -> " << arhive_name << ">\n";
+      if (file_sys.extract(arhive_name, dir_path)) {
+        out << "<EXTRACTED: " << dir_path << " -> " << arhive_name << ">\n";
       }
     } catch (const std::exception& e) {
       out << e.what() << '\n';
@@ -579,5 +593,106 @@ namespace zubarev
     out << "\n";
 
     std::exit(0);
+  }
+
+  void cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    std::string filename;
+    in >> filename;
+
+    std::ifstream script_file(filename);
+    if (!script_file.is_open()) {
+      throw std::logic_error("Cannot open test script: " + filename);
+    }
+
+    out << "<STARTING SCRIPT: " << filename << ">\n";
+
+    process_stream(script_file, out, file_sys);
+
+    out << "<END OF SCRIPT: " << filename << ">\n";
+  }
+
+  void process_stream(std::istream& in, std::ostream& out, FileSystem& file_sys)
+  {
+    using Hash = SipHash;
+    using Equal = Equaler< std::string >;
+    using cmd_t = void (*)(std::istream&, std::ostream&, FileSystem&);
+
+    static RobinHashTable< std::string, cmd_t, Hash, Equal > cmds(128);
+    static bool initialized = false;
+
+    if (!initialized) {
+      cmds["mkdir"] = cmd_mkdir;
+      cmds["rmdir"] = cmd_rmdir;
+      cmds["rm"] = cmd_rm;
+      cmds["touch"] = cmd_touch;
+      cmds["write"] = cmd_write;
+      cmds["append"] = cmd_append;
+      cmds["cd"] = cmd_cd;
+      cmds["mv"] = cmd_mv;
+      cmds["cp"] = cmd_cp;
+      cmds["cat"] = cmd_cat;
+      cmds["pwd"] = cmd_pwd;
+      cmds["ls"] = cmd_ls;
+      cmds["tree"] = cmd_tree;
+      cmds["search"] = cmd_search;
+      cmds["save"] = cmd_save;
+      cmds["load"] = cmd_load;
+      cmds["states"] = cmd_states;
+      cmds["import"] = cmd_import;
+      cmds["export"] = cmd_export;
+      cmds["save-state"] = cmd_save_state;
+      cmds["start-state"] = cmd_start_state;
+      cmds["archive"] = cmd_archive;
+      cmds["extract"] = cmd_extract;
+      cmds["help"] = cmd_help;
+      cmds["exit"] = cmd_exit;
+      cmds["test"] = cmd_test;
+      initialized = true;
+    }
+
+    bool is_console = (&in == &std::cin);
+    std::string line;
+
+    if (is_console) {
+      printPrompt(file_sys, out);
+    }
+
+    while (std::getline(in, line)) {
+
+      if (line.empty()) {
+        if (is_console)
+          printPrompt(file_sys, out);
+        continue;
+      }
+
+      if (!is_console) {
+        printPrompt(file_sys, out);
+        out << line << '\n';
+      }
+
+      std::istringstream iss(line);
+      std::string cmd;
+      if (!(iss >> cmd)) {
+        if (is_console)
+          printPrompt(file_sys, out);
+        continue;
+      }
+
+      try {
+        if (!cmds.has(cmd)) {
+          throw std::out_of_range("unknown command");
+        }
+        cmds.at(cmd)(iss, out, file_sys);
+      } catch (const std::out_of_range&) {
+        out << "<INVALID COMMAND>\n";
+      } catch (const std::logic_error& e) {
+        out << "<INVALID COMMAND: " << e.what() << ">\n";
+      }
+
+      if (is_console) {
+        printPrompt(file_sys, out);
+      }
+    }
   }
 }

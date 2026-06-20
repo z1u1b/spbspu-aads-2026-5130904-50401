@@ -949,18 +949,26 @@ namespace zubarev
     if (archive_name.empty() || dir_path.empty()) {
       throw std::runtime_error("archive: missing operand");
     }
-    if (curr_dir_->children_.has(archive_name)) {
+
+    auto existing = navigateTo(archive_name);
+    if (existing) {
       throw std::runtime_error("archive: cannot create '" + archive_name + "': File exists");
     }
 
     auto target_node = navigateTo(dir_path);
+
     if (!target_node || !target_node->isDirectory()) {
       throw std::runtime_error("archive: cannot access '" + dir_path + "': Not a directory");
     }
     auto target_dir = std::static_pointer_cast< Directory >(target_node);
+    size_t last_slash = dir_path.rfind('/');
+    std::string folder_name = (last_slash == std::string::npos) ? dir_path : dir_path.substr(last_slash + 1);
+
     std::string archived_data = "";
 
-    archiveImpl("", target_dir, archived_data);
+    // ✅ ПЕРЕДАЁМ имя папки как base_path
+    archiveImpl(folder_name, target_dir, archived_data);
+
     touch(archive_name);
     write(archive_name, archived_data);
     return true;
@@ -995,62 +1003,48 @@ namespace zubarev
 
   bool FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
   {
-
     auto archive_node = navigateTo(archive_path);
-    if (!archive_node || !archive_node->isDirectory()) {
-      throw std::runtime_error("extract: archive not found or is a directory");
+
+    if (!archive_node || archive_node->isDirectory()) {
+      throw std::runtime_error("extract: invalid archive");
     }
+
     std::string data = cat(archive_path);
-    size_t offset = 0;
-    std::string original_pwd = pwd();
+    std::string old_pwd = pwd();
 
     if (!dir_path_after.empty()) {
-      auto target_dir = navigateTo(dir_path_after);
-      if (!target_dir || !target_dir->isDirectory()) {
-        throw std::runtime_error("extract: target directory not found");
-      }
       cd(dir_path_after);
     }
-    std::string extract_base = pwd();
+    size_t offset = 0;
 
     while (offset < data.size()) {
-      if (offset + 4 > data.size()) {
-        break;
-      }
+
       uint32_t name_len = unpackUint32(data, offset);
-      if (name_len + offset > data.size()) {
-        break;
-      }
       std::string file_path = data.substr(offset, name_len);
       offset += name_len;
 
-      uint32_t content_len = unpackUint32(data, offset);
-      if (content_len + offset > data.size()) {
-        break;
-      }
-      std::string content = data.substr(offset, content_len);
-      offset += content_len;
+      uint32_t size = unpackUint32(data, offset);
+      std::string content = data.substr(offset, size);
+      offset += size;
 
-      size_t last_slash = file_path.rfind('/');
-      std::string dir_path = "";
-      std::string file_name = file_path;
+      size_t pos = file_path.rfind('/');
+      std::string dir;
+      std::string file;
+      if (pos != std::string::npos) {
+        dir = file_path.substr(0, pos);
+        file = file_path.substr(pos + 1);
 
-      if (last_slash != std::string::npos) {
-        std::string dir_path = file_path.substr(0, last_slash);
-        file_name = file_path.substr(last_slash + 1);
-        cd(extract_base);
-        ensurePathExists(dir_path);
-
+        cd(old_pwd);
+        ensurePathExists(dir);
       } else {
-        cd(extract_base);
+        cd(old_pwd);
+        file = file_path;
       }
 
-      if (curr_dir_->children_.has(file_name)) {
-        touch(file_name);
-      }
-      write(file_name, content);
+      touch(file);
+      write(file, content);
     }
-    cd(original_pwd);
+    cd(old_pwd);
     return true;
   }
 

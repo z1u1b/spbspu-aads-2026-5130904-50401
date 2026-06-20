@@ -5,7 +5,9 @@
 #include <iosfwd>
 namespace zubarev
 {
+
   void cmd_mkdir(std::istream&, std::ostream& out, FileSystem& file_sys);
+  void cmd_rmdir(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_rm(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_touch(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys);
@@ -27,9 +29,11 @@ namespace zubarev
   void cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys);
   void cmd_extract(std::istream& in, std::ostream& out, FileSystem& file_sys);
-  void printPrompt(const FileSystem& fs, std::ostream& out);
   void cmd_help(std::istream&, std::ostream& out, FileSystem&);
   void cmd_exit(std::istream&, std::ostream& out, FileSystem&);
+  void cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys);
+
+  void process_stream(std::istream& in, std::ostream& out, FileSystem& file_sys);
 
 }
 

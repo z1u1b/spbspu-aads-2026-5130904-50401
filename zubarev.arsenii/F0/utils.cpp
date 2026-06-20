@@ -136,6 +136,7 @@ namespace zubarev
 
       std::cout << "        Type 'help' to view all commands\n\n";
     }
+
   }
 
 }
