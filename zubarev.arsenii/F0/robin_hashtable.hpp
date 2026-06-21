@@ -200,13 +200,20 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
   {
-    return CIter(find_el(id).first, this);
+    auto res = find_el(id);
+    if (res.second == nullptr) {
+      return cend();
+    }
+    return CIter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
   RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
-
   {
-    return Iter(find_el(id).first, this);
+    auto res = find_el(id);
+    if (res.second == nullptr) {
+      return end();
+    }
+    return Iter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept

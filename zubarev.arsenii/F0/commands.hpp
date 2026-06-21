@@ -35,6 +35,7 @@ namespace zubarev
   void cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys);
 
   void process_stream(std::istream& in, std::ostream& out, FileSystem& file_sys);
+  void printPrompt(const FileSystem& fs, std::ostream& out);
 
 }
 

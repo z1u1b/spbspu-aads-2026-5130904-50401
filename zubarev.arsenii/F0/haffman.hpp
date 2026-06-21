@@ -18,6 +18,8 @@ namespace zubarev
     void buildTreeFromDictionary(const BSTree< char, std::string, Comparator< char > >& dictionary);
 
   private:
+    void destroy(BSTreeNode< size_t, char >* node);
+    bool is_leaf(const BSTreeNode< size_t, char >* n);
     BSTree< char, std::string, Comparator< char > > codes_;
     BSTreeNode< size_t, char >* root_;
 
