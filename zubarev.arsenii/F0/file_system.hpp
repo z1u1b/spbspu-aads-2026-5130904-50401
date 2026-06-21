@@ -68,6 +68,9 @@ namespace zubarev
     void ssearch();
 
   private:
+    enum class WriteMode { Overwrite, Append };
+    void writeToFile(File& file, const std::string& text, WriteMode mode);
+
     bool isDescendant(const std::shared_ptr< Directory >& root, const std::shared_ptr< FSNode >& candidate) const;
     std::shared_ptr< FSNode > cloneFile(const std::shared_ptr< File >& old_file);
     std::shared_ptr< FSNode > cloneDirectory(const std::shared_ptr< Directory >& old_directory);

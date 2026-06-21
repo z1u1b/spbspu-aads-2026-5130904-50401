@@ -206,17 +206,10 @@ namespace zubarev
 
   bool FileSystem::write(const std::string& file_path, const std::string& text)
   {
-    if (file_path.empty()) {
-      throw std::runtime_error("write: missing file operand");
-    }
-    if (file_path == "." || file_path == "..") {
-      throw std::runtime_error("write: cannot write '" + file_path + "': Invalid argument");
-    }
-
     std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
-
     std::shared_ptr< Directory > parent = result.first;
     std::string name = result.second;
+
     if (!parent->children_.has(name)) {
       touch(file_path);
     }
@@ -227,107 +220,86 @@ namespace zubarev
     }
 
     if (node->val_->isDirectory()) {
-      throw std::runtime_error("write: cannot write '" + file_path + "': Is a directory");
-    }
-    auto file_ptr = std::static_pointer_cast< File >(parent->children_[name]);
-    file_ptr->clearBlocks();
-
-    const size_t BLOCK_SIZE = 4096;
-    size_t total_size = text.size();
-    size_t offset = 0;
-    while (offset < total_size) {
-      size_t cur_size = std::min(BLOCK_SIZE, total_size - offset);
-      std::string cur_str = text.substr(offset, cur_size);
-      offset += cur_size;
-
-      SipHash sip_hasher;
-      XXHash xx_hasher;
-      uint64_t sip_hash = sip_hasher(cur_str);
-      uint64_t xx_hash = xx_hasher(cur_str);
-      BlockKey key{sip_hash, xx_hash};
-      // uint64_t cur_hash = sip_hasher(cur_str);
-      if (data_block_.has(key)) {
-        file_ptr->addBlock(data_block_[key]);
-      } else {
-        Huffman huffman;
-        std::string bit_string = huffman.encode(cur_str);
-        auto block = std::make_shared< DataBlock >();
-        block->content_hash = key;
-        block->original_size = cur_str.size();
-        block->total_bits_count = bit_string.size();
-        block->compressed_data = huffman.compress(bit_string);
-        block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
-
-        data_block_.add(key, block);
-        file_ptr->addBlock(block);
-      }
+      throw std::runtime_error("write: Is a directory");
     }
 
+    auto file = std::static_pointer_cast< File >(node->val_);
+    writeToFile(*file, text, WriteMode::Overwrite);
     return true;
   }
 
   bool FileSystem::append(const std::string& file_path, const std::string& text)
   {
     if (text.empty()) {
-      throw std::runtime_error("append: cannot append to '" + file_path + "': No data provided");
-    }
-    if (file_path.empty()) {
-      throw std::runtime_error("write: missing file operand");
-    }
-    if (file_path == "." || file_path == "..") {
-      throw std::runtime_error("write: cannot write '" + file_path + "': Invalid argument");
+      throw std::runtime_error("append: no data provided");
     }
 
     std::pair< std::shared_ptr< Directory >, std::string > result = resolveParent(file_path);
 
     std::shared_ptr< Directory > parent = result.first;
     std::string name = result.second;
+
     if (!parent->children_.has(name)) {
-      touch(name);
+      touch(file_path);
     }
 
     auto node = parent->children_.find(name);
+
     if (node == parent->children_.end()) {
-      throw std::runtime_error("write: file creation failed");
+      throw std::runtime_error("append: file creation failed");
     }
+
     if (node->val_->isDirectory()) {
-      throw std::runtime_error("append: cannot append '" + file_path + "': Is a directory");
+      throw std::runtime_error("append: Is a directory");
     }
-    auto file_ptr = std::static_pointer_cast< File >(parent->children_[name]);
+
+    auto file = std::static_pointer_cast< File >(node->val_);
+    writeToFile(*file, text, WriteMode::Append);
+    return true;
+  }
+
+  void FileSystem::writeToFile(File& file, const std::string& text, WriteMode mode)
+  {
+    if (mode == WriteMode::Overwrite) {
+      file.clearBlocks();
+    }
 
     const size_t BLOCK_SIZE = 4096;
-    size_t total_size = text.size();
     size_t offset = 0;
-    while (offset < total_size) {
-      size_t cur_size = std::min(BLOCK_SIZE, total_size - offset);
+
+    while (offset < text.size()) {
+
+      size_t cur_size = std::min(BLOCK_SIZE, text.size() - offset);
       std::string cur_str = text.substr(offset, cur_size);
       offset += cur_size;
 
       SipHash sip_hasher;
       XXHash xx_hasher;
-      uint64_t sip_hash = sip_hasher(cur_str);
-      uint64_t xx_hash = xx_hasher(cur_str);
-      BlockKey key{sip_hash, xx_hash};
-      // uint64_t cur_hash = sip_hasher(cur_str);
+
+      BlockKey key{sip_hasher(cur_str), xx_hasher(cur_str)};
+
+      std::shared_ptr< DataBlock > block;
+
       if (data_block_.has(key)) {
-        file_ptr->addBlock(data_block_[key]);
+        block = data_block_[key];
       } else {
         Huffman huffman;
-        std::string bit_string = huffman.encode(cur_str);
-        auto block = std::make_shared< DataBlock >();
+
+        std::string bits = huffman.encode(cur_str);
+
+        block = std::make_shared< DataBlock >();
         block->content_hash = key;
         block->original_size = cur_str.size();
-        block->total_bits_count = bit_string.size();
-        block->compressed_data = huffman.compress(bit_string);
+        block->total_bits_count = bits.size();
+        block->compressed_data = huffman.compress(bits);
         block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
         data_block_.add(key, block);
-        file_ptr->addBlock(block);
       }
-    }
-    return true;
-  }
 
+      file.addBlock(block);
+    }
+  }
   // bool FileSystem::cd(const std::string& path)
   // {
   //   if (path.empty()) {
