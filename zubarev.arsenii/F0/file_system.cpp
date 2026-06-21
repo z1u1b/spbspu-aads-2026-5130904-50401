@@ -421,63 +421,52 @@ std::shared_ptr< zubarev::FSNode > zubarev::FileSystem::cloneDirectory(const std
 bool zubarev::FileSystem::cp(const std::string& from, const std::string& to)
 {
   if (from.empty() || to.empty()) {
-    throw std::runtime_error("cp: missing file operand");
-  }
-  if (from == "~" || to == "~") {
-    throw std::runtime_error("cp: cannot copy root directory");
-  }
-  if (from == "." || from == ".." || to == "." || to == "..") {
-    throw std::runtime_error("cp: cannot copy '" + from + "': Invalid argument");
+    throw std::runtime_error("cp: missing operand");
   }
 
-  std::shared_ptr< FSNode > src_from = navigateTo(from);
-  std::shared_ptr< FSNode > src_to = navigateTo(to);
+  auto src_from = navigateTo(from);
+  auto src_to = navigateTo(to);
 
   if (!src_from || !src_from->getParent()) {
-    throw std::runtime_error("cp: cannot stat '" + from + "': No such file or directory");
+    throw std::runtime_error("cp: cannot stat '" + from + "'");
   }
+
   if (src_from == src_to) {
-    throw std::runtime_error("cp: '" + from + "' and '" + to + "' are the same file");
+    throw std::runtime_error("cp: same file");
   }
-  if (src_from->isDirectory() && src_to && !src_to->isDirectory()) {
-    throw std::runtime_error("cp: cannot overwrite non-directory '" + to + "' with directory '" + from + "'");
+
+  if (src_from->isDirectory() && src_to && isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
+    throw std::runtime_error("cp: cannot copy directory into itself");
   }
-  std::shared_ptr< FSNode > clone_node = nullptr;
-  if (src_from->isDirectory()) {
-    clone_node = cloneDirectory(std::static_pointer_cast< Directory >(src_from));
-  } else {
-    clone_node = cloneFile(std::static_pointer_cast< File >(src_from));
-  }
-  std::shared_ptr< Directory > target_dir = nullptr;
-  std::string target_name = "";
+
+  std::shared_ptr< Directory > target_dir;
+  std::string target_name;
 
   if (src_to && src_to->isDirectory()) {
     target_dir = std::static_pointer_cast< Directory >(src_to);
+
     target_name = src_from->getName();
-
   } else {
-    size_t last_slash = to.rfind('/');
-    if (last_slash == std::string::npos) {
-      target_dir = curr_dir_;
-      target_name = to;
-    } else {
-      std::string parent_path = to.substr(0, last_slash);
-      if (parent_path.empty()) {
-        parent_path = '/';
-      }
+    std::pair< std::shared_ptr< zubarev::Directory >, std::string > parent = resolveParent(to);
 
-      std::shared_ptr< FSNode > parent_node = navigateTo(parent_path);
-      if (!parent_node || !parent_node->isDirectory()) {
-        throw std::runtime_error("cp: cannot create regular file '" + to + "': No such file or directory");
-      }
-      target_dir = std::static_pointer_cast< Directory >(parent_node);
-      target_name = to.substr(last_slash + 1);
-    }
-    if (src_to && !src_to->isDirectory()) {
-      target_dir->removeChild(src_to->getName());
+    target_dir = parent.first;
+    target_name = parent.second;
+
+    if (target_dir->children_.has(target_name)) {
+      target_dir->removeChild(target_name);
     }
   }
-  target_dir->addChild(target_name, clone_node);
+
+  std::shared_ptr< FSNode > clone;
+
+  if (src_from->isDirectory()) {
+    clone = cloneDirectory(std::static_pointer_cast< Directory >(src_from));
+  } else {
+    clone = cloneFile(std::static_pointer_cast< File >(src_from));
+  }
+
+  target_dir->addChild(target_name, clone);
+
   return true;
 }
 
