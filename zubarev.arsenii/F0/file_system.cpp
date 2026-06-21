@@ -173,7 +173,7 @@ bool zubarev::FileSystem::rm(const std::string& file_path)
     throw std::runtime_error("rm: cannot remove '" + file_path + "': Is a directory");
   }
 
-  parent->removeChild(file_path);
+  parent->removeChild(name);
   return true;
 }
 
@@ -353,9 +353,6 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
   if (!src_from || !src_from->getParent()) {
     throw std::runtime_error("mv: cannot stat '" + from + "': No such file or directory");
   }
-  if (src_to && !src_to->isDirectory()) {
-    throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': Not a directory");
-  }
   if (src_from->isDirectory() && isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
     throw std::runtime_error("mv: cannot move '" + from + "' to a subdirectory of itself '" + to + "'");
   }
@@ -373,33 +370,23 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
       throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "/" + target_name + "': File exists");
     }
   } else {
-    size_t last_slash = to.rfind('/');
-    if (last_slash == std::string::npos) {
-      target_dir = curr_dir_;
-      target_name = to;
 
-    } else {
-      std::string parent_path = to.substr(0, last_slash);
-      if (parent_path.empty()) {
-        parent_path = '/';
-      }
+    std::pair< std::shared_ptr< zubarev::Directory >, std::string > parent_result = resolveParent(to);
 
-      std::shared_ptr< FSNode > parent_node = navigateTo(parent_path);
-      if (!parent_node || !parent_node->isDirectory()) {
-        throw std::runtime_error("mv: cannot create regular file '" + to + "': No such file or directory");
-      }
-      target_dir = std::static_pointer_cast< Directory >(parent_node);
-      target_name = to.substr(last_slash + 1);
-    }
+    target_dir = parent_result.first;
+    target_name = parent_result.second;
+
     if (src_to && !src_to->isDirectory()) {
-      target_dir->removeChild(src_to->getName());
+
+      target_dir->removeChild(target_name);
+
     } else if (target_dir->children_.has(target_name)) {
+
       throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': File exists");
     }
   }
   src_from->getParent()->removeChild(src_from->getName());
   target_dir->addChild(target_name, src_from);
-
   return true;
 }
 

@@ -1,0 +1,47 @@
+mkdir project
+cd project
+mkdir backup
+cd backup
+touch README.md
+write README.md 47
+This is virtual filesystem test Additional line
+end_write
+cd ..
+touch main.cpp
+write main.cpp 70
+#include <iostream> int main(){ std::cout << \"Hello FS\"; return 0; }
+end_write
+mkdir src
+cd src
+touch config.cfg
+write config.cfg 20
+debug=true version=1
+end_write
+touch app.cpp
+write app.cpp 23
+int app(){ return 10; }
+end_write
+cd ..
+mkdir docs
+cd docs
+touch manual.txt
+write manual.txt 34
+Filesystem documentation test file
+end_write
+cd ..
+mkdir include
+cd include
+touch header.hpp
+write header.hpp 44
+#ifndef HEADER_HPP #define HEADER_HPP #endif
+end_write
+cd ..
+touch README.md
+write README.md 47
+This is virtual filesystem test Additional line
+end_write
+touch utils.cpp
+write utils.cpp 39
+void hello(){ std::cout << \"utils\"; }
+end_write
+cd ..
