@@ -20,8 +20,6 @@ namespace zubarev
     FileSystem& operator=(const FileSystem&) = delete;
     bool isEmpty() const;
 
-    // Основные операции файловой системы
-    // Модифицирующие методы (возвращают bool для обработки ошибок в контроллере)
     bool mkdir(const std::string& name_dir);
     bool rmdir(const std::string& name_dir);
     bool rm(const std::string& name);
@@ -32,7 +30,6 @@ namespace zubarev
     bool mv(const std::string& from, const std::string& to);
     bool cp(const std::string& from, const std::string& to);
 
-    // Методы чтения (const!)
     std::string cat(const std::string& name) const;
     std::string pwd() const;
     topit::Vector< std::string > ls(const std::string& path) const;
@@ -47,7 +44,7 @@ namespace zubarev
       size_t size_kb;
       std::string date;
     };
-    std::vector< StateInfo > states(const std::string& path = ".") const;
+    topit::Vector< StateInfo > states(const std::string& path = ".") const;
     bool import_file(const std::string& real_path, const std::string& virtual_name);
     bool export_file(const std::string& virtual_name, const std::string& real_path);
 
@@ -57,15 +54,6 @@ namespace zubarev
 
     bool archive(const std::string& archive_name, const std::string& dir_path);
     bool extract(const std::string& archive_path, const std::string& dir_path);
-
-    // Управление кэшированием (LRU)
-    void cache_size();
-    void cache_on();
-    void cache_off();
-    void cache_stats();
-
-    // Поисковый движок
-    void ssearch();
 
   private:
     enum class WriteMode { Overwrite, Append };
@@ -93,7 +81,6 @@ namespace zubarev
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual > data_block_;
     RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > > session_storage_;
-    // std::string states_directory_ = "./states/";
   };
 
 }

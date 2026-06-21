@@ -1,13 +1,8 @@
-// #include "../common/my_vector/top-it-vector.hpp"
-#include "commands.hpp"
-// #include "my_equal.hpp"
-// #include "my_siphash.hpp"
 #include <iostream>
 #include <limits>
-// #include <string>
-// #include <functional>
+
+#include "commands.hpp"
 #include "file_system.hpp"
-// #include "robin_hashtable.hpp"
 #include "utils.hpp"
 
 int main()

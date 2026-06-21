@@ -12,14 +12,14 @@ namespace zubarev
     std::string getCurrentDateTime()
     {
 
-      auto now = std::chrono::system_clock::now();
+      std::chrono::time_point< std::chrono::system_clock > now = std::chrono::system_clock::now();
 
       std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
       std::tm* now_tm = std::localtime(&now_time);
 
       std::stringstream ss;
-      ss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // Формат: ГГГГ-ММ-ДД ЧЧ:ММ:СС
+      ss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S");
 
       return ss.str();
     }
@@ -29,10 +29,8 @@ namespace zubarev
       char* user = nullptr;
 
 #if defined(_WIN32) || defined(_WIN64)
-      // Для Windows используем USERNAME
       user = std::getenv("USERNAME");
 #else
-      // Для Linux, macOS и других POSIX-систем используем USER
       user = std::getenv("USER");
 #endif
 
@@ -40,7 +38,6 @@ namespace zubarev
         return std::string(user);
       }
 
-      // Значение по умолчанию, если переменная окружения не найдена
       return "root";
     }
 
@@ -76,8 +73,8 @@ namespace zubarev
       }
 
       size_t maxLen = 0;
-      for (const auto& name : names) {
-        maxLen = std::max(maxLen, name.size());
+      for (auto name = names.begin(); name != names.end(); ++name) {
+        maxLen = std::max(maxLen, name->size());
       }
 
       const size_t colWidth = maxLen + 2;
@@ -117,7 +114,6 @@ namespace zubarev
     }
     void printBannerColored()
     {
-      // ANSI escape codes для цветов
       const std::string RESET = "\033[0m";
       const std::string WHITE = "\033[97m";
       const std::string BOLD = "\033[1m";

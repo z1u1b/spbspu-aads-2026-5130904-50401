@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+
 #include "robin_hashtable.hpp"
 #include "../common/my_vector/top-it-vector.hpp"
 #include "my_siphash.hpp"
@@ -17,18 +18,15 @@ namespace zubarev
     std::string owner;
   };
 
-  // 2. Блок данных для дедупликации и сжатия Хаффмана
   struct DataBlock
   {
-    topit::Vector< uint8_t > compressed_data; // Сжатый поток бит
-    std::shared_ptr< BSTree< char, std::string, Comparator< char > > >
-        out_dictionary;      // Таблица частот / дерево Хаффмана для распаковки
-    BlockKey content_hash;   // Хэш исходных данных
-    size_t original_size;    // Размер до сжатия (полезно для контроля)
-    size_t total_bits_count; // Важно: сколько ИМЕННО значащих бит в сжатом потоке
+    topit::Vector< uint8_t > compressed_data;
+    std::shared_ptr< BSTree< char, std::string, Comparator< char > > > out_dictionary;
+    BlockKey content_hash;
+    size_t original_size;
+    size_t total_bits_count;
   };
 
-  // 3. Базовый интерфейс для узла ФС
   class Directory;
   class FSNode
   {
@@ -63,7 +61,6 @@ namespace zubarev
     std::string name_;
   };
 
-  // 4. Класс Файла
   class File : public FSNode
   {
   public:
@@ -103,7 +100,6 @@ namespace zubarev
     topit::Vector< std::shared_ptr< DataBlock > > blocks_;
   };
 
-  // 5. Класс Директории
   class Directory : public FSNode, public std::enable_shared_from_this< Directory >
   {
     friend class FileSystem;

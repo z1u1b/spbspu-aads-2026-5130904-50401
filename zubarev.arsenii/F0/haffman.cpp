@@ -51,7 +51,7 @@ namespace zubarev
   }
   std::string Huffman::decode(const std::string& code)
   {
-    auto current = root_;
+    BSTreeNode< size_t, char >* current = root_;
     std::string out_str = "";
     out_str.reserve(code.size() / 2);
     for (auto it = code.begin(); it != code.end(); ++it) {
@@ -148,7 +148,6 @@ namespace zubarev
     uint8_t cur_byte = 0;
 
     for (auto it = text.begin(); it != text.end(); ++it) {
-      // cur_byte=*it;
       if (*it != '0' && *it != '1') {
         throw std::invalid_argument("compress: input must contain only '0' and '1'");
       }

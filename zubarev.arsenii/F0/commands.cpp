@@ -1,9 +1,11 @@
 #include "commands.hpp"
 
 #include <iostream>
-#include "utils.hpp"
 #include <sstream>
 #include <fstream>
+
+#include "utils.hpp"
+
 namespace zubarev
 {
 
@@ -185,7 +187,7 @@ namespace zubarev
       return;
     }
     try {
-      auto text_out = file_sys.cat(name);
+      std::string text_out = file_sys.cat(name);
       out << text_out << '\n';
     } catch (const std::exception& e) {
       out << e.what() << '\n';
@@ -208,7 +210,7 @@ namespace zubarev
       in >> path;
     }
     try {
-      auto names = file_sys.ls(path);
+      topit::Vector< std::string > names = file_sys.ls(path);
       std::sort(names.begin(), names.end());
       out << detail::formatLsColumns(names);
     } catch (const std::exception& e) {
@@ -223,7 +225,7 @@ namespace zubarev
       in >> path;
     }
     try {
-      auto res = file_sys.tree(path);
+      std::tuple< std::string, size_t, size_t > res = file_sys.tree(path);
       out << std::get< 0 >(res) << "\n";
       out << std::get< 1 >(res) << " directories, ";
       out << std::get< 2 >(res) << " files\n";
@@ -232,145 +234,6 @@ namespace zubarev
     }
   }
 
-  // void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
-  // {
-  //   std::string query;
-
-  //   std::getline(in >> std::ws, query);
-
-  //   topit::Vector< std::shared_ptr< FSNode > > results = file_sys.search(query);
-
-  //   if (results.isEmpty()) {
-  //     out << "No matches found.\n";
-  //     return;
-  //   }
-
-  //   auto buildPath = [](std::shared_ptr< FSNode > node) -> std::string {
-  //     std::string path = node->getName();
-  //     std::shared_ptr< Directory > parent = node->getParent();
-  //     while (parent) {
-  //       path = parent->getName() + "/" + path;
-  //       parent = parent->getParent();
-  //     }
-  //     return path;
-  //   };
-
-  //   auto handleFileActions = [&](std::shared_ptr< FSNode > node) {
-  //     std::string path = buildPath(node);
-  //     out << "Selected: " << path << "\n";
-  //     out << "What would you like to do?\n"
-  //         << "  [1] Read (cat)\n"
-  //         << "  [2] Overwrite\n"
-  //         << "  [3] Append\n"
-  //         << "  [4] Cancel\n"
-  //         << "Select: ";
-
-  //     std::string choice;
-  //     std::getline(std::cin, choice);
-
-  //     if (choice == "1") {
-  //       out<<file_sys.cat(path)<<'\n';
-  //     } else if (choice == "2") {
-  //       out << "Enter new content (end with empty line):\n";
-  //       std::string content;
-  //       std::string line;
-  //       while (std::getline(std::cin, line) && !line.empty()) {
-  //         if (!content.empty())
-  //           content += "\n";
-  //         content += line;
-  //       }
-  //       // Предположим, что в FileSystem есть метод overwrite(path, content)
-  //       file_sys.write(path, content);
-  //       out << "File overwritten.\n";
-  //     } else if (choice == "3") {
-  //       out << "Enter content to append (end with empty line):\n";
-  //       std::string content;
-  //       std::string line;
-  //       while (std::getline(std::cin, line)) {
-  //   if (line.empty() || line == "q")
-  //       break;
-  //         if (!content.empty())
-  //           content += "\n";
-  //         content += line;
-  //       }
-  //       // Предположим, что в FileSystem есть метод append(path, content)
-  //       file_sys.append(path, content);
-  //       out << "Content appended.\n";
-  //     } else if (choice == "4" || choice.empty()) {
-  //       out << "Cancelled.\n";
-  //     } else {
-  //       out << "Invalid choice.\n";
-  //     }
-  //   };
-
-  //   // --- Найден ровно один файл ---
-  //   if (results.getSize() == 1) {
-  //     out << "Found 1 file.\n";
-  //     handleFileActions(results[0]);
-  //     return;
-  //   }
-
-  //   // --- Найдено несколько файлов: выводим список ---
-  //   out << "Found " << results.getSize() << " files:\n";
-  //   for (size_t i = 0; i < results.getSize(); ++i) {
-  //     std::string path = buildPath(results[i]);
-  //     out << "  [" << i + 1 << "] " << path << "\n";
-  //   }
-
-  //   out << "Select (number or prefix): "<< std::flush;
-  //   std::string choice;
-  //   std::getline(std::cin, choice);
-
-  //   if (choice.empty() || choice == "q")
-  //     return;
-
-  //   try {
-  //     size_t idx = std::stoul(choice);
-  //     if (idx >= 1 && idx <= results.getSize()) {
-  //       handleFileActions(results[idx - 1]);
-  //       return;
-  //     }
-  //   } catch (...) {
-  //     std::cin.clear();
-  //   }
-
-  //   topit::Vector< std::shared_ptr< FSNode > > filtered;
-  //   for (size_t i = 0; i < results.getSize(); ++i) {
-  //     const std::string& name = results[i]->getName();
-  //     if (name.size() >= choice.size() && name.substr(0, choice.size()) == choice) {
-  //       filtered.pushBack(results[i]);
-  //     }
-  //   }
-
-  //   if (filtered.isEmpty()) {
-  //     out << "No match for '" << choice << "'\n";
-  //   } else if (filtered.getSize() == 1) {
-  //     handleFileActions(filtered[0]);
-  //     return;
-  //   } else {
-  //     // Префикс отфильтровал, но осталось несколько — показываем и даем выбрать номер
-  //     out << "Found " << filtered.getSize() << " matches for prefix '" << choice << "':\n";
-  //     for (size_t i = 0; i < filtered.getSize(); ++i) {
-  //       std::string path = buildPath(filtered[i]);
-  //       out << "  [" << i + 1 << "] " << path << "\n";
-  //     }
-  //     out << "Select number: ";
-  //     std::string numChoice;
-  //     std::getline(std::cin, numChoice);
-  //     try {
-  //       size_t idx = std::stoul(numChoice);
-  //       if (idx >= 1 && idx <= filtered.getSize()) {
-  //         handleFileActions(filtered[idx - 1]);
-  //         return;
-  //       } else {
-  //         out << "Invalid selection.\n";
-  //       }
-  //     } catch (...) {
-  //       std::cin.clear();
-  //       out << "Invalid input.\n";
-  //     }
-  //   }
-  // }
   void cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string query;
@@ -397,7 +260,6 @@ namespace zubarev
       std::string path = buildPath(node);
       out << "Selected: " << path << "\n";
 
-      // Защита: Если это папка, не даем делать файловые операции
       if (node->isDirectory()) {
         out << "<This is a directory. File operations are not allowed>\n";
         return;
@@ -411,11 +273,12 @@ namespace zubarev
           << "Select: ";
 
       std::string choice;
-      std::getline(std::cin, choice); // Используем in вместо std::cin
+      std::getline(std::cin, choice);
 
       try {
         if (choice == "1") {
           out << file_sys.cat(path) << '\n';
+
         } else if (choice == "2") {
           out << "Enter new content (end with empty line):\n";
           std::string content;
@@ -427,38 +290,42 @@ namespace zubarev
           }
           file_sys.write(path, content);
           out << "File overwritten.\n";
+
         } else if (choice == "3") {
           out << "Enter content to append (end with empty line or 'q'):\n";
           std::string content;
           std::string line;
           while (std::getline(std::cin, line)) {
-            if (line.empty() || line == "q")
+            if (line.empty() || line == "q") {
               break;
-            if (!content.empty())
+            }
+
+            if (!content.empty()) {
               content += "\n";
+            }
+
             content += line;
           }
           file_sys.append(path, content);
           out << "Content appended.\n";
+
         } else if (choice == "4" || choice.empty()) {
           out << "Cancelled.\n";
+
         } else {
           out << "Invalid choice.\n";
         }
       } catch (const std::exception& e) {
-        // Теперь ошибки ядра ФС будут красиво выводиться пользователю!
         out << "<ERROR: " << e.what() << ">\n";
       }
     };
 
-    // --- Найден ровно один файл ---
     if (results.getSize() == 1) {
       out << "Found 1 file.\n";
       handleFileActions(results[0]);
       return;
     }
 
-    // --- Найдено несколько файлов: выводим список ---
     out << "Found " << results.getSize() << " files:\n";
     for (size_t i = 0; i < results.getSize(); ++i) {
       std::string path = buildPath(results[i]);
@@ -469,10 +336,10 @@ namespace zubarev
     std::string choice;
     std::getline(std::cin, choice);
 
-    if (choice.empty() || choice == "q")
+    if (choice.empty() || choice == "q") {
       return;
+    }
 
-    // Пытаемся обработать как номер
     try {
       size_t idx = std::stoul(choice);
       if (idx >= 1 && idx <= results.getSize()) {
@@ -480,11 +347,9 @@ namespace zubarev
         return;
       }
     } catch (const std::invalid_argument&) {
-      // Не число, значит префикс. Продолжаем выполнение.
+
     } catch (const std::out_of_range&) {
-      // Слишком большое число. Продолжаем выполнение.
     }
-    // Убрали catch(...), чтобы не глотать чужие исключения
 
     topit::Vector< std::shared_ptr< FSNode > > filtered;
     for (size_t i = 0; i < results.getSize(); ++i) {
@@ -496,9 +361,11 @@ namespace zubarev
 
     if (filtered.isEmpty()) {
       out << "No match for '" << choice << "'\n";
+
     } else if (filtered.getSize() == 1) {
       handleFileActions(filtered[0]);
       return;
+
     } else {
       out << "Found " << filtered.getSize() << " matches for prefix '" << choice << "':\n";
       for (size_t i = 0; i < filtered.getSize(); ++i) {
@@ -517,7 +384,6 @@ namespace zubarev
           out << "Invalid selection.\n";
         }
       } catch (...) {
-        // Тут можно оставить catch(...), так как внутри нет сложной логики ФС
         out << "Invalid input.\n";
       }
     }
@@ -566,12 +432,13 @@ namespace zubarev
       in >> path;
     }
     try {
-      auto states_list = file_sys.states(path);
-      if (states_list.empty()) {
+      topit::Vector< FileSystem::StateInfo > states_list = file_sys.states(path);
+      if (states_list.isEmpty()) {
         out << "<NO STATES FOUND>\n";
       } else {
-        for (const auto& info : states_list) {
-          out << info.name << " [" << info.size_kb << "KB, " << info.date << "]\n";
+
+        for (auto info = states_list.begin(); info != states_list.end(); ++info) {
+          out << info->name << " [" << info->size_kb << "KB, " << info->date << "]\n";
         }
       }
     } catch (const std::exception& e) {
@@ -582,7 +449,6 @@ namespace zubarev
   void cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
   {
     std::string real_path, virtual_name;
-    // Требуется ровно два аргумента
     if (!(in >> real_path >> virtual_name)) {
       out << "<INVALID COMMAND>\n";
       return;
@@ -770,7 +636,6 @@ namespace zubarev
 
   void printPrompt(const FileSystem& fs, std::ostream& out)
   {
-    // ANSI коды для цветов
     const std::string RESET = "\033[0m";
     const std::string GREEN = "\033[32m";
     const std::string BLUE = "\033[34m";
@@ -796,7 +661,6 @@ namespace zubarev
     out << "║                     FILE SYSTEM HELP                             ║\n";
     out << "╚══════════════════════════════════════════════════════════════════╝" << RESET << "\n\n";
 
-    // === КАТЕГОРИЯ 1: ФАЙЛЫ И ДИРЕКТОРИИ ===
     out << BOLD << GREEN << "  [FILES AND DIRECTORIES]" << RESET << "\n";
     out << CYAN << "  mkdir <dir-name>" << RESET << "           Create a new directory\n";
     out << CYAN << "  rmdir <dir-name>" << RESET << "           Remove an empty directory\n";
@@ -809,7 +673,6 @@ namespace zubarev
     out << CYAN << "  cp <from> <to>" << RESET << "             Copy a file/directory\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 2: НАВИГАЦИЯ ===
     out << BOLD << GREEN << "  [NAVIGATION]" << RESET << "\n";
     out << CYAN << "  cd <path>" << RESET << "                  Change current directory\n";
     out << CYAN << "  pwd" << RESET << "                        Print current working directory\n";
@@ -817,13 +680,11 @@ namespace zubarev
     out << CYAN << "  tree [path]" << RESET << "                Display directory tree structure\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 3: ПОИСК ===
     out << BOLD << GREEN << "  [SEARCH]" << RESET << "\n";
     out << CYAN << "  search <name>" << RESET << "              Search files/dirs by exact name\n";
     out << CYAN << "  ssearch <type> <text>" << RESET << "      Smart search (name/content/ext)\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 4: СЕССИИ И СОСТОЯНИЯ ===
     out << BOLD << GREEN << "  [SESSIONS AND STATES]" << RESET << "\n";
     out << CYAN << "  save <name>" << RESET << "                Save object to in-memory session storage\n";
     out << CYAN << "  load <name>" << RESET << "                Load object from session storage\n";
@@ -832,14 +693,12 @@ namespace zubarev
     out << CYAN << "  start-state <file>" << RESET << "         Load FS state from disk (replaces current)\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 5: ИМПОРТ/ЭКСПОРТ ===
     out << BOLD << GREEN << "  [IMPORT / EXPORT]" << RESET << "\n";
     out << CYAN << "  import <real-path> <virtual-name>" << RESET << "   Import file from real disk to VFS\n";
     out << CYAN << "  export <virtual-name> <real-path>" << RESET << "   Export file from VFS to real disk\n";
     out << CYAN << "  archive <dir-name>" << RESET << "               Create compressed archive (TODO)\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 6: КЭШИРОВАНИЕ ===
     out << BOLD << GREEN << "  [CACHING (LRU)]" << RESET << "\n";
     out << CYAN << "  cache_size <size>" << RESET << "         Set cache size (e.g., 512MB)\n";
     out << CYAN << "  cache_on" << RESET << "                  Enable caching system\n";
@@ -847,7 +706,6 @@ namespace zubarev
     out << CYAN << "  cache_stats" << RESET << "               Show cache usage statistics\n";
     out << "\n";
 
-    // === КАТЕГОРИЯ 7: СИСТЕМНЫЕ ===
     out << BOLD << GREEN << "  [SYSTEM]" << RESET << "\n";
     out << CYAN << "  help" << RESET << "                      Show this help message\n";
     out << CYAN << "  exit" << RESET << "                      Exit the file system\n";

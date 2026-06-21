@@ -2,6 +2,7 @@
 #define UTILS_HPP
 
 #include <string>
+
 #include "../common/my_vector/top-it-vector.hpp"
 #include "../common/my_queue/queue.hpp"
 namespace zubarev

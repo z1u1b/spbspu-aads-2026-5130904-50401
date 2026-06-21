@@ -1,8 +1,9 @@
 #ifndef COMMANDS_FS_HPP
 #define COMMANDS_FS_HPP
 
-#include "file_system.hpp"
 #include <iosfwd>
+#include "file_system.hpp"
+
 namespace zubarev
 {
 

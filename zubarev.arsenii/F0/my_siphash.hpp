@@ -22,7 +22,7 @@ namespace zubarev
 
     uint64_t operator()(const void* data, size_t len) const
     {
-      auto h = hasher_template_;
+      boost::hash2::siphash_64 h = hasher_template_;
       h.update(data, len);
       return boost::hash2::get_integral_result< uint64_t >(h);
     }
@@ -34,7 +34,7 @@ namespace zubarev
 
     uint64_t operator()(const std::pair< std::string, std::string >& p) const
     {
-      auto h = hasher_template_;
+      boost::hash2::siphash_64 h = hasher_template_;
 
       size_t s1 = p.first.size();
       size_t s2 = p.second.size();

@@ -2,10 +2,12 @@
 #define ROBIN_HASHTABLE_HPP
 
 #include <cstddef>
+
 #include "robin_node.hpp"
 #include "../common/my_vector/top-it-vector.hpp"
 #include "robin_iter.hpp"
 #include "robin_citer.hpp"
+
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -20,7 +22,6 @@ namespace zubarev
     using Table = RobinHashTable< Key, Value, Hash, Equal >;
 
   public:
-    // RobinHashTable();
     explicit RobinHashTable(size_t cap = 16);
     ~RobinHashTable() = default;
     RobinHashTable(const RobinHashTable& table);
@@ -61,32 +62,6 @@ namespace zubarev
     Hash hasher_;
     Equal equal_;
 
-    // std::pair< size_t, Node* > find_el(const Key& k) noexcept
-    // {
-    //   if (empty()) {
-    //     return {0, nullptr};
-    //   }
-
-    //   size_t index = hasher_(k) % capacity_;
-    //   int cur_psl = 0;
-
-    //   for (size_t i = 0; i < capacity_; ++i) {
-    //     const Node& cur_node = slots_[index];
-    //     if (cur_node.psl_ == -1) {
-    //       return {index, nullptr};
-    //     }
-
-    //     if (cur_psl > cur_node.psl_) {
-    //       return {index, nullptr};
-    //     }
-    //     if (equal_(k, cur_node.k)) {
-    //       return {index, std::addressof(slots_[index])};
-    //     }
-    //     index = (index + 1) % capacity_;
-    //     cur_psl++;
-    //   }
-    //   return {capacity_, nullptr};
-    // }
     std::pair< size_t, Node* > find_el(const Key& k) noexcept
     {
       auto res = const_cast< const Table* >(this)->find_el(k);
@@ -125,24 +100,6 @@ namespace zubarev
     }
   };
 
-  // template< class Key, class Value, class Hash, class Equal >
-  // RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable():
-  //   size_(0),
-  //   capacity_(8),
-  //   slots_(topit::Vector< Node >(8)),
-  //   hasher_(),
-  //   equal_()
-  // {}
-
-  // template < class Key, class Value, class Hash, class Equal >
-  // RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(
-  //     size_t size, size_t capacity, topit::Vector< Node > slots, Hash hasher, Equal equal):
-  //   size_(size),
-  //   capacity_(capacity),
-  //   slots_(slots),
-  //   hasher_(hasher),
-  //   equal_(equal)
-  // {}
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
     size_(0),
@@ -313,7 +270,6 @@ namespace zubarev
     }
 
     size_t index = hasher_(k) % capacity_;
-    // size_t cur_psl = 0;
 
     Node node_to_add(k, v, true, 0);
 
@@ -341,7 +297,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
   {
-    auto found_el = find_el(k);
+    std::pair< size_t, Node* > found_el = find_el(k);
     Node* node_to_del = found_el.second;
     size_t cur_id = found_el.first;
     if (node_to_del) {
@@ -366,20 +322,10 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
-    auto found_el = find_el(k);
+    const std::pair< size_t, const Node* > found_el = find_el(k);
     return found_el.second != nullptr;
   }
-  // template< class Key, class Value, class Hash, class Equal >
-  // void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
-  // {
-  //   Table tmp(slots);
-  //   for (size_t i = 0; i < capacity_; ++i) {
-  //     if (slots_[i].occupied_) {
-  //       tmp.add(slots_[i].key_, slots_[i].val_);
-  //     }
-  //   }
-  //   swap(tmp);
-  // }
+
   template< class Key, class Value, class Hash, class Equal >
   void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
@@ -388,12 +334,7 @@ namespace zubarev
     for (size_t i = 0; i < capacity_; ++i) {
       if (slots_[i].occupied_) {
 
-        // ВАЖНО: создаём "чистую" вставку без старого psl
-        Node clean_node(slots_[i].key_,
-                        slots_[i].val_,
-                        true,
-                        0 // ОБНУЛЕНИЕ PSL
-        );
+        Node clean_node(slots_[i].key_, slots_[i].val_, true, 0);
 
         tmp.add(clean_node.key_, clean_node.val_);
       }

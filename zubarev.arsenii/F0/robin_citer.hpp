@@ -1,9 +1,11 @@
 #ifndef MY_ROBIN_CITER_HPP
 #define MY_ROBIN_CITER_HPP
 
-#include "robin_node.hpp"
 #include <cstddef>
 #include <stdexcept>
+
+#include "robin_node.hpp"
+
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
