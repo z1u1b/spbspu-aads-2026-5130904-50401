@@ -63,7 +63,8 @@ zubarev::Queue< std::string > zubarev::detail::resolvePath(const std::string& pa
   return dirs;
 }
 
-std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names, size_t terminalWidth)
+std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names,
+                                             size_t terminalWidth)
 {
   if (names.isEmpty()) {
     return "";

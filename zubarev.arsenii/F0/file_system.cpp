@@ -135,7 +135,8 @@ bool zubarev::FileSystem::rmdir(const std::string& path_dir)
   std::shared_ptr< Directory > parent = result.first;
   std::string name = result.second;
   if (!parent->children_.has(name)) {
-    throw std::runtime_error("rmdir: failed to remove '" + path_dir + "': No such file or directory");
+    throw std::runtime_error("rmdir: failed to remove '" + path_dir +
+                             "': No such file or directory");
   }
 
   std::shared_ptr< FSNode > node = parent->children_.at(name);
@@ -291,7 +292,8 @@ void zubarev::FileSystem::writeToFile(File& file, const std::string& text, Write
       block->original_size = cur_str.size();
       block->total_bits_count = bits.size();
       block->compressed_data = huffman.compress(bits);
-      block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
+      block->out_dictionary =
+          std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
       data_block_.add(key, block);
     }
@@ -353,8 +355,10 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
   if (!src_from || !src_from->getParent()) {
     throw std::runtime_error("mv: cannot stat '" + from + "': No such file or directory");
   }
-  if (src_from->isDirectory() && isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
-    throw std::runtime_error("mv: cannot move '" + from + "' to a subdirectory of itself '" + to + "'");
+  if (src_from->isDirectory() &&
+      isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
+    throw std::runtime_error("mv: cannot move '" + from + "' to a subdirectory of itself '" + to +
+                             "'");
   }
   if (src_from == src_to) {
     throw std::runtime_error("mv: '" + from + "' and '" + to + "' are the same file");
@@ -367,11 +371,13 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
     target_dir = std::static_pointer_cast< Directory >(src_to);
     target_name = src_from->getName();
     if (target_dir->children_.has(target_name)) {
-      throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "/" + target_name + "': File exists");
+      throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "/" + target_name +
+                               "': File exists");
     }
   } else {
 
-    std::pair< std::shared_ptr< zubarev::Directory >, std::string > parent_result = resolveParent(to);
+    std::pair< std::shared_ptr< zubarev::Directory >, std::string > parent_result =
+        resolveParent(to);
 
     target_dir = parent_result.first;
     target_name = parent_result.second;
@@ -390,7 +396,8 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
   return true;
 }
 
-std::shared_ptr< zubarev::FSNode > zubarev::FileSystem::cloneFile(const std::shared_ptr< File >& old_file)
+std::shared_ptr< zubarev::FSNode >
+zubarev::FileSystem::cloneFile(const std::shared_ptr< File >& old_file)
 {
   auto new_file = std::make_shared< File >(old_file->getMeta());
   for (auto it = old_file->getBlocks().begin(); it != old_file->getBlocks().end(); ++it) {
@@ -398,7 +405,8 @@ std::shared_ptr< zubarev::FSNode > zubarev::FileSystem::cloneFile(const std::sha
   }
   return new_file;
 }
-std::shared_ptr< zubarev::FSNode > zubarev::FileSystem::cloneDirectory(const std::shared_ptr< Directory >& old_dir)
+std::shared_ptr< zubarev::FSNode >
+zubarev::FileSystem::cloneDirectory(const std::shared_ptr< Directory >& old_dir)
 {
   auto new_dir = std::make_shared< Directory >(old_dir->getMeta());
 
@@ -435,7 +443,8 @@ bool zubarev::FileSystem::cp(const std::string& from, const std::string& to)
     throw std::runtime_error("cp: same file");
   }
 
-  if (src_from->isDirectory() && src_to && isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
+  if (src_from->isDirectory() && src_to &&
+      isDescendant(std::static_pointer_cast< Directory >(src_from), src_to)) {
     throw std::runtime_error("cp: cannot copy directory into itself");
   }
 
@@ -563,8 +572,9 @@ void zubarev::FileSystem::treeImpl(std::shared_ptr< Directory > dir,
     sorted_children.push_back({it->key_, it->val_});
   }
 
-  std::sort(
-      sorted_children.begin(), sorted_children.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+  std::sort(sorted_children.begin(), sorted_children.end(), [](const auto& a, const auto& b) {
+    return a.first < b.first;
+  });
 
   for (size_t i = 0; i < sorted_children.size(); ++i) {
     const std::pair< std::string, std::shared_ptr< FSNode > >& child = sorted_children[i];
@@ -631,7 +641,8 @@ topit::Vector< std::string > getNodes(const std::string& name)
   }
   return trigrams;
 }
-bool equal_nodes(const topit::Vector< std::string >& node_trigrams, const topit::Vector< std::string >& query_trigrams)
+bool equal_nodes(const topit::Vector< std::string >& node_trigrams,
+                 const topit::Vector< std::string >& query_trigrams)
 {
   if (query_trigrams.isEmpty()) {
     return false;
@@ -662,7 +673,8 @@ void zubarev::FileSystem::search_impl(const std::shared_ptr< Directory > root,
   }
 }
 
-topit::Vector< std::shared_ptr< zubarev::FSNode > > zubarev::FileSystem::search(const std::string& name) const
+topit::Vector< std::shared_ptr< zubarev::FSNode > >
+zubarev::FileSystem::search(const std::string& name) const
 {
   if (name.empty()) {
     throw std::runtime_error("search: Empty name");
@@ -695,7 +707,8 @@ bool zubarev::FileSystem::save(const std::string& path)
   }
 
   if (found_node->isDirectory()) {
-    session_storage_.add(save_name, cloneDirectory(std::static_pointer_cast< Directory >(found_node)));
+    session_storage_.add(save_name,
+                         cloneDirectory(std::static_pointer_cast< Directory >(found_node)));
   } else {
     session_storage_.add(save_name, cloneFile(std::static_pointer_cast< File >(found_node)));
   }
@@ -725,7 +738,8 @@ bool zubarev::FileSystem::load(const std::string& path)
   return true;
 }
 
-topit::Vector< zubarev::FileSystem::StateInfo > zubarev::FileSystem::states(const std::string& path) const
+topit::Vector< zubarev::FileSystem::StateInfo >
+zubarev::FileSystem::states(const std::string& path) const
 {
   topit::Vector< StateInfo > result;
 
@@ -812,7 +826,8 @@ bool zubarev::FileSystem::export_file(const std::string& virtual_name, const std
 {
 
   if (virtual_name.empty() || !navigateTo(virtual_name)) {
-    throw std::runtime_error("export: cannot open '" + virtual_name + "': No such file or directory");
+    throw std::runtime_error("export: cannot open '" + virtual_name +
+                             "': No such file or directory");
   }
 
   std::ofstream output_file(real_path);
@@ -888,7 +903,8 @@ bool zubarev::FileSystem::start_state(const std::string& state_name)
   std::ifstream input(state_path, std::ios::binary);
 
   if (!input) {
-    throw std::runtime_error("start-state: cannot open '" + state_path + "': No such file or directory");
+    throw std::runtime_error("start-state: cannot open '" + state_path +
+                             "': No such file or directory");
   }
   FileMetaData root_data;
   root_data.date = detail::getCurrentDateTime();
@@ -965,7 +981,8 @@ void zubarev::FileSystem::archiveImpl(const std::string& base_path,
       Huffman huffman;
       for (auto it = blocks.begin(); it != blocks.end(); ++it) {
         huffman.buildTreeFromDictionary(*(*it)->out_dictionary);
-        std::string bit_string = huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
+        std::string bit_string =
+            huffman.decompress((*it)->compressed_data, (*it)->total_bits_count);
         content += huffman.decode(bit_string);
       }
 
@@ -996,7 +1013,8 @@ bool zubarev::FileSystem::archive(const std::string& archive_name, const std::st
   }
   auto target_dir = std::static_pointer_cast< Directory >(target_node);
   size_t last_slash = dir_path.rfind('/');
-  std::string folder_name = (last_slash == std::string::npos) ? dir_path : dir_path.substr(last_slash + 1);
+  std::string folder_name =
+      (last_slash == std::string::npos) ? dir_path : dir_path.substr(last_slash + 1);
 
   std::string archived_data = "";
 
@@ -1033,7 +1051,8 @@ void zubarev::FileSystem::ensurePathExists(const std::string& path)
   }
 }
 
-bool zubarev::FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
+bool zubarev::FileSystem::extract(const std::string& archive_path,
+                                  const std::string& dir_path_after)
 {
   std::shared_ptr< FSNode > archive_node = navigateTo(archive_path);
 

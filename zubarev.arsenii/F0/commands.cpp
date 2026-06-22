@@ -663,7 +663,8 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
   out << CYAN << "  rmdir <dir-name>" << RESET << "           Remove an empty directory\n";
   out << CYAN << "  rm <file-name>" << RESET << "             Remove a file\n";
   out << CYAN << "  touch <file-name>" << RESET << "          Create an empty file\n";
-  out << CYAN << "  write <file> \"<text>\"" << RESET << "      Write text to a file (replace content)\n";
+  out << CYAN << "  write <file> \"<text>\"" << RESET
+      << "      Write text to a file (replace content)\n";
   out << CYAN << "  cat <file-name>" << RESET << "            Display file content\n";
   out << CYAN << "  append <file> \"<text>\"" << RESET << "     Append text to the end of a file\n";
   out << CYAN << "  mv <from> <to>" << RESET << "             Move or rename a file/directory\n";
@@ -683,17 +684,24 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
   out << "\n";
 
   out << BOLD << GREEN << "  [SESSIONS AND STATES]" << RESET << "\n";
-  out << CYAN << "  save <name>" << RESET << "                Save object to in-memory session storage\n";
+  out << CYAN << "  save <name>" << RESET
+      << "                Save object to in-memory session storage\n";
   out << CYAN << "  load <name>" << RESET << "                Load object from session storage\n";
-  out << CYAN << "  states [path]" << RESET << "              List available .state files on disk\n";
-  out << CYAN << "  save-state <file> [true]" << RESET << "   Save current FS to disk (.state file)\n";
-  out << CYAN << "  start-state <file>" << RESET << "         Load FS state from disk (replaces current)\n";
+  out << CYAN << "  states [path]" << RESET
+      << "              List available .state files on disk\n";
+  out << CYAN << "  save-state <file> [true]" << RESET
+      << "   Save current FS to disk (.state file)\n";
+  out << CYAN << "  start-state <file>" << RESET
+      << "         Load FS state from disk (replaces current)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [IMPORT / EXPORT]" << RESET << "\n";
-  out << CYAN << "  import <real-path> <virtual-name>" << RESET << "   Import file from real disk to VFS\n";
-  out << CYAN << "  export <virtual-name> <real-path>" << RESET << "   Export file from VFS to real disk\n";
-  out << CYAN << "  archive <dir-name>" << RESET << "               Create compressed archive (TODO)\n";
+  out << CYAN << "  import <real-path> <virtual-name>" << RESET
+      << "   Import file from real disk to VFS\n";
+  out << CYAN << "  export <virtual-name> <real-path>" << RESET
+      << "   Export file from VFS to real disk\n";
+  out << CYAN << "  archive <dir-name>" << RESET
+      << "               Create compressed archive (TODO)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [CACHING (LRU)]" << RESET << "\n";

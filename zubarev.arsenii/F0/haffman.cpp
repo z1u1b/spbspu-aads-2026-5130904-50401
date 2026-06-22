@@ -72,7 +72,8 @@ std::string zubarev::Huffman::decode(const std::string& code)
   }
   return out_str;
 }
-zubarev::BSTree< char, size_t, zubarev::Comparator< char > > zubarev::Huffman::calculateLetters(const std::string& text)
+zubarev::BSTree< char, size_t, zubarev::Comparator< char > >
+zubarev::Huffman::calculateLetters(const std::string& text)
 {
   BSTree< char, size_t, Comparator< char > > letters;
 
@@ -83,7 +84,8 @@ zubarev::BSTree< char, size_t, zubarev::Comparator< char > > zubarev::Huffman::c
   return letters;
 }
 
-zubarev::BSTreeNode< size_t, char >* zubarev::Huffman::treeLetters(BSTree< char, size_t, Comparator< char > > frequency)
+zubarev::BSTreeNode< size_t, char >*
+zubarev::Huffman::treeLetters(BSTree< char, size_t, Comparator< char > > frequency)
 {
   using HuffNode = BSTreeNode< size_t, char >;
 
@@ -92,7 +94,9 @@ zubarev::BSTreeNode< size_t, char >* zubarev::Huffman::treeLetters(BSTree< char,
     tree.pushBack(new HuffNode(it->second, it->first));
   }
 
-  auto tree_comp = [](const HuffNode* a, const HuffNode* b) { return a->data_.first > b->data_.first; };
+  auto tree_comp = [](const HuffNode* a, const HuffNode* b) {
+    return a->data_.first > b->data_.first;
+  };
 
   if (tree.getSize() == 1) {
     HuffNode* root = tree.back();
@@ -124,9 +128,10 @@ zubarev::BSTreeNode< size_t, char >* zubarev::Huffman::treeLetters(BSTree< char,
   return tree.front();
 }
 
-void zubarev::Huffman::generateCodes(const BSTreeNode< size_t, char >* node,
-                                     const std::string& code,
-                                     BSTree< char, std::string, Comparator< char > >& out_dictionary)
+void zubarev::Huffman::generateCodes(
+    const BSTreeNode< size_t, char >* node,
+    const std::string& code,
+    BSTree< char, std::string, Comparator< char > >& out_dictionary)
 {
   if (!node) {
     return;
@@ -170,7 +175,8 @@ topit::Vector< uint8_t > zubarev::Huffman::compress(const std::string& text)
 
   return packed_bytes;
 }
-std::string zubarev::Huffman::decompress(const topit::Vector< uint8_t >& compress_bytes, size_t total_bits)
+std::string zubarev::Huffman::decompress(const topit::Vector< uint8_t >& compress_bytes,
+                                         size_t total_bits)
 {
   std::string bit_string = "";
   size_t few_bits = 0;
@@ -195,11 +201,13 @@ std::string zubarev::Huffman::decompress(const topit::Vector< uint8_t >& compres
   }
   return bit_string;
 }
-const zubarev::BSTree< char, std::string, zubarev::Comparator< char > >& zubarev::Huffman::getCodes() const
+const zubarev::BSTree< char, std::string, zubarev::Comparator< char > >&
+zubarev::Huffman::getCodes() const
 {
   return codes_;
 }
-void zubarev::Huffman::buildTreeFromDictionary(const BSTree< char, std::string, Comparator< char > >& dictionary)
+void zubarev::Huffman::buildTreeFromDictionary(
+    const BSTree< char, std::string, Comparator< char > >& dictionary)
 {
   destroy(root_);
   root_ = nullptr;

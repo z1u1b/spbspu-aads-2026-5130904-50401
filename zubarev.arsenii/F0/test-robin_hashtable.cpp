@@ -7,7 +7,8 @@
 
 BOOST_AUTO_TEST_SUITE(robin_hashtable_tests)
 
-using Table = zubarev::RobinHashTable< std::string, size_t, zubarev::SipHash, zubarev::Equaler< std::string > >;
+using Table = zubarev::
+    RobinHashTable< std::string, size_t, zubarev::SipHash, zubarev::Equaler< std::string > >;
 
 using Hash = zubarev::SipHash;
 using Equal = zubarev::Equaler< std::string >;

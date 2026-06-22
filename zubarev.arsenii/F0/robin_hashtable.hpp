@@ -198,7 +198,8 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
+  RobinCIter< Key, Value, Hash, Equal >
+  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -207,7 +208,8 @@ namespace zubarev
     return CIter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
+  RobinIter< Key, Value, Hash, Equal >
+  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -270,7 +272,8 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k,
+                                                                                      Value v)
   {
     if (load_factor() >= 0.75) {
       rehash(capacity_ * 2);
