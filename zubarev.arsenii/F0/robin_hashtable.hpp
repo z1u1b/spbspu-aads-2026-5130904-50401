@@ -106,7 +106,7 @@ namespace zubarev
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
     size_(0),
     capacity_(capacity),
-    slots_(),
+    slots_(capacity_, Node()),
     hasher_(),
     equal_()
   {
@@ -120,7 +120,7 @@ namespace zubarev
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(const RobinHashTable& table):
     size_(table.size_),
     capacity_(table.capacity_),
-    slots_(),
+    slots_(table.capacity_, Node()),
     hasher_(table.hasher_),
     equal_(table.equal_)
   {
