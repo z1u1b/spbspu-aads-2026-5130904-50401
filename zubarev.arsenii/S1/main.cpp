@@ -1,10 +1,10 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "data.hpp"
+#include "../common/my_list/data.hpp"
 #include "functions.hpp"
-#include "iter.hpp"
-#include "list.hpp"
+#include "../common/my_list/iter.hpp"
+#include "../common/my_list/list.hpp"
 
 int main()
 {

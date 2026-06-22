@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "haffman.hpp"
 #include "../common/my_vector/top-it-vector.hpp"
 
