@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <sstream>
+#include <algorithm>
 
 #include "utils.hpp"
 #include "../common/my_queue/queue.hpp"
@@ -577,17 +578,17 @@ zubarev::FileSystem::treeImpl(std::shared_ptr< Directory > dir,
   const std::string COMPOUND = "├";
   const std::string END_COMPOUND = "└";
 
-  std::vector< std::pair< std::string, std::shared_ptr< FSNode > > > sorted_children;
+  topit::Vector< std::pair< std::string, std::shared_ptr< FSNode > > > sorted_children;
   for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
-    sorted_children.push_back({it->key_, it->val_});
+    sorted_children.pushBack({it->key_, it->val_});
   }
 
   std::sort(
       sorted_children.begin(), sorted_children.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
 
-  for (size_t i = 0; i < sorted_children.size(); ++i) {
+  for (size_t i = 0; i < sorted_children.getSize(); ++i) {
     const std::pair< std::string, std::shared_ptr< FSNode > >& child = sorted_children[i];
-    bool isLast = (i == sorted_children.size() - 1);
+    bool isLast = (i == sorted_children.getSize() - 1);
 
     std::string childPrefix = prefix;
     if (isLast) {

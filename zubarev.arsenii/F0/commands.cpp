@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 
 #include "utils.hpp"
 
@@ -752,7 +753,7 @@ zubarev::cmd_exit(std::istream&, std::ostream& out, FileSystem&)
   out << "╔════════════════"
       << "════════════════"
       << "════════════════╗\n";
-  out << "║                  GOODBYE! SEE YOU SOON!                          ║\n";
+  out << "║             GOODBYE! SEE YOU SOON!             ║\n";
   out << "╚════════════════"
       << "════════════════"
       << "════════════════╝\n";

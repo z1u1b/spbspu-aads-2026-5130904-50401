@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdint>
 
 #include "../common/my_tree/my_tree.hpp"
 #include "../common/my_tree/my_compare.hpp"
