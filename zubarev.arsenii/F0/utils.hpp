@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "../common/my_vector/top-it-vector.hpp"
-#include "../common/my_queue/queue.hpp"
+#include <top-it-vector.hpp>
+#include <queue.hpp>
 namespace zubarev
 {
   namespace detail

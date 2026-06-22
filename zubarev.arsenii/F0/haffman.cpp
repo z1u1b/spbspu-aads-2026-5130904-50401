@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "haffman.hpp"
-#include "../common/my_vector/top-it-vector.hpp"
+#include <top-it-vector.hpp>
 
 void
 zubarev::Huffman::destroy(BSTreeNode< size_t, char >* node)

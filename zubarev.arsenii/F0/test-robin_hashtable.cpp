@@ -1,6 +1,6 @@
 #include "robin_hashtable.hpp"
-#include "../common/my_hashfunc/my_equal.hpp"
-#include "../common/my_hashfunc/my_siphash.hpp"
+#include <my_equal.hpp>
+#include <my_siphash.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <string>

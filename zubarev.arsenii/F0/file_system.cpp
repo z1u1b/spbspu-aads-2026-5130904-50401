@@ -13,7 +13,7 @@
 #include <algorithm>
 
 #include "utils.hpp"
-#include "../common/my_queue/queue.hpp"
+#include <queue.hpp>
 
 bool
 zubarev::FileSystem::isEmpty() const

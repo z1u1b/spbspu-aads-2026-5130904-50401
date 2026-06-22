@@ -1,9 +1,9 @@
 #include <string>
 #include <cstdint>
 
-#include "../common/my_tree/my_tree.hpp"
-#include "../common/my_tree/my_compare.hpp"
-#include "../common/my_vector/top-it-vector.hpp"
+#include <my_tree.hpp>
+#include <my_compare.hpp>
+#include <top-it-vector.hpp>
 namespace zubarev
 {
   class Huffman
