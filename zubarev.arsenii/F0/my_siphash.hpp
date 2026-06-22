@@ -20,19 +20,22 @@ namespace zubarev
       hasher_template_ = boost::hash2::siphash_64(keys, sizeof(keys));
     }
 
-    uint64_t operator()(const void* data, size_t len) const
+    uint64_t
+    operator()(const void* data, size_t len) const
     {
       boost::hash2::siphash_64 h = hasher_template_;
       h.update(data, len);
       return boost::hash2::get_integral_result< uint64_t >(h);
     }
 
-    uint64_t operator()(const std::string& s) const
+    uint64_t
+    operator()(const std::string& s) const
     {
       return (*this)(s.data(), s.size());
     }
 
-    uint64_t operator()(const std::pair< std::string, std::string >& p) const
+    uint64_t
+    operator()(const std::pair< std::string, std::string >& p) const
     {
       boost::hash2::siphash_64 h = hasher_template_;
 
@@ -47,7 +50,8 @@ namespace zubarev
 
       return boost::hash2::get_integral_result< uint64_t >(h);
     }
-    uint64_t operator()(uint64_t x) const
+    uint64_t
+    operator()(uint64_t x) const
     {
       return (*this)(&x, sizeof(x));
     }

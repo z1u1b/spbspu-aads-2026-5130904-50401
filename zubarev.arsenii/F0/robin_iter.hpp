@@ -45,7 +45,8 @@ namespace zubarev
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinNode< Key, Value >& RobinIter< Key, Value, Hash, Equal >::operator*() const
+  RobinNode< Key, Value >&
+  RobinIter< Key, Value, Hash, Equal >::operator*() const
   {
     if (!table_ || el_idx_ >= table_->capacity_) {
       throw std::out_of_range("Invalid iterator dereference");
@@ -58,12 +59,14 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
+  RobinNode< Key, Value >*
+  RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >& RobinIter< Key, Value, Hash, Equal >::operator++()
+  RobinIter< Key, Value, Hash, Equal >&
+  RobinIter< Key, Value, Hash, Equal >::operator++()
   {
     if (!table_) {
       return *this;
@@ -75,7 +78,8 @@ namespace zubarev
     return *this;
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator++(int)
+  RobinIter< Key, Value, Hash, Equal >
+  RobinIter< Key, Value, Hash, Equal >::operator++(int)
   {
     RobinIter tmp = *this;
     ++(*this);
@@ -83,7 +87,8 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >& RobinIter< Key, Value, Hash, Equal >::operator--()
+  RobinIter< Key, Value, Hash, Equal >&
+  RobinIter< Key, Value, Hash, Equal >::operator--()
   {
     if (!table_ || el_idx_ == 0) {
       throw std::out_of_range("Iterator cannot be decremented");
@@ -96,19 +101,22 @@ namespace zubarev
     return *this;
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator--(int)
+  RobinIter< Key, Value, Hash, Equal >
+  RobinIter< Key, Value, Hash, Equal >::operator--(int)
   {
     RobinIter tmp = *this;
     --(*this);
     return tmp;
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool RobinIter< Key, Value, Hash, Equal >::operator!=(const RobinIter& rhs) const
+  bool
+  RobinIter< Key, Value, Hash, Equal >::operator!=(const RobinIter& rhs) const
   {
     return !(*this == rhs);
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool RobinIter< Key, Value, Hash, Equal >::operator==(const RobinIter& rhs) const
+  bool
+  RobinIter< Key, Value, Hash, Equal >::operator==(const RobinIter& rhs) const
   {
     if (table_ != rhs.table_) {
       return false;
