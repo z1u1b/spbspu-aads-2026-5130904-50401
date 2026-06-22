@@ -1,7 +1,8 @@
-#include "my_compare.hpp"
-#include "my_node_tree.hpp"
-#include "my_tree.hpp"
 #include <boost/test/unit_test.hpp>
+
+#include "../common/my_tree/my_compare.hpp"
+#include "../common/my_tree/my_node_tree.hpp"
+#include "../common/my_tree/my_tree.hpp"
 
 BOOST_AUTO_TEST_SUITE(my_tree_tests)
 

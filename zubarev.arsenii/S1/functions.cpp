@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <cctype>
-#include "list.hpp"
+#include "../common/my_list/list.hpp"
 
 zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {

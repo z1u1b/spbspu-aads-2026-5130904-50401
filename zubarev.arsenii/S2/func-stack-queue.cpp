@@ -1,8 +1,13 @@
 
 #include "func-stack-queue.hpp"
+
 #include <iostream>
-#include <limits>
 #include <string>
+#include <iosfwd>
+
+#include "func-math.hpp"
+#include "../common/my_queue/queue.hpp"
+#include "../common/my_stack/stack.hpp"
 
 namespace zubarev
 {

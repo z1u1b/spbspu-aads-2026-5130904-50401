@@ -1,13 +1,15 @@
 #ifndef GRAPH_TABLE_HPP
 #define GRAPH_TABLE_HPP
 
-#include "my_equal.hpp"
-#include "my_hashtable.hpp"
-#include "my_siphash.hpp"
 #include <iostream>
 #include <string>
 
-#include "../common/top-it-vector.hpp"
+#include "../common/my_hashfunc/my_equal.hpp"
+#include "my_hashtable.hpp"
+#include "../common/my_hashfunc/my_siphash.hpp"
+
+
+#include "../common/my_vector/top-it-vector.hpp"
 namespace zubarev
 {
   class GraphTable

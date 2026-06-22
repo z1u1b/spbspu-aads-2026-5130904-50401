@@ -1,7 +1,7 @@
 #ifndef MY_BLOCKKEY_HPP
 #define MY_BLOCKKEY_HPP
 
-#include "my_siphash.hpp"
+#include "../common/my_hashfunc/my_siphash.hpp"
 #include "my_xxhash.hpp"
 
 namespace zubarev

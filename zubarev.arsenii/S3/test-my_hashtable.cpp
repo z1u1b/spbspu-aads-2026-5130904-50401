@@ -1,8 +1,11 @@
-#include "my_equal.hpp"
+#include <boost/test/unit_test.hpp>
+
+#include "../common/my_hashfunc/my_siphash.hpp"
 #include "my_hashtable.hpp"
 #include "my_node_hashtable.hpp"
-#include "my_siphash.hpp"
-#include <boost/test/unit_test.hpp>
+#include "../common/my_hashfunc/my_equal.hpp"
+
+
 
 BOOST_AUTO_TEST_SUITE(my_hashtable_tests)
 

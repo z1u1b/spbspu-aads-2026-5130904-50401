@@ -3,6 +3,7 @@
 #include <limits>
 #include <string>
 
+#include "../common/my_stack/stack.hpp"
 long long zubarev::summation(long long oper1, long long oper2)
 {
   if (oper2 > 0 && oper1 > std::numeric_limits< long long >::max() - oper2) {

@@ -1,7 +1,7 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
 #include <iosfwd>
-#include "data.hpp"
+#include "../common/my_list/data.hpp"
 
 namespace zubarev
 {
