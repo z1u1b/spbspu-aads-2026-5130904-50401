@@ -1,5 +1,5 @@
 #include "func-math.hpp"
-#include <iostream>
+
 #include <limits>
 #include <string>
 

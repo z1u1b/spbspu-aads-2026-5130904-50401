@@ -3,7 +3,6 @@
 
 #include "../common/my_list/c-iter.hpp"
 #include "my_node_hashtable.hpp"
-#include <iostream>
 namespace zubarev
 {
   template < class Key, class Value, class Hash, class Equal >
