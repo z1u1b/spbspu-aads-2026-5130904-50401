@@ -9,8 +9,7 @@
 std::string zubarev::detail::getCurrentDateTime()
 {
 
-  std::chrono::time_point< std::chrono::system_clock > now =
-      std::chrono::system_clock::now();
+  std::chrono::time_point< std::chrono::system_clock > now = std::chrono::system_clock::now();
 
   std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
@@ -64,8 +63,7 @@ zubarev::Queue< std::string > zubarev::detail::resolvePath(const std::string& pa
   return dirs;
 }
 
-std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names,
-                                             size_t terminalWidth)
+std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names, size_t terminalWidth)
 {
   if (names.isEmpty()) {
     return "";
@@ -99,8 +97,7 @@ std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >&
 
       result += names[index];
 
-      bool lastPrintedColumn =
-          (col == columns - 1) || (row + (col + 1) * rows >= names.getSize());
+      bool lastPrintedColumn = (col == columns - 1) || (row + (col + 1) * rows >= names.getSize());
 
       if (!lastPrintedColumn) {
         result.append(colWidth - names[index].size(), ' ');

@@ -641,8 +641,7 @@ void zubarev::printPrompt(const FileSystem& fs, std::ostream& out)
   std::string user = detail::getCurrentUser();
   std::string path = fs.pwd();
 
-  out << GREEN << user << RESET << ":" << BLUE << path << RESET << YELLOW << " $ "
-      << RESET;
+  out << GREEN << user << RESET << ":" << BLUE << path << RESET << YELLOW << " $ " << RESET;
 }
 
 void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
@@ -655,74 +654,53 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
   const std::string MAGENTA = "\033[35m";
 
   out << "\n";
-  out << BOLD << YELLOW
-      << "╔══════════════════════════════════════════════════════════════════╗\n";
+  out << BOLD << YELLOW << "╔══════════════════════════════════════════════════════════════════╗\n";
   out << "║                     FILE SYSTEM HELP                             ║\n";
-  out << "╚══════════════════════════════════════════════════════════════════╝" << RESET
-      << "\n\n";
+  out << "╚══════════════════════════════════════════════════════════════════╝" << RESET << "\n\n";
 
   out << BOLD << GREEN << "  [FILES AND DIRECTORIES]" << RESET << "\n";
   out << CYAN << "  mkdir <dir-name>" << RESET << "           Create a new directory\n";
-  out << CYAN << "  rmdir <dir-name>" << RESET
-      << "           Remove an empty directory\n";
+  out << CYAN << "  rmdir <dir-name>" << RESET << "           Remove an empty directory\n";
   out << CYAN << "  rm <file-name>" << RESET << "             Remove a file\n";
   out << CYAN << "  touch <file-name>" << RESET << "          Create an empty file\n";
-  out << CYAN << "  write <file> \"<text>\"" << RESET
-      << "      Write text to a file (replace content)\n";
+  out << CYAN << "  write <file> \"<text>\"" << RESET << "      Write text to a file (replace content)\n";
   out << CYAN << "  cat <file-name>" << RESET << "            Display file content\n";
-  out << CYAN << "  append <file> \"<text>\"" << RESET
-      << "     Append text to the end of a file\n";
-  out << CYAN << "  mv <from> <to>" << RESET
-      << "             Move or rename a file/directory\n";
+  out << CYAN << "  append <file> \"<text>\"" << RESET << "     Append text to the end of a file\n";
+  out << CYAN << "  mv <from> <to>" << RESET << "             Move or rename a file/directory\n";
   out << CYAN << "  cp <from> <to>" << RESET << "             Copy a file/directory\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [NAVIGATION]" << RESET << "\n";
   out << CYAN << "  cd <path>" << RESET << "                  Change current directory\n";
-  out << CYAN << "  pwd" << RESET
-      << "                        Print current working directory\n";
+  out << CYAN << "  pwd" << RESET << "                        Print current working directory\n";
   out << CYAN << "  ls [path]" << RESET << "                  List directory contents\n";
-  out << CYAN << "  tree [path]" << RESET
-      << "                Display directory tree structure\n";
+  out << CYAN << "  tree [path]" << RESET << "                Display directory tree structure\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [SEARCH]" << RESET << "\n";
-  out << CYAN << "  search <name>" << RESET
-      << "              Search files/dirs by exact name\n";
-  out << CYAN << "  ssearch <type> <text>" << RESET
-      << "      Smart search (name/content/ext)\n";
+  out << CYAN << "  search <name>" << RESET << "              Search files/dirs by exact name\n";
+  out << CYAN << "  ssearch <type> <text>" << RESET << "      Smart search (name/content/ext)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [SESSIONS AND STATES]" << RESET << "\n";
-  out << CYAN << "  save <name>" << RESET
-      << "                Save object to in-memory session storage\n";
-  out << CYAN << "  load <name>" << RESET
-      << "                Load object from session storage\n";
-  out << CYAN << "  states [path]" << RESET
-      << "              List available .state files on disk\n";
-  out << CYAN << "  save-state <file> [true]" << RESET
-      << "   Save current FS to disk (.state file)\n";
-  out << CYAN << "  start-state <file>" << RESET
-      << "         Load FS state from disk (replaces current)\n";
+  out << CYAN << "  save <name>" << RESET << "                Save object to in-memory session storage\n";
+  out << CYAN << "  load <name>" << RESET << "                Load object from session storage\n";
+  out << CYAN << "  states [path]" << RESET << "              List available .state files on disk\n";
+  out << CYAN << "  save-state <file> [true]" << RESET << "   Save current FS to disk (.state file)\n";
+  out << CYAN << "  start-state <file>" << RESET << "         Load FS state from disk (replaces current)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [IMPORT / EXPORT]" << RESET << "\n";
-  out << CYAN << "  import <real-path> <virtual-name>" << RESET
-      << "   Import file from real disk to VFS\n";
-  out << CYAN << "  export <virtual-name> <real-path>" << RESET
-      << "   Export file from VFS to real disk\n";
-  out << CYAN << "  archive <dir-name>" << RESET
-      << "               Create compressed archive (TODO)\n";
+  out << CYAN << "  import <real-path> <virtual-name>" << RESET << "   Import file from real disk to VFS\n";
+  out << CYAN << "  export <virtual-name> <real-path>" << RESET << "   Export file from VFS to real disk\n";
+  out << CYAN << "  archive <dir-name>" << RESET << "               Create compressed archive (TODO)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [CACHING (LRU)]" << RESET << "\n";
-  out << CYAN << "  cache_size <size>" << RESET
-      << "         Set cache size (e.g., 512MB)\n";
+  out << CYAN << "  cache_size <size>" << RESET << "         Set cache size (e.g., 512MB)\n";
   out << CYAN << "  cache_on" << RESET << "                  Enable caching system\n";
-  out << CYAN << "  cache_off" << RESET
-      << "                 Disable caching and flush data\n";
-  out << CYAN << "  cache_stats" << RESET
-      << "               Show cache usage statistics\n";
+  out << CYAN << "  cache_off" << RESET << "                 Disable caching and flush data\n";
+  out << CYAN << "  cache_stats" << RESET << "               Show cache usage statistics\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [SYSTEM]" << RESET << "\n";

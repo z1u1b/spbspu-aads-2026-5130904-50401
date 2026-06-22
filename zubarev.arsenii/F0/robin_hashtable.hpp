@@ -128,8 +128,7 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(
-      RobinHashTable&& table) noexcept:
+  RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(RobinHashTable&& table) noexcept:
     size_(table.size_),
     capacity_(table.capacity_),
     slots_(std::move(table.slots_)),
@@ -199,8 +198,7 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -209,8 +207,7 @@ namespace zubarev
     return CIter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -245,8 +242,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
   {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i) {
@@ -257,28 +253,24 @@ namespace zubarev
     return cend();
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::cend() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cend() const
   {
     return CIter(capacity_, this);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::begin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin() const
   {
     return cbegin();
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::end() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end() const
   {
     return cend();
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
     if (load_factor() >= 0.75) {
       rehash(capacity_ * 2);
@@ -307,8 +299,8 @@ namespace zubarev
       node_to_add.psl_++;
       index = (index + 1) % capacity_;
     }
-    throw std::runtime_error(
-        "RobinHashTable overflow: rehash failed or capacity logic error");
+    throw std::runtime_error("RobinHashTable overflow: rehash failed or capacity logic "
+                             "error");
   }
   template< class Key, class Value, class Hash, class Equal >
   Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
