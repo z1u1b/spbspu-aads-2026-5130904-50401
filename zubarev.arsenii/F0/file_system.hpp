@@ -62,14 +62,18 @@ namespace zubarev
     bool isDescendant(const std::shared_ptr< Directory >& root,
                       const std::shared_ptr< FSNode >& candidate) const;
     std::shared_ptr< FSNode > cloneFile(const std::shared_ptr< File >& old_file);
-    std::shared_ptr< FSNode > cloneDirectory(const std::shared_ptr< Directory >& old_directory);
+    std::shared_ptr< FSNode >
+    cloneDirectory(const std::shared_ptr< Directory >& old_directory);
 
     std::shared_ptr< FSNode > navigateTo(const std::string& path) const;
     std::pair< std::shared_ptr< Directory >, std::string >
     resolveParent(const std::string& path) const;
 
-    void treeImpl(
-        std::shared_ptr< Directory >, const std::string&, std::string&, size_t&, size_t&) const;
+    void treeImpl(std::shared_ptr< Directory >,
+                  const std::string&,
+                  std::string&,
+                  size_t&,
+                  size_t&) const;
     void packUint32(uint32_t value, std::string& out);
     void archiveImpl(const std::string& base_path,
                      std::shared_ptr< Directory > dir,
@@ -86,7 +90,10 @@ namespace zubarev
 
     RobinHashTable< BlockKey, std::shared_ptr< DataBlock >, BlockKeyHash, BlockKeyEqual >
         data_block_;
-    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > >
+    RobinHashTable< std::string,
+                    std::shared_ptr< FSNode >,
+                    SipHash,
+                    Equaler< std::string > >
         session_storage_;
   };
 

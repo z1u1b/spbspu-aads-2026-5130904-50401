@@ -9,7 +9,8 @@
 std::string zubarev::detail::getCurrentDateTime()
 {
 
-  std::chrono::time_point< std::chrono::system_clock > now = std::chrono::system_clock::now();
+  std::chrono::time_point< std::chrono::system_clock > now =
+      std::chrono::system_clock::now();
 
   std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
@@ -98,7 +99,8 @@ std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >&
 
       result += names[index];
 
-      bool lastPrintedColumn = (col == columns - 1) || (row + (col + 1) * rows >= names.getSize());
+      bool lastPrintedColumn =
+          (col == columns - 1) || (row + (col + 1) * rows >= names.getSize());
 
       if (!lastPrintedColumn) {
         result.append(colWidth - names[index].size(), ' ');
@@ -117,12 +119,18 @@ void zubarev::detail::printBannerColored()
   const std::string BOLD = "\033[1m";
 
   std::cout << BOLD << WHITE;
-  std::cout << "███████╗██╗██╗     ███████╗███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗\n";
-  std::cout << "██╔════╝██║██║     ██╔════╝██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║\n";
-  std::cout << "█████╗  ██║██║     █████╗  ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║\n";
-  std::cout << "██╔══╝  ██║██║     ██╔══╝  ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║\n";
-  std::cout << "██║     ██║███████╗███████╗███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║\n";
-  std::cout << "╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝\n";
+  std::cout << "███████╗██╗██╗     ███████╗███████╗██╗   "
+               "██╗███████╗████████╗███████╗███╗   ███╗\n";
+  std::cout << "██╔════╝██║██║     ██╔════╝██╔════╝╚██╗ "
+               "██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║\n";
+  std::cout << "█████╗  ██║██║     █████╗  ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  "
+               "██╔████╔██║\n";
+  std::cout << "██╔══╝  ██║██║     ██╔══╝  ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  "
+               "██║╚██╔╝██║\n";
+  std::cout << "██║     ██║███████╗███████╗███████║   ██║   ███████║   ██║   ███████╗██║ "
+               "╚═╝ ██║\n";
+  std::cout << "╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝ "
+               "    ╚═╝\n";
   std::cout << RESET << "\n";
 
   std::cout << "        Custom Virtual File System\n";

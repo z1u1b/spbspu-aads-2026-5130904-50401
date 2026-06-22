@@ -136,7 +136,10 @@ namespace zubarev
 
   private:
     FileMetaData meta;
-    RobinHashTable< std::string, std::shared_ptr< FSNode >, SipHash, Equaler< std::string > >
+    RobinHashTable< std::string,
+                    std::shared_ptr< FSNode >,
+                    SipHash,
+                    Equaler< std::string > >
         children_;
   };
 }

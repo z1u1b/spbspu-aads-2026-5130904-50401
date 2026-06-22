@@ -58,7 +58,8 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
+  RobinNode< Key, Value >*
+  RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }
@@ -75,7 +76,8 @@ namespace zubarev
     return *this;
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator++(int)
+  RobinIter< Key, Value, Hash, Equal >
+  RobinIter< Key, Value, Hash, Equal >::operator++(int)
   {
     RobinIter tmp = *this;
     ++(*this);
@@ -96,7 +98,8 @@ namespace zubarev
     return *this;
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator--(int)
+  RobinIter< Key, Value, Hash, Equal >
+  RobinIter< Key, Value, Hash, Equal >::operator--(int)
   {
     RobinIter tmp = *this;
     --(*this);
