@@ -105,16 +105,11 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
     size_(0),
-    capacity_(capacity),
+    capacity_(capacity == 0 ? 8 : capacity),
     slots_(capacity_, Node()),
     hasher_(),
     equal_()
-  {
-    if (capacity == 0) {
-      capacity_ = 8;
-    }
-    slots_ = topit::Vector< Node >(capacity_);
-  }
+  {}
 
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(const RobinHashTable& table):
