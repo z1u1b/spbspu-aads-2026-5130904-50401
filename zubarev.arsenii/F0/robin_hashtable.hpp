@@ -124,7 +124,6 @@ namespace zubarev
     hasher_(table.hasher_),
     equal_(table.equal_)
   {
-    slots_ = topit::Vector< Node >(table.capacity_);
     for (size_t i = 0; i < table.capacity_; ++i) {
       slots_[i] = table.slots_[i];
     }
