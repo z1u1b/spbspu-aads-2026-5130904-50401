@@ -17,7 +17,6 @@ namespace zubarev
     const T& top() const;
     bool empty() const;
     size_t size() const;
-    void print(std::ostream& out = std::cout) const;
 
   private:
     List< T > list_;

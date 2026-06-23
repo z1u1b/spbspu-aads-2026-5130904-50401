@@ -14,14 +14,15 @@ namespace zubarev
 
   public:
     void push(const T& rhs);
+    void push(T&& rhs);
     void drop();
     void pop();
     const T& top() const;
     T& top();
     const T& last() const;
     T& last();
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
   private:
     List< T > list_;
@@ -33,6 +34,12 @@ namespace zubarev
   void Queue< T >::push(const T& rhs)
   {
     list_.push_back(rhs);
+    size_++;
+  }
+  template< class T >
+  void Queue< T >::push(T&& rhs)
+  {
+    list_.push_back(std::move(rhs));
     size_++;
   }
   template< class T >
@@ -86,12 +93,12 @@ namespace zubarev
     return *list_.back();
   }
   template< class T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return list_.empty();
   }
   template< class T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return size_;
   }
