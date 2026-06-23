@@ -1,5 +1,5 @@
-#ifndef FUNC_HPP
-#define FUNC_HPP
+#ifndef FUNC_STACK_QUEUE_HPP
+#define FUNC_STACK_QUEUE_HPP
 
 #include <iosfwd>
 #include "queue.hpp"
