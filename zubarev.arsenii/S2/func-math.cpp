@@ -125,6 +125,7 @@ long long (*zubarev::getOperation(const std::string& op))(long long, long long)
 }
 long long zubarev::eval(Queue< std::string >& postfixQ)
 {
+  using OpFuncPtr = long long (*)(long long, long long);
   Stack< long long > res;
 
   while (!postfixQ.empty()) {
@@ -135,7 +136,7 @@ long long zubarev::eval(Queue< std::string >& postfixQ)
       res.push(std::stoll(el));
     } catch (const std::exception&) {
 
-      auto operation = getOperation(el);
+      OpFuncPtr operation = getOperation(el);
 
       if (!operation) {
         throw std::runtime_error("Invalid operation");
