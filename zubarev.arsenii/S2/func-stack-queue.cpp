@@ -24,25 +24,6 @@ zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string&
     } else {
       container+=(ch);
     }
-    // if (std::isdigit(ch)) {
-    //   container += (ch);
-    // } else {
-    //   if (!container.empty()) {
-    //     q.push(container);
-    //     container = "";
-    //   }
-    //   if (ch == '#') {
-    //     container = "";
-    //     if (it + 1 != str.end() && *(it + 1) == '#') {
-    //       q.push("##");
-    //       ++it;
-    //     } else {
-    //       it++;
-    //     }
-    //   } else {
-    //     q.push(std::string(1, ch));
-    //   }
-    // }
   }
   if (!container.empty()) {
     q.push(container);
