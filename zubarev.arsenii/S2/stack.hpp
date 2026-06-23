@@ -27,15 +27,13 @@ namespace zubarev
   };
 
   template< class T >
-  void
-  Stack< T >::push(const T& rhs)
+  void Stack< T >::push(const T& rhs)
   {
     list_.push_front(rhs);
     size_++;
   }
   template< class T >
-  void
-  Stack< T >::drop()
+  void Stack< T >::drop()
   {
     if (list_.empty()) {
       throw std::runtime_error("Stack is empty");
@@ -44,8 +42,7 @@ namespace zubarev
     size_--;
   }
   template< class T >
-  const T&
-  Stack< T >::top() const
+  const T& Stack< T >::top() const
   {
     if (list_.empty()) {
       throw std::runtime_error("Stack is empty");
@@ -53,20 +50,17 @@ namespace zubarev
     return *list_.begin();
   }
   template< class T >
-  bool
-  Stack< T >::empty() const
+  bool Stack< T >::empty() const
   {
     return list_.empty();
   }
   template< class T >
-  size_t
-  Stack< T >::size() const
+  size_t Stack< T >::size() const
   {
     return size_;
   }
   template< class U >
-  std::ostream&
-  operator<<(std::ostream& out, const Stack< U >& s)
+  std::ostream& operator<<(std::ostream& out, const Stack< U >& s)
   {
 
     out << "Stack[ size = " << s.size_ << " ]: < ";

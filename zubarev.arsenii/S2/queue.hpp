@@ -27,15 +27,13 @@ namespace zubarev
     friend std::ostream& operator<<(std::ostream& out, const Queue< U >& q);
   };
   template< class T >
-  void
-  Queue< T >::push(const T& rhs)
+  void Queue< T >::push(const T& rhs)
   {
     list_.push_back(rhs);
     size_++;
   }
   template< class T >
-  void
-  Queue< T >::drop()
+  void Queue< T >::drop()
   {
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
@@ -44,8 +42,7 @@ namespace zubarev
     size_--;
   }
   template< class T >
-  const T&
-  Queue< T >::top() const
+  const T& Queue< T >::top() const
   {
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
@@ -53,8 +50,7 @@ namespace zubarev
     return *list_.begin();
   }
   template< class T >
-  const T&
-  Queue< T >::last() const
+  const T& Queue< T >::last() const
   {
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
@@ -62,20 +58,17 @@ namespace zubarev
     return *list_.back();
   }
   template< class T >
-  bool
-  Queue< T >::empty() const
+  bool Queue< T >::empty() const
   {
     return list_.empty();
   }
   template< class T >
-  size_t
-  Queue< T >::size() const
+  size_t Queue< T >::size() const
   {
     return size_;
   }
   template< class U >
-  std::ostream&
-  operator<<(std::ostream& out, const Queue< U >& q)
+  std::ostream& operator<<(std::ostream& out, const Queue< U >& q)
   {
     out << "Queue[ size = " << q.size_ << " ]: < ";
 

@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "func-stack-queue.hpp"
+#include "func-math.hpp"
 
 BOOST_AUTO_TEST_SUITE(operation_test)
 
@@ -12,7 +13,30 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
 
   std::ostringstream output;
 
-  zubarev::run(input, output);
+  zubarev::Stack< long long > results;
+  std::string expression = "";
+  while (std::getline(input, expression)) {
+    zubarev::Queue< std::string > infixQ = zubarev::detail::fromStrToQueue(expression);
+    if (infixQ.empty()) {
+      continue;
+    }
+
+    zubarev::Queue< std::string > postfixQ = zubarev::detail::fromInfixToPostfix(infixQ);
+    results.push(zubarev::eval(postfixQ));
+  }
+
+  if (results.empty()) {
+    output << '\n';
+    return;
+  }
+  output << results.top();
+  results.drop();
+  while (!results.empty()) {
+    output << ' ' << results.top();
+    results.drop();
+  }
+
+  output << '\n';
 
   BOOST_CHECK(output.str() == "1035 1006 153\n");
 }

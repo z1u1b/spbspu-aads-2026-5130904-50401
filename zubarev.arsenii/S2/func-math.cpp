@@ -4,8 +4,7 @@
 #include <string>
 
 #include "stack.hpp"
-long long
-zubarev::summation(long long oper1, long long oper2)
+long long zubarev::summation(long long oper1, long long oper2)
 {
   if (oper2 > 0 && oper1 > std::numeric_limits< long long >::max() - oper2) {
     throw std::overflow_error("Addition overflow: positive");
@@ -15,8 +14,7 @@ zubarev::summation(long long oper1, long long oper2)
   }
   return oper1 + oper2;
 }
-long long
-zubarev::subtraction(long long oper1, long long oper2)
+long long zubarev::subtraction(long long oper1, long long oper2)
 {
   if ((oper2 > 0 && oper1 < std::numeric_limits< long long >::min() + oper2) ||
       (oper2 < 0 && oper1 > std::numeric_limits< long long >::max() + oper2)) {
@@ -24,8 +22,7 @@ zubarev::subtraction(long long oper1, long long oper2)
   }
   return oper1 - oper2;
 }
-long long
-zubarev::multiplication(long long oper1, long long oper2)
+long long zubarev::multiplication(long long oper1, long long oper2)
 {
   if (oper1 == 0 || oper2 == 0) {
     return 0;
@@ -64,8 +61,7 @@ zubarev::multiplication(long long oper1, long long oper2)
 
   return oper1 * oper2;
 }
-long long
-zubarev::division(long long oper1, long long oper2)
+long long zubarev::division(long long oper1, long long oper2)
 {
   if (oper2 == 0) {
     throw std::runtime_error("Division by zero");
@@ -75,8 +71,7 @@ zubarev::division(long long oper1, long long oper2)
   }
   return oper1 / oper2;
 }
-long long
-zubarev::remainder(long long oper1, long long oper2)
+long long zubarev::remainder(long long oper1, long long oper2)
 {
   if (oper2 == 0) {
     throw std::runtime_error("Modulo by zero");
@@ -87,8 +82,7 @@ zubarev::remainder(long long oper1, long long oper2)
   }
   return res;
 }
-long long
-zubarev::concatenation(long long oper1, long long oper2)
+long long zubarev::concatenation(long long oper1, long long oper2)
 {
   long long res;
   if (oper2 < 0) {
@@ -129,8 +123,7 @@ long long (*zubarev::getOperation(const std::string& op))(long long, long long)
 
   return nullptr;
 }
-long long
-zubarev::eval(Queue< std::string >& postfixQ)
+long long zubarev::eval(Queue< std::string >& postfixQ)
 {
   Stack< long long > res;
 
