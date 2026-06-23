@@ -17,7 +17,9 @@ namespace zubarev
     void drop();
     void pop();
     const T& top() const;
+    T& top();
     const T& last() const;
+    T& last();
     bool empty() const;
     size_t size() const;
 
@@ -60,7 +62,23 @@ namespace zubarev
     return *list_.begin();
   }
   template< class T >
+  T& Queue< T >::top()
+  {
+    if (list_.empty()) {
+      throw std::runtime_error("Queue is empty");
+    }
+    return *list_.begin();
+  }
+  template< class T >
   const T& Queue< T >::last() const
+  {
+    if (list_.empty()) {
+      throw std::runtime_error("Queue is empty");
+    }
+    return *list_.back();
+  }
+  template< class T >
+  T& Queue< T >::last()
   {
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
