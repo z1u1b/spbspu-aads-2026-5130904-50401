@@ -2,7 +2,7 @@
 #include <cstdint>
 
 #include <my_tree/my_tree.hpp>
-#include <my_compare.hpp>
+#include <my_hashfunc/my_compare.hpp>
 #include <my_vector/top-it-vector.hpp>
 namespace zubarev
 {
