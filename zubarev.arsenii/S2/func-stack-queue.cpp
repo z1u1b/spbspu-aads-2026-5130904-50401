@@ -1,6 +1,5 @@
 #include "func-stack-queue.hpp"
 
-#include <iostream>
 #include <string>
 
 #include "queue.hpp"

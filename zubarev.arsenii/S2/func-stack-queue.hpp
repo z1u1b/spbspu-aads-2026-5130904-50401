@@ -1,7 +1,6 @@
 #ifndef FUNC_STACK_QUEUE_HPP
 #define FUNC_STACK_QUEUE_HPP
 
-#include <iosfwd>
 #include "queue.hpp"
 
 namespace zubarev
