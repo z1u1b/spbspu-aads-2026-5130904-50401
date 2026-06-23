@@ -13,10 +13,13 @@ namespace zubarev
 
   public:
     void push(const T& rhs);
+    void push(T&& rhs);
     void drop();
+    void pop();
     const T& top() const;
-    bool empty() const;
-    size_t size() const;
+    T& top();
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
   private:
     List< T > list_;
@@ -31,6 +34,12 @@ namespace zubarev
     list_.push_front(rhs);
     size_++;
   }
+    template< class T >
+  void Stack< T >::push(T&& rhs)
+  {
+    list_.push_front(std::move(rhs));
+    size_++;
+  }
   template< class T >
   void Stack< T >::drop()
   {
@@ -38,6 +47,15 @@ namespace zubarev
       throw std::runtime_error("Stack is empty");
     }
     list_.pop_front();
+    size_--;
+  }
+    template< class T >
+  void Stack< T >::pop()
+  {
+    if (list_.empty()) {
+      throw std::runtime_error("Stack is empty");
+    }
+    list_.pop_back();
     size_--;
   }
   template< class T >
@@ -48,13 +66,23 @@ namespace zubarev
     }
     return *list_.begin();
   }
+
+    template< class T >
+   T& Stack< T >::top()
+  {
+    if (list_.empty()) {
+      throw std::runtime_error("Stack is empty");
+    }
+    return *list_.begin();
+  }
+
   template< class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return list_.empty();
   }
   template< class T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return size_;
   }
