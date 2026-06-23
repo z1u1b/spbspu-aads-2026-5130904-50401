@@ -12,30 +12,37 @@ zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string&
 {
   Queue< std::string > q;
   std::string container = "";
+  if (str.empty()) {
+    return q;
+  }
   for (auto it = str.begin(); it != str.end(); ++it) {
     char ch = *it;
+
     if (std::isspace(static_cast< unsigned char >(ch))) {
-      continue;
-    }
-    if (std::isdigit(ch)) {
-      container += (ch);
+      q.push(container);
+      container="";
     } else {
-      if (!container.empty()) {
-        q.push(container);
-        container = "";
-      }
-      if (ch == '#') {
-        container = "";
-        if (it + 1 != str.end() && *(it + 1) == '#') {
-          q.push("##");
-          ++it;
-        } else {
-          it++;
-        }
-      } else {
-        q.push(std::string(1, ch));
-      }
+      container+=(ch);
     }
+    // if (std::isdigit(ch)) {
+    //   container += (ch);
+    // } else {
+    //   if (!container.empty()) {
+    //     q.push(container);
+    //     container = "";
+    //   }
+    //   if (ch == '#') {
+    //     container = "";
+    //     if (it + 1 != str.end() && *(it + 1) == '#') {
+    //       q.push("##");
+    //       ++it;
+    //     } else {
+    //       it++;
+    //     }
+    //   } else {
+    //     q.push(std::string(1, ch));
+    //   }
+    // }
   }
   if (!container.empty()) {
     q.push(container);
