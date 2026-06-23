@@ -8,7 +8,6 @@ namespace zubarev
 {
   namespace detail
   {
-    std::string readLine(std::istream& in);
     Queue< std::string > fromStrToQueue(const std::string& str);
     bool isOperation(const std::string& str);
     size_t getPriority(const std::string& oper);

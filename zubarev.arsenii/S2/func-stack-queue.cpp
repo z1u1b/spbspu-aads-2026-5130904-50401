@@ -6,12 +6,7 @@
 #include "queue.hpp"
 #include "stack.hpp"
 
-std::string zubarev::detail::readLine(std::istream& in)
-{
-  std::string line;
-  std::getline(in, line);
-  return line;
-}
+
 
 zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string& str)
 {
