@@ -5,10 +5,10 @@
 #include <memory>
 
 #include "robin_hashtable.hpp"
-#include <top-it-vector.hpp>
-#include <my_siphash.hpp>
+#include <my_vector/top-it-vector.hpp>
+#include <my_hashfunc/my_siphash.hpp>
 #include "blockkey.hpp"
-#include <my_equal.hpp>
+#include <my_hashfunc/my_equal.hpp>
 #include "haffman.hpp"
 namespace zubarev
 {
