@@ -2,7 +2,6 @@
 #define FUNC_HPP
 
 #include <iosfwd>
-#include "stack.hpp"
 #include "queue.hpp"
 
 namespace zubarev

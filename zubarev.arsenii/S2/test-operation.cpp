@@ -2,6 +2,7 @@
 
 #include "func-stack-queue.hpp"
 #include "func-math.hpp"
+#include "stack.hpp"
 
 BOOST_AUTO_TEST_SUITE(operation_test)
 
