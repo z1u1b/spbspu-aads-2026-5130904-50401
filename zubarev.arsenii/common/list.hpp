@@ -79,7 +79,7 @@ namespace zubarev
 
   template< class T >
   detail::Node< T >::Node(T&& v, Node* n):
-    val(std::move(v)),
+    val(std::forward< T >(v)),
     next(n)
   {}
   template< class T >
