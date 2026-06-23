@@ -38,24 +38,20 @@ namespace zubarev
     virtual const FileMetaData& getMeta() const noexcept = 0;
     virtual void setMeta(const FileMetaData& meta) = 0;
 
-    void
-    setParent(std::weak_ptr< Directory > p)
+    void setParent(std::weak_ptr< Directory > p)
     {
       parent_ = p;
     }
-    std::shared_ptr< Directory >
-    getParent() const
+    std::shared_ptr< Directory > getParent() const
     {
       return parent_.lock();
     }
 
-    void
-    setName(const std::string& n)
+    void setName(const std::string& n)
     {
       name_ = n;
     }
-    std::string
-    getName() const
+    std::string getName() const
     {
       return name_;
     }
@@ -72,35 +68,29 @@ namespace zubarev
       meta_(std::move(m))
     {}
 
-    bool
-    isDirectory() const noexcept override
+    bool isDirectory() const noexcept override
     {
       return false;
     }
 
-    const FileMetaData&
-    getMeta() const noexcept override
+    const FileMetaData& getMeta() const noexcept override
     {
       return meta_;
     }
-    void
-    setMeta(const FileMetaData& m) override
+    void setMeta(const FileMetaData& m) override
     {
       meta_ = m;
     }
 
-    const topit::Vector< std::shared_ptr< DataBlock > >&
-    getBlocks() const noexcept
+    const topit::Vector< std::shared_ptr< DataBlock > >& getBlocks() const noexcept
     {
       return blocks_;
     }
-    void
-    addBlock(std::shared_ptr< DataBlock > block)
+    void addBlock(std::shared_ptr< DataBlock > block)
     {
       blocks_.pushBack(std::move(block));
     }
-    void
-    clearBlocks()
+    void clearBlocks()
     {
       blocks_.clear();
     }
@@ -119,32 +109,27 @@ namespace zubarev
       meta(std::move(m))
     {}
 
-    bool
-    isDirectory() const noexcept override
+    bool isDirectory() const noexcept override
     {
       return true;
     }
 
-    const FileMetaData&
-    getMeta() const noexcept override
+    const FileMetaData& getMeta() const noexcept override
     {
       return meta;
     }
-    void
-    setMeta(const FileMetaData& m) override
+    void setMeta(const FileMetaData& m) override
     {
       meta = m;
     }
 
-    void
-    addChild(const std::string& name, std::shared_ptr< FSNode > node)
+    void addChild(const std::string& name, std::shared_ptr< FSNode > node)
     {
       node->setName(name);
       node->setParent(shared_from_this());
       children_.add(name, node);
     }
-    void
-    removeChild(const std::string& name)
+    void removeChild(const std::string& name)
     {
       children_.drop(name);
     }

@@ -6,8 +6,7 @@
 #include <sstream>
 #include <cstdlib>
 
-std::string
-zubarev::detail::getCurrentDateTime()
+std::string zubarev::detail::getCurrentDateTime()
 {
 
   std::chrono::time_point< std::chrono::system_clock > now = std::chrono::system_clock::now();
@@ -22,8 +21,7 @@ zubarev::detail::getCurrentDateTime()
   return ss.str();
 }
 
-std::string
-zubarev::detail::getCurrentUser()
+std::string zubarev::detail::getCurrentUser()
 {
   char* user = nullptr;
 
@@ -40,8 +38,7 @@ zubarev::detail::getCurrentUser()
   return "root";
 }
 
-zubarev::Queue< std::string >
-zubarev::detail::resolvePath(const std::string& path)
+zubarev::Queue< std::string > zubarev::detail::resolvePath(const std::string& path)
 {
   Queue< std::string > dirs;
   std::string cur_str = "";
@@ -66,8 +63,7 @@ zubarev::detail::resolvePath(const std::string& path)
   return dirs;
 }
 
-std::string
-zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names, size_t terminalWidth)
+std::string zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names, size_t terminalWidth)
 {
   if (names.isEmpty()) {
     return "";
@@ -113,8 +109,7 @@ zubarev::detail::formatLsColumns(const topit::Vector< std::string >& names, size
 
   return result;
 }
-void
-zubarev::detail::printBannerColored()
+void zubarev::detail::printBannerColored()
 {
   const std::string RESET = "\033[0m";
   const std::string WHITE = "\033[97m";

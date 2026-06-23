@@ -7,8 +7,7 @@
 
 #include "utils.hpp"
 
-void
-zubarev::cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -21,8 +20,7 @@ zubarev::cmd_mkdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
     out << e.what() << '\n';
   }
 }
-void
-zubarev::cmd_rmdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_rmdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -36,8 +34,7 @@ zubarev::cmd_rmdir(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_rm(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_rm(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -51,8 +48,7 @@ zubarev::cmd_rm(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_touch(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_touch(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -66,8 +62,7 @@ zubarev::cmd_touch(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
 
   std::string line;
@@ -104,8 +99,7 @@ zubarev::cmd_write(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string line;
   std::getline(in, line);
@@ -141,8 +135,7 @@ zubarev::cmd_append(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_cd(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_cd(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string path;
   if (!(in >> path)) {
@@ -156,8 +149,7 @@ zubarev::cmd_cd(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_mv(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_mv(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string from, to;
   if (!(in >> from >> to)) {
@@ -171,8 +163,7 @@ zubarev::cmd_mv(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_cp(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_cp(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string from, to;
   if (!(in >> from >> to)) {
@@ -186,8 +177,7 @@ zubarev::cmd_cp(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_cat(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_cat(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -202,8 +192,7 @@ zubarev::cmd_cat(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_pwd(std::istream&, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_pwd(std::istream&, std::ostream& out, FileSystem& file_sys)
 {
   try {
     out << file_sys.pwd() << "\n";
@@ -212,8 +201,7 @@ zubarev::cmd_pwd(std::istream&, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string path = "";
   if (in.peek() != '\n' && in.peek() != EOF) {
@@ -228,8 +216,7 @@ zubarev::cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string path = "";
   if (in.peek() != '\n' && in.peek() != EOF) {
@@ -245,8 +232,7 @@ zubarev::cmd_tree(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string query;
   std::getline(in >> std::ws, query);
@@ -401,8 +387,7 @@ zubarev::cmd_search(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_save(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_save(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string path;
   if (!(in >> path)) {
@@ -420,8 +405,7 @@ zubarev::cmd_save(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_load(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_load(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string name;
   if (!(in >> name)) {
@@ -439,8 +423,7 @@ zubarev::cmd_load(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string path = "";
   if (in.peek() != '\n' && in.peek() != EOF) {
@@ -461,8 +444,7 @@ zubarev::cmd_states(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string real_path, virtual_name;
   if (!(in >> real_path >> virtual_name)) {
@@ -479,8 +461,7 @@ zubarev::cmd_import(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string virtual_name, real_path;
   if (!(in >> virtual_name >> real_path)) {
@@ -497,8 +478,7 @@ zubarev::cmd_export(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_save_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_save_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string line;
   std::getline(in, line);
@@ -524,8 +504,7 @@ zubarev::cmd_save_state(std::istream& in, std::ostream& out, FileSystem& file_sy
   }
 }
 
-void
-zubarev::cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string line;
   std::getline(in, line);
@@ -554,8 +533,7 @@ zubarev::cmd_archive(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_extract(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_extract(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string line;
   std::getline(in, line);
@@ -584,8 +562,7 @@ zubarev::cmd_extract(std::istream& in, std::ostream& out, FileSystem& file_sys)
   }
 }
 
-void
-zubarev::cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string line;
   std::getline(in, line);
@@ -655,8 +632,7 @@ zubarev::cmd_start_state(std::istream& in, std::ostream& out, FileSystem& file_s
   }
 }
 
-void
-zubarev::printPrompt(const FileSystem& fs, std::ostream& out)
+void zubarev::printPrompt(const FileSystem& fs, std::ostream& out)
 {
   const std::string RESET = "\033[0m";
   const std::string GREEN = "\033[32m";
@@ -669,8 +645,7 @@ zubarev::printPrompt(const FileSystem& fs, std::ostream& out)
   out << GREEN << user << RESET << ":" << BLUE << path << RESET << YELLOW << " $ " << RESET;
 }
 
-void
-zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
+void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
 {
   const std::string RESET = "\033[0m";
   const std::string BOLD = "\033[1m";
@@ -745,8 +720,7 @@ zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
          "SipHash+XXHash\n";
   out << "\n";
 }
-void
-zubarev::cmd_exit(std::istream&, std::ostream& out, FileSystem&)
+void zubarev::cmd_exit(std::istream&, std::ostream& out, FileSystem&)
 {
   out << "\n";
   out << "\033[1;32m";
@@ -763,8 +737,7 @@ zubarev::cmd_exit(std::istream&, std::ostream& out, FileSystem&)
   std::exit(0);
 }
 
-void
-zubarev::cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   std::string filename;
   in >> filename;
@@ -781,8 +754,7 @@ zubarev::cmd_test(std::istream& in, std::ostream& out, FileSystem& file_sys)
   out << "<END OF SCRIPT: " << filename << ">\n";
 }
 
-void
-zubarev::process_stream(std::istream& in, std::ostream& out, FileSystem& file_sys)
+void zubarev::process_stream(std::istream& in, std::ostream& out, FileSystem& file_sys)
 {
   using Hash = SipHash;
   using Equal = Equaler< std::string >;

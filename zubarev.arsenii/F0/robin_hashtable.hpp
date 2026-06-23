@@ -62,15 +62,13 @@ namespace zubarev
     Hash hasher_;
     Equal equal_;
 
-    std::pair< size_t, Node* >
-    find_el(const Key& k) noexcept
+    std::pair< size_t, Node* > find_el(const Key& k) noexcept
     {
       auto res = const_cast< const Table* >(this)->find_el(k);
       return {res.first, const_cast< Node* >(res.second)};
     }
 
-    const std::pair< size_t, const Node* >
-    find_el(const Key& k) const noexcept
+    const std::pair< size_t, const Node* > find_el(const Key& k) const noexcept
     {
       if (empty()) {
         return {0, nullptr};
@@ -161,8 +159,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value&
-  RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
+  Value& RobinHashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
   {
     Node* el = find_el(k).second;
     if (el) {
@@ -174,8 +171,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value&
-  RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
+  Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
 
     Node* el = find_el(id).second;
@@ -186,8 +182,7 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  const Value&
-  RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id) const
+  const Value& RobinHashTable< Key, Value, Hash, Equal >::at(const Key& id) const
   {
     const Node* el = find_el(id).second;
     if (el) {
@@ -197,8 +192,7 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id) const
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -207,8 +201,7 @@ namespace zubarev
     return CIter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::find(const Key& id)
   {
     auto res = find_el(id);
     if (res.second == nullptr) {
@@ -217,8 +210,7 @@ namespace zubarev
     return Iter(res.first, this);
   }
   template< class Key, class Value, class Hash, class Equal >
-  void
-  RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
+  void RobinHashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
   {
     std::swap(size_, rhs.size_);
     std::swap(capacity_, rhs.capacity_);
@@ -227,8 +219,7 @@ namespace zubarev
     std::swap(equal_, rhs.equal_);
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::begin()
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin()
   {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i) {
@@ -239,15 +230,13 @@ namespace zubarev
     return end();
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::end()
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end()
   {
     return Iter(capacity_, this);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cbegin() const
   {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i) {
@@ -258,28 +247,24 @@ namespace zubarev
     return cend();
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::cend() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::cend() const
   {
     return CIter(capacity_, this);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::begin() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::begin() const
   {
     return cbegin();
   }
   template< class Key, class Value, class Hash, class Equal >
-  RobinCIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::end() const
+  RobinCIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::end() const
   {
     return cend();
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinIter< Key, Value, Hash, Equal >
-  RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
+  RobinIter< Key, Value, Hash, Equal > RobinHashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
     if (load_factor() >= 0.75) {
       rehash(capacity_ * 2);
@@ -312,8 +297,7 @@ namespace zubarev
                              "error");
   }
   template< class Key, class Value, class Hash, class Equal >
-  Value
-  RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
+  Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
   {
     std::pair< size_t, Node* > found_el = find_el(k);
     Node* node_to_del = found_el.second;
@@ -338,16 +322,14 @@ namespace zubarev
     throw std::out_of_range("Key not found in drop()");
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool
-  RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
+  bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
     const std::pair< size_t, const Node* > found_el = find_el(k);
     return found_el.second != nullptr;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void
-  RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
+  void RobinHashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
     Table tmp(slots);
 
@@ -363,26 +345,22 @@ namespace zubarev
     swap(tmp);
   }
   template< class Key, class Value, class Hash, class Equal >
-  size_t
-  RobinHashTable< Key, Value, Hash, Equal >::size() const
+  size_t RobinHashTable< Key, Value, Hash, Equal >::size() const
   {
     return size_;
   }
   template< class Key, class Value, class Hash, class Equal >
-  size_t
-  RobinHashTable< Key, Value, Hash, Equal >::capacity() const
+  size_t RobinHashTable< Key, Value, Hash, Equal >::capacity() const
   {
     return capacity_;
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool
-  RobinHashTable< Key, Value, Hash, Equal >::empty() const
+  bool RobinHashTable< Key, Value, Hash, Equal >::empty() const
   {
     return size_ == 0;
   }
   template< class Key, class Value, class Hash, class Equal >
-  double
-  RobinHashTable< Key, Value, Hash, Equal >::load_factor() const
+  double RobinHashTable< Key, Value, Hash, Equal >::load_factor() const
   {
     return static_cast< double >(size_) / capacity_;
   }
