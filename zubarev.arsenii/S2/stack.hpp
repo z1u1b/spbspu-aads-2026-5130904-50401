@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../common/list.hpp"
+#include <list.hpp>
 
 namespace zubarev
 {
@@ -34,7 +34,7 @@ namespace zubarev
     list_.push_front(rhs);
     size_++;
   }
-    template< class T >
+  template< class T >
   void Stack< T >::push(T&& rhs)
   {
     list_.push_front(std::move(rhs));
@@ -49,7 +49,7 @@ namespace zubarev
     list_.pop_front();
     size_--;
   }
-    template< class T >
+  template< class T >
   void Stack< T >::pop()
   {
     if (list_.empty()) {
@@ -67,8 +67,8 @@ namespace zubarev
     return *list_.begin();
   }
 
-    template< class T >
-   T& Stack< T >::top()
+  template< class T >
+  T& Stack< T >::top()
   {
     if (list_.empty()) {
       throw std::runtime_error("Stack is empty");

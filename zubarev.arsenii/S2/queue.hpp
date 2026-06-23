@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../common/list.hpp"
+#include <list.hpp>
 
 namespace zubarev
 {

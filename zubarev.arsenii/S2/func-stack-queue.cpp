@@ -5,8 +5,6 @@
 #include "queue.hpp"
 #include "stack.hpp"
 
-
-
 zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string& str)
 {
   Queue< std::string > q;
@@ -19,9 +17,9 @@ zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string&
 
     if (std::isspace(static_cast< unsigned char >(ch))) {
       q.push(container);
-      container="";
+      container = "";
     } else {
-      container+=(ch);
+      container += (ch);
     }
   }
   if (!container.empty()) {
