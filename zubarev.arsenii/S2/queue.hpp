@@ -15,6 +15,7 @@ namespace zubarev
   public:
     void push(const T& rhs);
     void drop();
+    void pop();
     const T& top() const;
     const T& last() const;
     bool empty() const;
@@ -39,6 +40,15 @@ namespace zubarev
       throw std::runtime_error("Queue is empty");
     }
     list_.pop_front();
+    size_--;
+  }
+  template< class T >
+  void Queue< T >::pop()
+  {
+    if (list_.empty()) {
+      throw std::runtime_error("Queue is empty");
+    }
+    list_.pop_back();
     size_--;
   }
   template< class T >
