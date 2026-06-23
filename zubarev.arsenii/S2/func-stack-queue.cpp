@@ -1,21 +1,25 @@
-
 #include "func-stack-queue.hpp"
+
 #include <iostream>
-#include <limits>
 #include <string>
 
+#include "queue.hpp"
+#include "stack.hpp"
+#include "func-math.hpp"
 namespace zubarev
 {
   namespace detail
   {
-    std::string readLine(std::istream& in)
+    std::string
+    readLine(std::istream& in)
     {
       std::string line;
       std::getline(in, line);
       return line;
     }
 
-    Queue< std::string > fromStrToQueue(const std::string& str)
+    Queue< std::string >
+    fromStrToQueue(const std::string& str)
     {
       Queue< std::string > q;
       std::string container = "";
@@ -49,11 +53,13 @@ namespace zubarev
       }
       return q;
     }
-    bool isOperation(const std::string& str)
+    bool
+    isOperation(const std::string& str)
     {
       return str == "+" || str == "-" || str == "*" || str == "/" || str == "%" || str == "##";
     }
-    size_t getPriority(const std::string& oper)
+    size_t
+    getPriority(const std::string& oper)
     {
 
       if (oper == "##") {
@@ -70,7 +76,8 @@ namespace zubarev
       return 0;
     }
 
-    Queue< std::string > fromInfixToPostfix(Queue< std::string >& infixQ)
+    Queue< std::string >
+    fromInfixToPostfix(Queue< std::string >& infixQ)
     {
       Stack< std::string > stack;
       Queue< std::string > postfixQ;
@@ -120,7 +127,8 @@ namespace zubarev
   }
 
 }
-void zubarev::run(std::istream& in, std::ostream& out)
+void
+zubarev::run(std::istream& in, std::ostream& out)
 {
   Stack< long long > results;
   std::string expression = "";

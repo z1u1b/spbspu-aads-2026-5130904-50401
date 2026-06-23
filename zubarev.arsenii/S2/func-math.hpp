@@ -1,9 +1,9 @@
 #ifndef FUNC_MATH_HPP
 #define FUNC_MATH_HPP
-#include "queue.hpp"
-#include "stack.hpp"
-#include <iosfwd>
 #include <string>
+
+#include "queue.hpp"
+
 namespace zubarev
 {
 

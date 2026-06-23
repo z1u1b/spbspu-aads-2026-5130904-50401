@@ -1,8 +1,6 @@
-#include "func-math.hpp"
-#include "func-stack-queue.hpp"
-#include "queue.hpp"
-#include "stack.hpp"
 #include <boost/test/unit_test.hpp>
+
+#include "func-stack-queue.hpp"
 
 BOOST_AUTO_TEST_SUITE(operation_test)
 

@@ -1,8 +1,10 @@
-#include "func-stack-queue.hpp"
 #include <fstream>
 #include <iostream>
 
-int main(int argc, char const* argv[])
+#include "func-stack-queue.hpp"
+
+int
+main(int argc, char const* argv[])
 {
 
   try {
