@@ -8,7 +8,7 @@
 BOOST_AUTO_TEST_SUITE(my_hashtable_tests)
 
 using Table = zubarev::HashTable< std::string, size_t, zubarev::SipHash, std::equal_to< std::string > >;
-using Node = zubarev::NodeHashTable< std::string, size_t >;
+using Node = zubarev::detail::NodeHashTable< std::string, size_t >;
 using Hash = zubarev::SipHash;
 using Equal = std::equal_to< std::string >;
 BOOST_AUTO_TEST_CASE(default_constructor)

@@ -14,10 +14,13 @@ namespace zubarev
 
   public:
     CIterHashTable() = default;
-    CIterHashTable(size_t, size_t, LCIter< NodeHashTable< Key, Value > >, const HashTable< Key, Value, Hash, Equal >*);
+    CIterHashTable(size_t,
+                   size_t,
+                   LCIter< detail::NodeHashTable< Key, Value > >,
+                   const HashTable< Key, Value, Hash, Equal >*);
 
-    const NodeHashTable< Key, Value >& operator*() const;
-    const NodeHashTable< Key, Value >* operator->() const noexcept;
+    const detail::NodeHashTable< Key, Value >& operator*() const;
+    const detail::NodeHashTable< Key, Value >* operator->() const noexcept;
     CIterHashTable& operator++();
     CIterHashTable operator++(int);
     bool operator!=(const CIterHashTable&) const;
@@ -27,7 +30,7 @@ namespace zubarev
     friend class HashTable< Key, Value, Hash, Equal >;
     size_t element_index_;
     size_t bucket_index_;
-    LCIter< NodeHashTable< Key, Value > > overflow_el_;
+    LCIter< detail::NodeHashTable< Key, Value > > overflow_el_;
     const HashTable< Key, Value, Hash, Equal >* table_;
 
     bool is_in_overflow() const noexcept;
@@ -40,7 +43,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal >::CIterHashTable(size_t el_idx,
                                                             size_t buc_idx,
-                                                            LCIter< NodeHashTable< Key, Value > > over_it,
+                                                            LCIter< detail::NodeHashTable< Key, Value > > over_it,
                                                             const HashTable< Key, Value, Hash, Equal >* table):
     element_index_(el_idx),
     bucket_index_(buc_idx),
@@ -49,7 +52,7 @@ namespace zubarev
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  const NodeHashTable< Key, Value >& CIterHashTable< Key, Value, Hash, Equal >::operator*() const
+  const detail::NodeHashTable< Key, Value >& CIterHashTable< Key, Value, Hash, Equal >::operator*() const
   {
     if (is_in_overflow()) {
       if (overflow_el_ != table_->overflow_bucket_.end()) {
@@ -64,7 +67,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const NodeHashTable< Key, Value >* CIterHashTable< Key, Value, Hash, Equal >::operator->() const noexcept
+  const detail::NodeHashTable< Key, Value >* CIterHashTable< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }

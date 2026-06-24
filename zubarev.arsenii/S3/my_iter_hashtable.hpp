@@ -16,10 +16,10 @@ namespace zubarev
 
   public:
     IterHashTable() = default;
-    IterHashTable(size_t, size_t, LIter< NodeHashTable< Key, Value > >, HashTable< Key, Value, Hash, Equal >*);
+    IterHashTable(size_t, size_t, LIter< detail::NodeHashTable< Key, Value > >, HashTable< Key, Value, Hash, Equal >*);
 
-    NodeHashTable< Key, Value >& operator*();
-    NodeHashTable< Key, Value >* operator->() noexcept;
+    detail::NodeHashTable< Key, Value >& operator*();
+    detail::NodeHashTable< Key, Value >* operator->() noexcept;
     IterHashTable& operator++();
     IterHashTable operator++(int);
     bool operator!=(const IterHashTable&) const;
@@ -28,7 +28,7 @@ namespace zubarev
   private:
     size_t element_index_;
     size_t bucket_index_;
-    LIter< NodeHashTable< Key, Value > > overflow_el_;
+    LIter< detail::NodeHashTable< Key, Value > > overflow_el_;
     HashTable< Key, Value, Hash, Equal >* table_;
 
     bool is_in_overflow() const noexcept;
@@ -42,7 +42,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal >::IterHashTable(size_t el_idx,
                                                           size_t buc_idx,
-                                                          LIter< NodeHashTable< Key, Value > > it,
+                                                          LIter< detail::NodeHashTable< Key, Value > > it,
                                                           HashTable< Key, Value, Hash, Equal >* table):
     element_index_(el_idx),
     bucket_index_(buc_idx),
@@ -51,7 +51,7 @@ namespace zubarev
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  NodeHashTable< Key, Value >& IterHashTable< Key, Value, Hash, Equal >::operator*()
+  detail::NodeHashTable< Key, Value >& IterHashTable< Key, Value, Hash, Equal >::operator*()
   {
 
     if (is_in_overflow()) {
@@ -72,7 +72,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  NodeHashTable< Key, Value >* IterHashTable< Key, Value, Hash, Equal >::operator->() noexcept
+  detail::NodeHashTable< Key, Value >* IterHashTable< Key, Value, Hash, Equal >::operator->() noexcept
   {
     return std::addressof(operator*());
   }

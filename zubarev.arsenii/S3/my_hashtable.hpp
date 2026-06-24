@@ -17,7 +17,7 @@ namespace zubarev
   {
 
   public:
-    using Node = NodeHashTable< Key, Value >;
+    using Node = detail::NodeHashTable< Key, Value >;
     using OverflowList = List< Node >;
     using OverflowIter = LIter< Node >;
     using Iter = IterHashTable< Key, Value, Hash, Equal >;

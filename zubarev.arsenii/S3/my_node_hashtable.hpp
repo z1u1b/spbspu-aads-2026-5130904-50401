@@ -3,24 +3,28 @@
 
 namespace zubarev
 {
-  template< class Key, class Value >
-  struct NodeHashTable
+  namespace detail
   {
-    NodeHashTable();
-    NodeHashTable(Key, Value, bool);
+    template< class Key, class Value >
+    struct NodeHashTable
+    {
 
-    Key key;
-    Value val;
-    bool is_val;
-  };
+      NodeHashTable();
+      NodeHashTable(Key, Value, bool);
+
+      Key key;
+      Value val;
+      bool is_val;
+    };
+  }
   template< class Key, class Value >
-  NodeHashTable< Key, Value >::NodeHashTable():
+  detail::NodeHashTable< Key, Value >::NodeHashTable():
     key(),
     val(),
     is_val(false)
   {}
   template< class Key, class Value >
-  NodeHashTable< Key, Value >::NodeHashTable(Key key, Value val, bool is_val):
+  detail::NodeHashTable< Key, Value >::NodeHashTable(Key key, Value val, bool is_val):
     key(key),
     val(val),
     is_val(is_val)
