@@ -1,3 +1,4 @@
+
 #include "input.hpp"
 #include <iostream>
 namespace zubarev

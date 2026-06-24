@@ -1,9 +1,9 @@
+#include <boost/test/unit_test.hpp>
+#include <functional>
 
 #include "my_hashtable.hpp"
 #include "my_node_hashtable.hpp"
 #include "my_siphash.hpp"
-#include <boost/test/unit_test.hpp>
-#include <functional>
 
 BOOST_AUTO_TEST_SUITE(my_hashtable_tests)
 

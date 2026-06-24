@@ -1,13 +1,14 @@
 #ifndef MY_HASHTABLE_HPP
 #define MY_HASHTABLE_HPP
 
+#include <stdexcept>
+#include <utility>
+
 #include "../common/list.hpp"
 #include "my_citer_hashtable.hpp"
 #include "my_iter_hashtable.hpp"
-
 #include "my_node_hashtable.hpp"
-#include <stdexcept>
-#include <utility>
+
 namespace zubarev
 {
 

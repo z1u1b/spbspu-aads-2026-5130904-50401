@@ -1,8 +1,10 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
-#include "graph.hpp"
 #include <iosfwd>
+
+#include "graph.hpp"
+
 namespace zubarev
 {
   void cmd_graphs(std::istream&, std::ostream& out, GraphTable& graph);

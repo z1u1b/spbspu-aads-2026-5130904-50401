@@ -1,11 +1,12 @@
 #ifndef GRAPH_TABLE_HPP
 #define GRAPH_TABLE_HPP
 
-#include "my_hashtable.hpp"
-#include "my_siphash.hpp"
 #include <iostream>
 #include <string>
 #include <functional>
+
+#include "my_hashtable.hpp"
+#include "my_siphash.hpp"
 #include "../common/top-it-vector.hpp"
 namespace zubarev
 {

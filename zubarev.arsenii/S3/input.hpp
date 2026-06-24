@@ -1,12 +1,9 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "graph.hpp"
-#include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <limits>
-#include <string>
+
+#include "graph.hpp"
 
 namespace zubarev
 {

@@ -1,13 +1,15 @@
-#include "commands.hpp"
-#include "graph.hpp"
-#include "input.hpp"
-#include "my_hashtable.hpp"
-#include "my_siphash.hpp"
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <functional>
+
+#include "commands.hpp"
+#include "graph.hpp"
+#include "input.hpp"
+#include "my_hashtable.hpp"
+#include "my_siphash.hpp"
+
 int main(int argc, char* argv[])
 
 {
