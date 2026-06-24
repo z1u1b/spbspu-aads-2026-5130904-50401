@@ -192,7 +192,8 @@ bool zubarev::FileSystem::touch(const std::string& file_path)
   std::shared_ptr< Directory > parent = result.first;
   std::string name = result.second;
   if (parent->children_.has(name)) {
-    throw std::runtime_error("rm: failed to touch '" + file_path + "': File already exists");
+    write(file_path, "");
+    // throw std::runtime_error("touch: failed to touch '" + file_path + "': File already exists");
   }
 
   FileMetaData new_data;
@@ -391,8 +392,18 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
       throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': File exists");
     }
   }
-  target_dir->addChild(target_name, src_from);
-  src_from->getParent()->removeChild(src_from->getName());
+  std::shared_ptr< Directory > old_parent = src_from->getParent();
+  std::string saved_name = src_from->getName();
+  old_parent->removeChild(saved_name);
+
+  try {
+    target_dir->addChild(target_name, src_from);
+    src_from->setParent(target_dir);
+  } catch (...) {
+    old_parent->addChild(saved_name, src_from);
+    src_from->setParent(old_parent);
+    throw;
+  }
   return true;
 }
 
@@ -808,10 +819,10 @@ bool zubarev::FileSystem::import_file(const std::string& real_path, const std::s
   auto new_file = std::make_shared< File >(new_data);
   std::ostringstream buffer;
   buffer << input.rdbuf();
-
-  append(new_file_name, buffer.str());
-
   curr_dir_->addChild(new_file_name, new_file);
+
+  write(new_file_name, buffer.str());
+
   return true;
 }
 bool zubarev::FileSystem::export_file(const std::string& virtual_name, const std::string& real_path)
@@ -1043,49 +1054,108 @@ void zubarev::FileSystem::ensurePathExists(const std::string& path)
   }
 }
 
+// bool zubarev::FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
+// {
+//   std::shared_ptr< FSNode > archive_node = navigateTo(archive_path);
+
+//   if (!archive_node || archive_node->isDirectory()) {
+//     throw std::runtime_error("extract: invalid archive");
+//   }
+
+//   std::string data = cat(archive_path);
+//   std::string extract_root = pwd();
+
+//   if (!dir_path_after.empty()) {
+//     cd(dir_path_after);
+//     extract_root = pwd();
+//   }
+//   size_t offset = 0;
+
+//   while (offset < data.size()) {
+
+//     uint32_t name_len = unpackUint32(data, offset);
+//     std::string file_path = data.substr(offset, name_len);
+//     offset += name_len;
+
+//     uint32_t size = unpackUint32(data, offset);
+//     std::string content = data.substr(offset, size);
+//     offset += size;
+
+//     size_t pos = file_path.rfind('/');
+//     std::string dir;
+//     std::string file;
+//     cd(extract_root);
+//     if (pos != std::string::npos) {
+//       dir = file_path.substr(0, pos);
+//       file = file_path.substr(pos + 1);
+
+//       ensurePathExists(dir);
+//     } else {
+//       file = file_path;
+//     }
+
+//     touch(file);
+//     write(file, content);
+//     cd(extract_root);
+//   }
+//   cd(extract_root);
+//   return true;
+// }
 bool zubarev::FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
 {
   std::shared_ptr< FSNode > archive_node = navigateTo(archive_path);
-
   if (!archive_node || archive_node->isDirectory()) {
     throw std::runtime_error("extract: invalid archive");
   }
 
   std::string data = cat(archive_path);
-  std::string old_pwd = pwd();
 
+  // 1. Переходим в целевую папку, если она указана
   if (!dir_path_after.empty()) {
     cd(dir_path_after);
   }
+
+  // 2. ЖЕСТКО ФИКСИРУЕМ СОСТОЯНИЕ (без строк)
+  std::shared_ptr< Directory > extract_root_node = curr_dir_;
+
   size_t offset = 0;
-
   while (offset < data.size()) {
-
+    if (offset + 4 > data.size())
+      break;
     uint32_t name_len = unpackUint32(data, offset);
+    if (offset + name_len > data.size())
+      break;
+
     std::string file_path = data.substr(offset, name_len);
     offset += name_len;
 
+    if (offset + 4 > data.size())
+      break;
     uint32_t size = unpackUint32(data, offset);
+    if (offset + size > data.size())
+      break;
+
     std::string content = data.substr(offset, size);
     offset += size;
 
     size_t pos = file_path.rfind('/');
     std::string dir;
     std::string file;
+
+    curr_dir_ = extract_root_node;
+
     if (pos != std::string::npos) {
       dir = file_path.substr(0, pos);
       file = file_path.substr(pos + 1);
-
-      cd(old_pwd);
       ensurePathExists(dir);
     } else {
-      cd(old_pwd);
       file = file_path;
     }
 
     touch(file);
     write(file, content);
   }
-  cd(old_pwd);
+
+  curr_dir_ = extract_root_node;
   return true;
 }
