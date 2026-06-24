@@ -193,7 +193,6 @@ bool zubarev::FileSystem::touch(const std::string& file_path)
   std::string name = result.second;
   if (parent->children_.has(name)) {
     write(file_path, "");
-    // throw std::runtime_error("touch: failed to touch '" + file_path + "': File already exists");
   }
 
   FileMetaData new_data;
@@ -1054,53 +1053,6 @@ void zubarev::FileSystem::ensurePathExists(const std::string& path)
   }
 }
 
-// bool zubarev::FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
-// {
-//   std::shared_ptr< FSNode > archive_node = navigateTo(archive_path);
-
-//   if (!archive_node || archive_node->isDirectory()) {
-//     throw std::runtime_error("extract: invalid archive");
-//   }
-
-//   std::string data = cat(archive_path);
-//   std::string extract_root = pwd();
-
-//   if (!dir_path_after.empty()) {
-//     cd(dir_path_after);
-//     extract_root = pwd();
-//   }
-//   size_t offset = 0;
-
-//   while (offset < data.size()) {
-
-//     uint32_t name_len = unpackUint32(data, offset);
-//     std::string file_path = data.substr(offset, name_len);
-//     offset += name_len;
-
-//     uint32_t size = unpackUint32(data, offset);
-//     std::string content = data.substr(offset, size);
-//     offset += size;
-
-//     size_t pos = file_path.rfind('/');
-//     std::string dir;
-//     std::string file;
-//     cd(extract_root);
-//     if (pos != std::string::npos) {
-//       dir = file_path.substr(0, pos);
-//       file = file_path.substr(pos + 1);
-
-//       ensurePathExists(dir);
-//     } else {
-//       file = file_path;
-//     }
-
-//     touch(file);
-//     write(file, content);
-//     cd(extract_root);
-//   }
-//   cd(extract_root);
-//   return true;
-// }
 bool zubarev::FileSystem::extract(const std::string& archive_path, const std::string& dir_path_after)
 {
   std::shared_ptr< FSNode > archive_node = navigateTo(archive_path);
@@ -1110,12 +1062,10 @@ bool zubarev::FileSystem::extract(const std::string& archive_path, const std::st
 
   std::string data = cat(archive_path);
 
-  // 1. Переходим в целевую папку, если она указана
   if (!dir_path_after.empty()) {
     cd(dir_path_after);
   }
 
-  // 2. ЖЕСТКО ФИКСИРУЕМ СОСТОЯНИЕ (без строк)
   std::shared_ptr< Directory > extract_root_node = curr_dir_;
 
   size_t offset = 0;
