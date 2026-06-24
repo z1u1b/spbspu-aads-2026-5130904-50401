@@ -6,10 +6,10 @@
 #include <iostream>
 namespace zubarev
 {
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class HashTable;
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class CIterHashTable
   {
     friend class HashTable< Key, Value, Hash, Equal >;
@@ -40,7 +40,7 @@ namespace zubarev
     bool operator==(const CIterHashTable&) const;
   };
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal >::CIterHashTable(size_t el_idx,
                                                             size_t buc_idx,
                                                             OverflowCIter over_it,
@@ -51,7 +51,7 @@ namespace zubarev
     table_(table)
   {}
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const NodeHashTable< Key, Value >& CIterHashTable< Key, Value, Hash, Equal >::operator*() const
   {
     if (is_in_overflow()) {
@@ -66,13 +66,13 @@ namespace zubarev
     }
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const NodeHashTable< Key, Value >* CIterHashTable< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return &operator*();
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal >& CIterHashTable< Key, Value, Hash, Equal >::operator++()
   {
     if (is_in_overflow()) {
@@ -103,13 +103,13 @@ namespace zubarev
     return *this;
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool CIterHashTable< Key, Value, Hash, Equal >::operator!=(const CIterHashTable& rhs) const
   {
     return !(*this == rhs);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool CIterHashTable< Key, Value, Hash, Equal >::operator==(const CIterHashTable& rhs) const
   {
     if (table_ != rhs.table_) {

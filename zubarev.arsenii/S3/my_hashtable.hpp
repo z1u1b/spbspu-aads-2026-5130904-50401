@@ -12,11 +12,12 @@
 namespace zubarev
 {
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
     friend class IterHashTable< Key, Value, Hash, Equal >;
     friend class CIterHashTable< Key, Value, Hash, Equal >;
+
   private:
     using Node = NodeHashTable< Key, Value >;
     using OverflowList = List< Node >;
@@ -106,7 +107,7 @@ namespace zubarev
     CIter begin() const;
     CIter end() const;
   };
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable():
     bucket_count_(8),
     bucket_capacity_(8),
@@ -117,7 +118,7 @@ namespace zubarev
     equaler_()
   {}
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(size_t bucket_count,
                                                   size_t bucket_capacity,
                                                   Node* data,
@@ -145,13 +146,13 @@ namespace zubarev
     }
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::~HashTable()
   {
     delete[] data_;
     delete[] sizes_;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& table):
     bucket_count_(table.bucket_count_),
     bucket_capacity_(table.bucket_capacity_),
@@ -170,9 +171,8 @@ namespace zubarev
       }
     }
     overflow_bucket_ = table.overflow_bucket_;
-
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& table) noexcept:
     bucket_count_(table.bucket_count_),
     bucket_capacity_(table.bucket_capacity_),
@@ -187,7 +187,7 @@ namespace zubarev
     table.data_ = nullptr;
     table.sizes_ = nullptr;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs)
   {
     if (this == std::addressof(rhs)) {
@@ -199,7 +199,7 @@ namespace zubarev
     return *this;
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& rhs) noexcept
   {
     if (this == std::addressof(rhs)) {
@@ -211,7 +211,7 @@ namespace zubarev
     return *this;
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   Value& HashTable< Key, Value, Hash, Equal >::operator[](Key k)
   {
     Node* el = find_el(k);
@@ -222,13 +222,13 @@ namespace zubarev
       return find_el(k)->val_;
     }
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const
   {
     return at(id);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   Value& HashTable< Key, Value, Hash, Equal >::at(Key id)
   {
     Node* el = find_el(id);
@@ -238,7 +238,7 @@ namespace zubarev
       throw std::out_of_range("HashTable: index out of range");
     }
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   const Value& HashTable< Key, Value, Hash, Equal >::at(Key id) const
   {
     const Node* el = find_el(id);
@@ -249,7 +249,7 @@ namespace zubarev
     }
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::swap(Table& rhs) noexcept
   {
     std::swap(bucket_count_, rhs.bucket_count_);
@@ -260,7 +260,7 @@ namespace zubarev
     std::swap(hasher_, rhs.hasher_);
     std::swap(equaler_, rhs.equaler_);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin()
   {
     Iter it(0, 0, overflow_bucket_.begin(), this);
@@ -278,13 +278,13 @@ namespace zubarev
 
     return it;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
   {
     return Iter(0, bucket_count_, overflow_bucket_.end(), this);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::cbegin() const
   {
     CIter it(0, 0, overflow_bucket_.begin(), this);
@@ -302,13 +302,13 @@ namespace zubarev
 
     return it;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::cend() const
   {
     return CIter(0, bucket_count_, overflow_bucket_.end(), this);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin() const
   {
     CIter it(0, 0, overflow_bucket_.begin(), this);
@@ -326,13 +326,13 @@ namespace zubarev
 
     return it;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end() const
   {
     return CIter(0, bucket_count_, overflow_bucket_.end(), this);
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
   {
     Table tmp(*this);
@@ -360,7 +360,7 @@ namespace zubarev
     }
     swap(tmp);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   Value HashTable< Key, Value, Hash, Equal >::drop(Key k)
   {
     Table tmp(*this);
@@ -392,7 +392,7 @@ namespace zubarev
     }
     throw std::out_of_range("Key not found in drop()");
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool HashTable< Key, Value, Hash, Equal >::has(Key k) const
   {
 
@@ -414,7 +414,7 @@ namespace zubarev
 
     return false;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
     Table tmp(slots,

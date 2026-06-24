@@ -45,7 +45,7 @@ namespace zubarev
     void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&, std::ostream&);
   };
 
-  template < class T, class Compare >
+  template< class T, class Compare >
   void sort(topit::VectIter< T > beg, topit::VectIter< T > end, Compare comp)
   {
     if (beg == end) {
@@ -74,7 +74,7 @@ namespace zubarev
       end = last_swap;
     }
   }
-  template < class T, class Equal >
+  template< class T, class Equal >
   topit::VectIter< T > unique(topit::VectIter< T > begin, topit::VectIter< T > end, Equal eq)
   {
     if (begin == end) {

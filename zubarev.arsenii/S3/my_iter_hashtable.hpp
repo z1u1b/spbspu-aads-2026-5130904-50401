@@ -7,13 +7,23 @@
 #include <iostream>
 namespace zubarev
 {
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class HashTable;
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class IterHashTable
   {
     friend class HashTable< Key, Value, Hash, Equal >;
+
+  public:
+    IterHashTable() = default;
+    IterHashTable(size_t, size_t, OverflowIter, Table*);
+
+    Node& operator*() const;
+    Node* operator->() const noexcept;
+    IterHashTable& operator++();
+    bool operator!=(const IterHashTable&) const;
+    bool operator==(const IterHashTable&) const;
 
   private:
     using Node = NodeHashTable< Key, Value >;
@@ -29,19 +39,9 @@ namespace zubarev
     {
       return bucket_index_ >= table_->bucket_count_;
     }
-
-  public:
-    IterHashTable() = default;
-    IterHashTable(size_t, size_t, OverflowIter, Table*);
-
-    Node& operator*() const;
-    Node* operator->() const noexcept;
-    IterHashTable& operator++();
-    bool operator!=(const IterHashTable&) const;
-    bool operator==(const IterHashTable&) const;
   };
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal >::IterHashTable(size_t el_idx,
                                                           size_t buc_idx,
 
@@ -53,7 +53,7 @@ namespace zubarev
     table_(table)
   {}
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   NodeHashTable< Key, Value >& IterHashTable< Key, Value, Hash, Equal >::operator*() const
   {
 
@@ -74,12 +74,12 @@ namespace zubarev
     }
   }
 
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   NodeHashTable< Key, Value >* IterHashTable< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal >& IterHashTable< Key, Value, Hash, Equal >::operator++()
   {
     if (is_in_overflow()) {
@@ -113,12 +113,12 @@ namespace zubarev
     }
     return *this;
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool IterHashTable< Key, Value, Hash, Equal >::operator!=(const IterHashTable& rhs) const
   {
     return !(*this == rhs);
   }
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   bool IterHashTable< Key, Value, Hash, Equal >::operator==(const IterHashTable& rhs) const
   {
     if (table_ != rhs.table_) {
