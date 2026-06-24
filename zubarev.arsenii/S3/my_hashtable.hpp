@@ -32,16 +32,16 @@ namespace zubarev
     HashTable& operator=(const HashTable& other);
     HashTable& operator=(HashTable&& other) noexcept;
 
-    Value& operator[](Key k);
-    const Value& operator[](Key id) const;
-    Value& at(Key id);
-    const Value& at(Key id) const;
+    Value& operator[](const Key& k);
+    const Value& operator[](const Key& id) const;
+    Value& at(const Key& id);
+    const Value& at(const Key& id) const;
 
     void swap(Table& rhs) noexcept;
 
-    void add(Key k, Value v);
-    Value drop(Key k);
-    bool has(Key k) const;
+    void add(const Key& k, Value v);
+    Value drop(const Key& k);
+    bool has(const Key& k) const;
     void rehash(size_t slots);
 
     Iter begin();
@@ -199,7 +199,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value& HashTable< Key, Value, Hash, Equal >::operator[](Key k)
+  Value& HashTable< Key, Value, Hash, Equal >::operator[](const Key& k)
   {
     Node* el = find_el(k);
     if (el) {
@@ -210,13 +210,13 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::operator[](Key id) const
+  const Value& HashTable< Key, Value, Hash, Equal >::operator[](const Key& id) const
   {
     return at(id);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value& HashTable< Key, Value, Hash, Equal >::at(Key id)
+  Value& HashTable< Key, Value, Hash, Equal >::at(const Key& id)
   {
     Node* el = find_el(id);
     if (el) {
@@ -226,7 +226,7 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::at(Key id) const
+  const Value& HashTable< Key, Value, Hash, Equal >::at(const Key& id) const
   {
     const Node* el = find_el(id);
     if (el) {
@@ -320,7 +320,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+  void HashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
   {
     Table tmp(*this);
     size_t buc_idx = getBucketIndex(k);
@@ -348,7 +348,7 @@ namespace zubarev
     swap(tmp);
   }
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< Key, Value, Hash, Equal >::drop(Key k)
+  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& k)
   {
     Table tmp(*this);
     Value val;
@@ -380,7 +380,7 @@ namespace zubarev
     throw std::out_of_range("Key not found in drop()");
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< Key, Value, Hash, Equal >::has(Key k) const
+  bool HashTable< Key, Value, Hash, Equal >::has(const Key& k) const
   {
 
     size_t buc_idx = getBucketIndex(k);
