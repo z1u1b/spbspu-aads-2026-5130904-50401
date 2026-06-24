@@ -73,20 +73,7 @@ namespace zubarev
 
     Node* find_el(const Key& k) noexcept
     {
-      for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-        if (equaler_(k, (*it).key) && (*it).is_val) {
-          return std::addressof(*it);
-        }
-      }
-      size_t buc_idx = getBucketIndex(k);
-      for (size_t i = 0; i < bucket_capacity_; ++i) {
-        size_t idx = bucket_capacity_ * buc_idx + i;
-        if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
-
-          return &data_[idx];
-        }
-      }
-      return nullptr;
+      return const_cast< Node* >(static_cast< const HashTable* >(this)->find_el(k));
     }
 
     const Node* find_el(const Key& k) const noexcept
