@@ -1,4 +1,5 @@
 #include "graph.hpp"
+
 namespace zubarev
 {
   void GraphTable::graphs(std::ostream& out) const
@@ -46,7 +47,7 @@ namespace zubarev
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    Equaler< std::string > eq;
+    std::equal_to< std::string > eq;
 
     const auto& graph = edge_data_.at(graph_name);
     const auto& verts = vertex_data_.at(graph_name);
@@ -93,7 +94,7 @@ namespace zubarev
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    Equaler< std::string > eq;
+    std::equal_to< std::string > eq;
 
     const auto& graph = edge_data_.at(graph_name);
     const auto& verts = vertex_data_.at(graph_name);
@@ -145,7 +146,7 @@ namespace zubarev
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    Equaler< std::string > eq_;
+    std::equal_to< std::string > eq_;
     auto& edges = edge_data_.at(graph_name);
     auto& verts = vertex_data_.at(graph_name);
 
@@ -217,7 +218,7 @@ namespace zubarev
       return false;
     }
 
-    Equaler< std::string > eq;
+    std::equal_to< std::string > eq;
     for (size_t i = 0; i < count; ++i) {
       for (size_t j = i + 1; j < count; ++j) {
         if (eq(vertices[i], vertices[j])) {
@@ -227,7 +228,7 @@ namespace zubarev
       }
     }
 
-    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
     EdgeTable new_table;
 
     edge_data_.add(graph_name, new_table);
@@ -253,7 +254,7 @@ namespace zubarev
     if (!create(new_name, 0, {}, out)) {
       return;
     }
-    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
 
     EdgeTable new_table = edge_data_.at(new_name);
     const EdgeTable& source1_table = edge_data_[source1];
@@ -278,7 +279,7 @@ namespace zubarev
     const auto& verts1 = vertex_data_.at(source1);
     const auto& verts2 = vertex_data_.at(source2);
 
-    Equaler< std::string > eq;
+    std::equal_to< std::string > eq;
 
     for (auto it = verts1.begin(); it != verts1.end(); ++it) {
       bool found = false;
@@ -327,7 +328,7 @@ namespace zubarev
       return;
     }
 
-    Equaler< std::string > eq_;
+    std::equal_to< std::string > eq_;
 
     const auto& source_verts = vertex_data_.at(source);
 

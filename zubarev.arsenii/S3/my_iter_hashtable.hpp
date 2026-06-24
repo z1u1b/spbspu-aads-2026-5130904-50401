@@ -4,7 +4,6 @@
 #include <iter.hpp>
 #include "my_node_hashtable.hpp"
 
-#include <iostream>
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -32,16 +31,17 @@ namespace zubarev
     LIter< NodeHashTable< Key, Value > > overflow_el_;
     HashTable< Key, Value, Hash, Equal >* table_;
 
-    bool is_in_overflow() const noexcept
-    {
-      return bucket_index_ >= table_->bucket_count_;
-    }
+    bool is_in_overflow() const noexcept;
   };
+  template< class Key, class Value, class Hash, class Equal >
+  bool IterHashTable< Key, Value, Hash, Equal >::is_in_overflow() const noexcept
+  {
+    return bucket_index_ >= table_->bucket_count_;
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal >::IterHashTable(size_t el_idx,
                                                           size_t buc_idx,
-
                                                           LIter< NodeHashTable< Key, Value > > it,
                                                           HashTable< Key, Value, Hash, Equal >* table):
     element_index_(el_idx),

@@ -6,7 +6,6 @@
 #include "my_iter_hashtable.hpp"
 
 #include "my_node_hashtable.hpp"
-#include <iostream>
 #include <stdexcept>
 #include <utility>
 namespace zubarev

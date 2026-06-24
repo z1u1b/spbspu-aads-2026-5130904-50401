@@ -1,12 +1,11 @@
 #ifndef GRAPH_TABLE_HPP
 #define GRAPH_TABLE_HPP
 
-#include "my_equal.hpp"
 #include "my_hashtable.hpp"
 #include "my_siphash.hpp"
 #include <iostream>
 #include <string>
-
+#include <functional>
 #include <top-it-vector.hpp>
 namespace zubarev
 {
@@ -17,13 +16,13 @@ namespace zubarev
     using EdgeKey = std::pair< std::string, std::string >;
     using Weights = topit::Vector< size_t >;
 
-    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, Equaler< EdgeKey > >;
-    using GraphEdgeTable = HashTable< std::string, EdgeTable, SipHash, Equaler< std::string > >;
+    using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
+    using GraphEdgeTable = HashTable< std::string, EdgeTable, SipHash, std::equal_to< std::string > >;
 
     GraphEdgeTable edge_data_;
 
     using VertexList = topit::Vector< std::string >;
-    using GraphVertexTable = HashTable< std::string, VertexList, SipHash, Equaler< std::string > >;
+    using GraphVertexTable = HashTable< std::string, VertexList, SipHash, std::equal_to< std::string > >;
 
     GraphVertexTable vertex_data_;
 
@@ -75,7 +74,7 @@ namespace zubarev
     }
   }
   template< class T, class Equal >
-  topit::VectIter< T > unique(topit::VectIter< T > begin, topit::VectIter< T > end, Equal eq)
+  topit::VectIter< T > unique(topit::VectIter< T > begin, topit::VectIter< T > end, std::equal_to< T > eq)
   {
     if (begin == end) {
       return end;

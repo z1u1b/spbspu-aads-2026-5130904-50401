@@ -56,6 +56,7 @@ namespace zubarev
       return;
     }
 
+
     topit::Vector< std::string > vertexes;
 
     for (size_t i = 0; i < count; ++i) {

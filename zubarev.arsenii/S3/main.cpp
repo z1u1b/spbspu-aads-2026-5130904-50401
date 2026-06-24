@@ -1,16 +1,13 @@
-#include <top-it-vector.hpp>
 #include "commands.hpp"
 #include "graph.hpp"
 #include "input.hpp"
-#include "my_equal.hpp"
 #include "my_hashtable.hpp"
 #include "my_siphash.hpp"
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
-
+#include <functional>
 int main(int argc, char* argv[])
 
 {
@@ -30,7 +27,7 @@ int main(int argc, char* argv[])
   }
 
   using Hash = zub::SipHash;
-  using Equal = zub::Equaler< std::string >;
+  using Equal = std::equal_to< std::string >;
   using cmd_t = void (*)(std::istream&, std::ostream&, zub::GraphTable&);
   zub::HashTable< std::string, cmd_t, Hash, Equal > cmds;
 

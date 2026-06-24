@@ -3,7 +3,6 @@
 
 #include <c-iter.hpp>
 #include "my_node_hashtable.hpp"
-#include <iostream>
 namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -31,12 +30,13 @@ namespace zubarev
     LCIter< NodeHashTable< Key, Value > > overflow_el_;
     const HashTable< Key, Value, Hash, Equal >* table_;
 
-    bool is_in_overflow() const noexcept
-    {
-      return bucket_index_ >= table_->bucket_count_;
-    }
+    bool is_in_overflow() const noexcept;
   };
-
+  template< class Key, class Value, class Hash, class Equal >
+  bool CIterHashTable< Key, Value, Hash, Equal >::is_in_overflow() const noexcept
+  {
+    return bucket_index_ >= table_->bucket_count_;
+  }
   template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal >::CIterHashTable(size_t el_idx,
                                                             size_t buc_idx,
@@ -66,7 +66,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   const NodeHashTable< Key, Value >* CIterHashTable< Key, Value, Hash, Equal >::operator->() const noexcept
   {
-    return &operator*();
+    return std::addressof(operator*());
   }
 
   template< class Key, class Value, class Hash, class Equal >
