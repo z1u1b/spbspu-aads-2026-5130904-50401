@@ -22,6 +22,7 @@ namespace zubarev
     NodeHashTable< Key, Value >& operator*();
     NodeHashTable< Key, Value >* operator->() noexcept;
     IterHashTable& operator++();
+    IterHashTable operator++(int);
     bool operator!=(const IterHashTable&) const;
     bool operator==(const IterHashTable&) const;
 
@@ -108,6 +109,41 @@ namespace zubarev
       } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
     }
     return *this;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  IterHashTable< Key, Value, Hash, Equal > IterHashTable< Key, Value, Hash, Equal >::operator++(int)
+  {
+    IterHashTable< Key, Value, Hash, Equal > tmp = this;
+    if (is_in_overflow()) {
+      if (overflow_el_ != table_->overflow_bucket_.end()) {
+        ++overflow_el_;
+      }
+
+    } else {
+      do {
+        element_index_++;
+        if (element_index_ >= table_->bucket_capacity_) {
+          bucket_index_++;
+
+          element_index_ = 0;
+          while (bucket_index_ < table_->bucket_count_ && table_->sizes_[bucket_index_] == 0) {
+            bucket_index_++;
+            element_index_ = 0;
+          }
+
+          if (bucket_index_ >= table_->bucket_count_) {
+
+            if (!table_->overflow_bucket_.empty()) {
+              overflow_el_ = table_->overflow_bucket_.begin();
+            } else {
+              bucket_index_ = table_->bucket_count_ + 1;
+            }
+            return *this;
+          }
+        }
+      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
+    }
+    return tmp;
   }
   template< class Key, class Value, class Hash, class Equal >
   bool IterHashTable< Key, Value, Hash, Equal >::operator!=(const IterHashTable& rhs) const
