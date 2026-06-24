@@ -1,5 +1,8 @@
-#include "all.hpp"
 #include <boost/test/unit_test.hpp>
+
+#include "func-stack-queue.hpp"
+#include "func-math.hpp"
+#include "stack.hpp"
 
 BOOST_AUTO_TEST_SUITE(operation_test)
 
@@ -7,25 +10,36 @@ BOOST_AUTO_TEST_CASE(BitShiftToRightTest)
 {
 
   std::string inp = "( 10 + 5 ) ## 3\n100 ## ( 2 * 3 )\n( 2 ## 3 ) * ( 4 ## 5 )";
-  std::istringstream inputFlow(inp);
-  std::string resString = "";
-  while (inputFlow && !inputFlow.eof()) {
-    bool error = false;
-    std::string expression = zubarev::input(inputFlow, error);
+  std::istringstream input(inp);
 
-    if (error) {
-      throw std::runtime_error("input: incorrect input");
+  std::ostringstream output;
+
+  zubarev::Stack< long long > results;
+  std::string expression = "";
+  while (std::getline(input, expression)) {
+    zubarev::Queue< std::string > infixQ = zubarev::detail::fromStrToQueue(expression);
+    if (infixQ.empty()) {
+      continue;
     }
 
-    if (!expression.empty()) {
-      zubarev::Queue< std::string > infixQ = zubarev::fromStrToQueue(expression);
-      zubarev::Queue< std::string > postfixQ = zubarev::fromInfixToPostfix(infixQ);
-      resString += std::to_string(zubarev::eval(postfixQ));
-      resString += " ";
-    }
+    zubarev::Queue< std::string > postfixQ = zubarev::detail::fromInfixToPostfix(infixQ);
+    results.push(zubarev::eval(postfixQ));
   }
 
-  BOOST_CHECK(resString == "153 1006 1035 ");
+  if (results.empty()) {
+    output << '\n';
+    return;
+  }
+  output << results.top();
+  results.drop();
+  while (!results.empty()) {
+    output << ' ' << results.top();
+    results.drop();
+  }
+
+  output << '\n';
+
+  BOOST_CHECK(output.str() == "1035 1006 153\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

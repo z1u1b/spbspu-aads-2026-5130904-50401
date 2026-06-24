@@ -1,57 +1,74 @@
 #ifndef CITER_HPP
 #define CITER_HPP
-
+#include <memory>
 namespace zubarev
 {
-  template < class T >
+  template< class T >
   class List;
-  template < class T >
-  struct Node;
+  namespace detail
+  {
+    template< class T >
+    struct Node;
+  }
 
-  template < class T >
+  template< class T >
   class LCIter
   {
-    friend class List< T >;
-
-  private:
-    const Node< T >* ptr;
-    LCIter(const Node< T >* p);
 
   public:
     const T& operator*() const;
-    LCIter< T > operator++();
+    const T* operator->() const;
+    LCIter< T >& operator++();
+    LCIter< T > operator++(int);
     bool operator!=(const LCIter&) const;
     bool operator==(const LCIter&) const;
+
+  private:
+    friend class List< T >;
+    const detail::Node< T >* ptr_;
+    LCIter(const detail::Node< T >* p);
   };
 
-  template < class T >
-  LCIter< T >::LCIter(const Node< T >* p):
-    ptr(p)
+  template< class T >
+  LCIter< T >::LCIter(const detail::Node< T >* p):
+    ptr_(p)
   {}
 
-  template < class T >
+  template< class T >
   const T& LCIter< T >::operator*() const
   {
-    return ptr->val;
+    return ptr_->val;
+  }
+  template< class T >
+  const T* LCIter< T >::operator->() const
+  {
+    return std::addressof(ptr_->val);
   }
 
-  template < class T >
-  LCIter< T > LCIter< T >::operator++()
+  template< class T >
+  LCIter< T >& LCIter< T >::operator++()
   {
-    ptr = ptr->next;
+    ptr_ = ptr_->next;
     return *this;
   }
-
-  template < class T >
-  bool LCIter< T >::operator!=(const LCIter& iter) const
+  template< class T >
+  LCIter< T > LCIter< T >::operator++(int)
   {
-    return ptr != iter.ptr;
+    LCIter< T > tmp = this;
+    ptr_ = ptr_->next;
+    return tmp;
   }
 
-  template < class T >
+  template< class T >
+  bool LCIter< T >::operator!=(const LCIter& iter) const
+  {
+    return ptr_ != iter.ptr_;
+  }
+
+  template< class T >
   bool LCIter< T >::operator==(const LCIter& iter) const
   {
-    return ptr == iter.ptr;
+    return ptr_ == iter.ptr_;
   }
 }
 

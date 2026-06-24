@@ -1,239 +1,181 @@
-#include "all.hpp"
+#include "functions.hpp"
 #include <iostream>
 #include <limits>
-#include <string>
+#include <cctype>
+#include "list.hpp"
 
-namespace zubarev
+zubarev::List< zubarev::Data > zubarev::input(std::istream& in, bool& error)
 {
-  List< Data > input(std::istream& in, bool& error)
-  {
-    List< Data > list;
-    LIter< Data > itList = list.before_begin();
-    Data value;
+  zubarev::List< zubarev::Data > list;
+  auto itList = list.before_begin();
+  error = false;
 
-    while (in >> value.name) {
-      List< size_t > nums;
-      LIter< size_t > itNum = nums.before_begin();
-      std::string num;
-
-      while (true) {
-
-        while (in.peek() == ' ' || in.peek() == '\t') {
-          in.get();
-        }
-
-        if (in.peek() == '\n' || in.eof()) {
-          if (in.peek() == '\n') {
-            in.get();
-          }
-          break;
-        }
-
-        if (in >> num) {
-          if (isdigit(num)) {
-            std::string maxStr = std::to_string(std::numeric_limits< size_t >::max());
-
-            if (num.size() < maxStr.size()) {
-
-              nums.insert_after(itNum, to_size_t(num));
-              ++itNum;
-            } else if (num.size() == maxStr.size()) {
-
-              if (num <= maxStr) {
-                nums.insert_after(itNum, to_size_t(num));
-                ++itNum;
-              } else {
-                error = true;
-                std::cerr << "input: number overflow" << '\n';
-                return List< Data >{};
-              }
-            } else {
-
-              error = true;
-              std::cerr << "input: number overflow" << '\n';
-              return List< Data >{};
-            }
-          } else {
-            error = true;
-            std::cerr << "input: incorrect input" << '\n';
-            return List< Data >{};
-          }
-        } else {
-          error = true;
-          std::cerr << "input: bad input" << '\n';
-          return List< Data >{};
-        }
-      }
+  zubarev::Data value;
+  while (in >> value.name) {
+    zubarev::List< size_t > nums;
+    auto itNum = nums.before_begin();
+    size_t num;
+    while (in >> num) {
+      itNum = nums.insert_after(itNum, num);
+    }
+    if (in.eof()) {
       value.numbers = nums;
       list.insert_after(itList, value);
-      ++itList;
-    }
-    return list;
-  }
-  template < class T >
-  void output(std::ostream& out, T el, bool is_first)
-  {
-    if (is_first) {
-      out << el;
-    } else {
-      out << " " << el;
-    }
-  }
-
-  size_t output_names(List< Data >* list)
-  {
-    if (!list) {
-      std::cerr << "output_names: list pointer is nullptr" << '\n';
-      return 1;
-    }
-    LIter< Data > it = list->begin();
-    bool is_first = true;
-    while (it != list->end()) {
-      output< std::string >(std::cout, (*it).name, is_first);
-      is_first = false;
-      ++it;
-    }
-    if (!list->empty()) {
-      std::cout << '\n';
+      break;
     }
 
+    in.clear();
+
+    // char ch;
+    // if (in >> ch) {
+    //   if (std::isalpha(static_cast< unsigned char >(ch))) {
+    //     in.unget();
+    //   } else {
+    //     error = true;
+    //     return zubarev::List< zubarev::Data >{};
+    //   }
+    // }
+
+    value.numbers = nums;
+    itList = list.insert_after(itList, value);
+  }
+
+  return list;
+}
+size_t zubarev::output_names(const zubarev::List< zubarev::Data >& list)
+{
+  if (list.empty()) {
     return 0;
   }
-  size_t max_sequences(List< Data >* list)
-  {
-    if (!list) {
-      std::cerr << "max_sequences: list pointer is nullptr";
-      return 0;
+
+  auto it = list.begin();
+
+  std::cout << it->name;
+  ++it;
+
+  while (it != list.end()) {
+    std::cout << " " << it->name;
+    ++it;
+  }
+
+  return 0;
+}
+size_t zubarev::max_sequences(const zubarev::List< zubarev::Data >& list)
+{
+  size_t maxNum = 0;
+  auto itList = list.begin();
+  while (itList != list.end()) {
+    const zubarev::List< size_t >& nums = itList->numbers;
+    LCIter< size_t > itNums = nums.begin();
+    size_t count = 0;
+    while (itNums != nums.end()) {
+      count++;
+      ++itNums;
     }
-    size_t maxNum = 0;
-    LIter< Data > itList = list->begin();
-    while (itList != list->end()) {
-      const List< size_t >& nums = (*itList).numbers;
-      LCIter< size_t > itNums = nums.begin();
-      size_t count = 0;
-      while (itNums != nums.end()) {
-        count++;
+    maxNum = std::max(maxNum, count);
+    ++itList;
+  }
+  return maxNum;
+}
+size_t zubarev::output_sequences(const zubarev::List< zubarev::Data >& list)
+{
+  if (list.empty()) {
+    return 0;
+  }
+
+  size_t maxSeq = max_sequences(list);
+  for (size_t i = 0; i < maxSeq; ++i) {
+    LCIter< zubarev::Data > itList = list.begin();
+    bool found_first = false;
+
+    while (itList != list.end() && !found_first) {
+      LCIter< size_t > itNums = itList->numbers.begin();
+      bool flag = true;
+
+      for (size_t j = 0; j < i; ++j) {
+        if (itNums != itList->numbers.end()) {
+          ++itNums;
+        } else {
+          flag = false;
+          break;
+        }
+      }
+
+      if (flag && itNums != itList->numbers.end()) {
+        std::cout << *itNums;
+        found_first = true;
+      }
+      ++itList;
+    }
+
+    while (itList != list.end()) {
+      LCIter< size_t > itNums = itList->numbers.begin();
+      bool flag = true;
+
+      for (size_t j = 0; j < i; ++j) {
+        if (itNums != itList->numbers.end()) {
+          ++itNums;
+        } else {
+          flag = false;
+          break;
+        }
+      }
+      if (flag && itNums != itList->numbers.end()) {
+        std::cout << " " << *itNums;
+      }
+      ++itList;
+    }
+    if (i + 1 != maxSeq) {
+      std::cout << '\n';
+    }
+  }
+  return 0;
+}
+
+zubarev::List< size_t > zubarev::calculate_sums(const zubarev::List< zubarev::Data >& list)
+{
+  const size_t maxSeq = max_sequences(list);
+  zubarev::List< size_t > sums;
+  auto itSum = sums.before_begin();
+
+  for (size_t i = 0; i < maxSeq; ++i) {
+    size_t sum = 0;
+    auto itList = list.begin();
+
+    while (itList != list.end()) {
+      auto itNums = itList->numbers.begin();
+
+      for (size_t j = 0; j < i && itNums != itList->numbers.end(); ++j) {
         ++itNums;
       }
-      maxNum = std::max(maxNum, count);
+      if (itNums != itList->numbers.end()) {
+        size_t value = *itNums;
+        if (sum > std::numeric_limits< size_t >::max() - value) {
+          throw std::overflow_error("sum overflow");
+        }
+        sum += value;
+      }
+
       ++itList;
     }
-    return maxNum;
+
+    itSum = sums.insert_after(itSum, sum);
   }
-  size_t output_sequences(List< Data >* list)
-  {
-    if (!list) {
-      std::cerr << "output_sequences: list pointer is nullptr";
-      return 1;
-    }
-    for (size_t i = 0; i < max_sequences(list); ++i) {
-      bool is_first = true;
-      LIter< Data > itList = list->begin();
-      while (itList != list->end()) {
-        LIter< size_t > itNums = (*itList).numbers.begin();
-        bool flag = true;
-        for (size_t j = 0; j < i; ++j) {
-          if (itNums != (*itList).numbers.end()) {
-            ++itNums;
-          } else {
-            flag = false;
-            break;
-          }
-        }
-        if (flag && itNums != (*itList).numbers.end()) {
-          output< size_t >(std::cout, (*itNums), is_first);
-          is_first = false;
-        }
-        ++itList;
-      }
-      std::cout << '\n';
-    }
-    return 0;
+  return sums;
+}
+
+void zubarev::print_sums(const zubarev::List< size_t >& sums)
+{
+  if (sums.empty()) {
+    return;
   }
 
-  size_t output_sums(List< Data >* list)
-  {
-    if (!list) {
-      std::cerr << "output_sums: list pointer is nullptr" << '\n';
-      return 1;
-    }
+  auto it = sums.begin();
+  std::cout << *it;
+  ++it;
 
-    const size_t maxSeq = max_sequences(list);
-
-    if (maxSeq == 0) {
-      std::cout << "0\n";
-      return 0;
-    }
-
-    List< size_t > sums;
-    LIter< size_t > itSum = sums.before_begin();
-    bool overflow = false;
-
-    for (size_t i = 0; i < maxSeq; ++i) {
-      size_t sum = 0;
-      LIter< Data > itList = list->begin();
-
-      while (itList != list->end()) {
-        LIter< size_t > itNums = (*itList).numbers.begin();
-        for (size_t j = 0; j < i && itNums != (*itList).numbers.end(); ++j) {
-          ++itNums;
-        }
-        if (itNums != (*itList).numbers.end()) {
-          size_t value = (*itNums);
-          if (sum > std::numeric_limits< size_t >::max() - value) {
-            overflow = true;
-            break;
-          }
-          sum += value;
-        }
-        ++itList;
-      }
-
-      if (overflow) {
-        break;
-      }
-
-      sums.insert_after(itSum, sum);
-      ++itSum;
-    }
-
-    if (overflow) {
-      std::cerr << "output_sums: sum overflow" << '\n';
-      return 1;
-    }
-
-    LIter< size_t > it = sums.begin();
-    bool is_first = true;
-    while (it != sums.end()) {
-      output< size_t >(std::cout, (*it), is_first);
-      is_first = false;
-      ++it;
-    }
-    std::cout << '\n';
-
-    return 0;
-  }
-  size_t to_size_t(const std::string& num)
-  {
-    size_t res = 0;
-    for (size_t i = 0; i < num.size(); ++i) {
-
-      res = res * 10 + static_cast< size_t >(num[i] - '0');
-    }
-    return res;
-  }
-  bool isdigit(const std::string& str)
-  {
-    if (str.empty()) {
-      return false;
-    }
-
-    for (size_t i = 0; i < str.size(); ++i) {
-      if (!std::isdigit(str[i])) {
-        return false;
-      }
-    }
-
-    return true;
+  while (it != sums.end()) {
+    std::cout << " " << *it;
+    ++it;
   }
 }

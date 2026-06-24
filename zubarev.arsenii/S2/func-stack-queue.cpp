@@ -1,173 +1,96 @@
-#include "all.hpp"
-#include "func-math.hpp"
-#include <iostream>
-#include <limits>
-namespace zubarev
+#include "func-stack-queue.hpp"
+
+#include <string>
+
+#include "queue.hpp"
+#include "stack.hpp"
+
+zubarev::Queue< std::string > zubarev::detail::fromStrToQueue(const std::string& str)
 {
-  using ll_int = long long int;
-  void output(std::istream& in)
-  {
-    Stack< ll_int > results;
-
-    while (in && !in.eof()) {
-      bool error = false;
-      std::string expression = input(in, error);
-
-      if (error) {
-        throw std::runtime_error("input: incorrect input");
-      }
-
-      if (!expression.empty()) {
-        Queue< std::string > infixQ = fromStrToQueue(expression);
-        Queue< std::string > postfixQ = fromInfixToPostfix(infixQ);
-        results.push(eval(postfixQ));
-      }
-    }
-
-    while (!results.empty()) {
-      std::cout << results.top() << (results.size() > 1 ? " " : "");
-      results.drop();
-    }
-    std::cout << '\n';
+  Queue< std::string > q;
+  std::string container = "";
+  if (str.empty()) {
+    return q;
   }
-  std::string input(std::istream& in, bool& error)
-  {
-    error = false;
-    std::string line;
+  for (auto it = str.begin(); it != str.end(); ++it) {
+    char ch = *it;
 
-    if (!std::getline(in, line)) {
-      if (in.eof()) {
-        return "";
-      }
-      error = true;
-      return "";
+    if (std::isspace(static_cast< unsigned char >(ch))) {
+      q.push(container);
+      container = "";
+    } else {
+      container += (ch);
     }
+  }
+  if (!container.empty()) {
+    q.push(container);
+  }
+  return q;
+}
+bool zubarev::detail::isOperation(const std::string& str)
+{
+  return str == "+" || str == "-" || str == "*" || str == "/" || str == "%" || str == "##";
+}
+size_t zubarev::detail::getPriority(const std::string& oper)
+{
 
-    std::string result;
-    char ch;
-    for (size_t i = 0; i < line.size(); ++i) {
-      ch = line[i];
-      if (std::isspace(static_cast< unsigned char >(ch))) {
-        continue;
-      }
-
-      if (std::isdigit(static_cast< unsigned char >(ch)) || ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
-          ch == '(' || ch == ')' || ch == '%' || ch == '#') {
-        result += ch;
-      } else {
-        error = true;
-        std::cerr << "input: incorrect input (invalid char '" << ch << "')\n";
-        return "";
-      }
-    }
-
-    return result;
+  if (oper == "##") {
+    return 3;
   }
 
-  Queue< std::string > fromStrToQueue(std::string& str)
-  {
-    Queue< std::string > infixQ;
-    size_t num = 0;
-    while (num < str.size()) {
-      if (std::isdigit(str[num])) {
-        std::string container = "";
-        while (num < str.size() && std::isdigit(str[num])) {
-          container += str[num];
-          num++;
-        }
-        infixQ.push(container);
-      } else if (str[num] == '#') {
-
-        std::string container = "";
-        if (num + 2 < str.size() && str[num + 1] == '#') {
-          container += str[num];
-          container += str[num];
-          num += 2;
-          infixQ.push(container);
-        } else {
-          num++;
-        }
-
-      } else if (str[num] == '+' || str[num] == '-' || str[num] == '*' || str[num] == '/' || str[num] == '(' ||
-                 str[num] == ')' || str[num] == '%') {
-        infixQ.push(std::string(1, str[num]));
-        num++;
-      } else {
-        num++;
-      }
-    }
-    return infixQ;
+  if (oper == "*" || oper == "/" || oper == "%") {
+    return 2;
   }
-  bool isdigit(const std::string& str)
-  {
-    if (str.empty()) {
-      return false;
-    }
 
-    for (size_t i = 0; i < str.size(); ++i) {
-      if (!std::isdigit(str[i])) {
-        return false;
-      }
-    }
-
-    return true;
+  if (oper == "+" || oper == "-") {
+    return 1;
   }
-  size_t getPriority(const std::string& oper)
-  {
+  return 0;
+}
 
-    if (oper == "##") {
-      return 3;
-    }
+zubarev::Queue< std::string > zubarev::detail::fromInfixToPostfix(Queue< std::string >& infixQ)
+{
+  Stack< std::string > stack;
+  Queue< std::string > postfixQ;
 
-    if (oper == "*" || oper == "/" || oper == "%") {
-      return 2;
-    }
+  while (!infixQ.empty()) {
 
-    if (oper == "+" || oper == "-") {
-      return 1;
-    }
-    return 0;
-  }
-  Queue< std::string > fromInfixToPostfix(Queue< std::string >& infixQ)
-  {
-    Stack< std::string > stack;
-    Queue< std::string > postfixQ;
+    std::string el = infixQ.top();
+    infixQ.drop();
 
-    while (!infixQ.empty()) {
-      std::string el = infixQ.top();
-      if (isdigit(el)) {
-        postfixQ.push(el);
-      } else {
-        if (el != "(" && el != ")") {
-          while (!stack.empty() && getPriority(stack.top()) >= getPriority(el)) {
-            postfixQ.push(stack.top());
-            stack.drop();
-          }
-          stack.push(el);
-        } else {
-          if (el == ")") {
-            while (!stack.empty() && stack.top() != "(") {
-              postfixQ.push(stack.top());
-              stack.drop();
-              if (stack.empty()) {
-                throw std::runtime_error("Unbalanced parentheses: missing '('");
-              }
-            }
-            stack.drop();
-          } else {
-            stack.push(el);
-          }
-        }
+    if (el == "(") {
+      stack.push(el);
+    } else if (el == ")") {
+
+      while (!stack.empty() && stack.top() != "(") {
+        postfixQ.push(stack.top());
+        stack.drop();
       }
 
-      infixQ.drop();
-    }
+      if (stack.empty()) {
+        throw std::runtime_error("Unbalanced parentheses");
+      }
 
-    while (!stack.empty()) {
-      postfixQ.push(stack.top());
       stack.drop();
+    } else if (isOperation(el)) {
+
+      while (!stack.empty() && getPriority(stack.top()) >= getPriority(el)) {
+        postfixQ.push(stack.top());
+        stack.drop();
+      }
+      stack.push(el);
+    } else {
+      postfixQ.push(el);
     }
-    return postfixQ;
   }
 
+  while (!stack.empty()) {
+    if (stack.top() == "(") {
+      throw std::runtime_error("Unbalanced parentheses");
+    }
+    postfixQ.push(stack.top());
+    stack.drop();
+  }
+
+  return postfixQ;
 }
