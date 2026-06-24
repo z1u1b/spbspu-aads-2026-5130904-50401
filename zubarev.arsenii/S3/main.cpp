@@ -1,4 +1,4 @@
-#include "../common/top-it-vector.hpp"
+#include <top-it-vector.hpp>
 #include "commands.hpp"
 #include "graph.hpp"
 #include "input.hpp"

@@ -1,7 +1,7 @@
 #ifndef MY_HASHTABLE_HPP
 #define MY_HASHTABLE_HPP
 
-#include "../common/list.hpp"
+#include <list.hpp>
 #include "my_citer_hashtable.hpp"
 #include "my_iter_hashtable.hpp"
 

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#include "../common/top-it-vector.hpp"
+#include <top-it-vector.hpp>
 namespace zubarev
 {
   class GraphTable
