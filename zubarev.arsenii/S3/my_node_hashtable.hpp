@@ -9,21 +9,21 @@ namespace zubarev
     NodeHashTable();
     NodeHashTable(Key, Value, bool);
 
-    Key key_;
-    Value val_;
-    bool is_val_;
+    Key key;
+    Value val;
+    bool is_val;
   };
   template< class Key, class Value >
   NodeHashTable< Key, Value >::NodeHashTable():
-    key_(),
-    val_(),
-    is_val_(false)
+    key(),
+    val(),
+    is_val(false)
   {}
   template< class Key, class Value >
   NodeHashTable< Key, Value >::NodeHashTable(Key key, Value val, bool is_val):
-    key_(key),
-    val_(val),
-    is_val_(is_val)
+    key(key),
+    val(val),
+    is_val(is_val)
   {}
 }
 

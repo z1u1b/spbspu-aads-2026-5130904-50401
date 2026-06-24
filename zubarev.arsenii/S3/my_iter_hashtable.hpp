@@ -1,7 +1,7 @@
 #ifndef MY_ITER_HPP
 #define MY_ITER_HPP
 
-#include <iter.hpp>
+#include "../common/iter.hpp"
 #include "my_node_hashtable.hpp"
 
 namespace zubarev
@@ -56,7 +56,7 @@ namespace zubarev
 
     if (is_in_overflow()) {
       if (overflow_el_ != table_->overflow_bucket_.end()) {
-        if (!(*overflow_el_).is_val_) {
+        if (!(*overflow_el_).is_val) {
           throw std::out_of_range("Invalid node in overflow");
         }
         return *overflow_el_;
@@ -106,7 +106,7 @@ namespace zubarev
             return *this;
           }
         }
-      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
+      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val);
     }
     return *this;
   }
@@ -141,7 +141,7 @@ namespace zubarev
             return *this;
           }
         }
-      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
+      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val);
     }
     return tmp;
   }

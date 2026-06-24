@@ -1,5 +1,5 @@
 #include "commands.hpp"
-#include <top-it-vector.hpp>
+#include "../common/top-it-vector.hpp"
 #include "graph.hpp"
 #include <iostream>
 
@@ -55,7 +55,6 @@ namespace zubarev
       graph.create(name, 0, {}, out);
       return;
     }
-
 
     topit::Vector< std::string > vertexes;
 

@@ -1,7 +1,7 @@
 #ifndef MY_CITER_HPP
 #define MY_CITER_HPP
 
-#include <c-iter.hpp>
+#include "../common/c-iter.hpp"
 #include "my_node_hashtable.hpp"
 namespace zubarev
 {
@@ -95,7 +95,7 @@ namespace zubarev
             return *this;
           }
         }
-      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
+      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val);
     }
     return *this;
   }
@@ -126,7 +126,7 @@ namespace zubarev
             return *this;
           }
         }
-      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val_);
+      } while (!table_->data_[bucket_index_ * table_->bucket_capacity_ + element_index_].is_val);
     }
     return tmp;
   }

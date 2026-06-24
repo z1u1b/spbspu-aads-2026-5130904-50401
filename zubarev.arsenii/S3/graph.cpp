@@ -1,5 +1,4 @@
 #include "graph.hpp"
-
 namespace zubarev
 {
   void GraphTable::graphs(std::ostream& out) const
@@ -7,7 +6,7 @@ namespace zubarev
     topit::Vector< std::string > names;
 
     for (auto it = edge_data_.begin(); it != edge_data_.end(); ++it) {
-      names.pushBack(it->key_);
+      names.pushBack(it->key);
     }
     if (names.getSize() == 0) {
       out << '\n';
@@ -66,10 +65,10 @@ namespace zubarev
     topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
 
     for (auto it = graph.begin(); it != graph.end(); ++it) {
-      if (eq(it->key_.first, vertex)) {
+      if (eq(it->key.first, vertex)) {
         std::pair< std::string, topit::Vector< size_t > > tmp;
-        tmp.first = it->key_.second;
-        tmp.second = it->val_;
+        tmp.first = it->key.second;
+        tmp.second = it->val;
         results.pushBack(tmp);
       }
     }
@@ -114,10 +113,10 @@ namespace zubarev
     topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
 
     for (auto it = graph.begin(); it != graph.end(); ++it) {
-      if (eq(it->key_.second, vertex)) {
+      if (eq(it->key.second, vertex)) {
         std::pair< std::string, topit::Vector< size_t > > tmp;
-        tmp.first = it->key_.first;
-        tmp.second = it->val_;
+        tmp.first = it->key.first;
+        tmp.second = it->val;
         results.pushBack(tmp);
       }
     }
@@ -261,16 +260,16 @@ namespace zubarev
     const EdgeTable& source2_table = edge_data_[source2];
 
     for (auto it = source1_table.begin(); it != source1_table.end(); ++it) {
-      Weights weights(it->val_);
+      Weights weights(it->val);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        edge_data_.at(new_name)[it->key_].pushBack(*vit);
+        edge_data_.at(new_name)[it->key].pushBack(*vit);
       }
     }
 
     for (auto it = source2_table.begin(); it != source2_table.end(); ++it) {
-      Weights weights(it->val_);
+      Weights weights(it->val);
       for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-        edge_data_.at(new_name)[it->key_].pushBack(*vit);
+        edge_data_.at(new_name)[it->key].pushBack(*vit);
       }
     }
 
@@ -355,8 +354,8 @@ namespace zubarev
     const auto& graph = edge_data_.at(source);
 
     for (auto it = graph.begin(); it != graph.end(); ++it) {
-      const auto& from = it->key_.first;
-      const auto& to = it->key_.second;
+      const auto& from = it->key.first;
+      const auto& to = it->key.second;
 
       bool flag_from = false;
       bool flag_to = false;
@@ -372,10 +371,10 @@ namespace zubarev
       }
 
       if (flag_from && flag_to) {
-        Weights weights(it->val_);
+        Weights weights(it->val);
 
         for (auto vit = weights.begin(); vit != weights.end(); ++vit) {
-          edge_data_.at(new_name)[it->key_].pushBack(*vit);
+          edge_data_.at(new_name)[it->key].pushBack(*vit);
         }
       }
     }

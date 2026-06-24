@@ -1,7 +1,7 @@
 #ifndef MY_HASHTABLE_HPP
 #define MY_HASHTABLE_HPP
 
-#include <list.hpp>
+#include "../common/list.hpp"
 #include "my_citer_hashtable.hpp"
 #include "my_iter_hashtable.hpp"
 
@@ -43,14 +43,14 @@ namespace zubarev
     Node* find_el(const Key& k) noexcept
     {
       for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-        if (equaler_(k, (*it).key_) && (*it).is_val_) {
+        if (equaler_(k, (*it).key) && (*it).is_val) {
           return std::addressof(*it);
         }
       }
       size_t buc_idx = getBucketIndex(k);
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t idx = bucket_capacity_ * buc_idx + i;
-        if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
+        if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
 
           return &data_[idx];
         }
@@ -61,14 +61,14 @@ namespace zubarev
     const Node* find_el(const Key& k) const noexcept
     {
       for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-        if (equaler_(k, (*it).key_) && (*it).is_val_) {
+        if (equaler_(k, (*it).key) && (*it).is_val) {
           return std::addressof(*it);
         }
       }
       size_t buc_idx = getBucketIndex(k);
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t idx = bucket_capacity_ * buc_idx + i;
-        if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
+        if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
 
           return &data_[idx];
         }
@@ -215,10 +215,10 @@ namespace zubarev
   {
     Node* el = find_el(k);
     if (el) {
-      return el->val_;
+      return el->val;
     } else {
       add(k, Value{});
-      return find_el(k)->val_;
+      return find_el(k)->val;
     }
   }
   template< class Key, class Value, class Hash, class Equal >
@@ -232,7 +232,7 @@ namespace zubarev
   {
     Node* el = find_el(id);
     if (el) {
-      return el->val_;
+      return el->val;
     } else {
       throw std::out_of_range("HashTable: index out of range");
     }
@@ -242,7 +242,7 @@ namespace zubarev
   {
     const Node* el = find_el(id);
     if (el) {
-      return el->val_;
+      return el->val;
     } else {
       throw std::out_of_range("HashTable: index out of range");
     }
@@ -265,7 +265,7 @@ namespace zubarev
     Iter it(0, 0, overflow_bucket_.begin(), this);
 
     while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
+           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
       ++it;
       if (it.is_in_overflow())
         break;
@@ -289,7 +289,7 @@ namespace zubarev
     CIter it(0, 0, overflow_bucket_.begin(), this);
 
     while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
+           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
       ++it;
       if (it.is_in_overflow())
         break;
@@ -313,7 +313,7 @@ namespace zubarev
     CIter it(0, 0, overflow_bucket_.begin(), this);
 
     while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val_) {
+           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
       ++it;
       if (it.is_in_overflow())
         break;
@@ -338,7 +338,7 @@ namespace zubarev
     size_t buc_idx = getBucketIndex(k);
     size_t is_over = true;
     for (size_t i = 0; i < bucket_capacity_; ++i) {
-      if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val_) {
+      if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val) {
         tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
         tmp.sizes_[buc_idx]++;
         is_over = false;
@@ -347,8 +347,8 @@ namespace zubarev
     }
     if (is_over) {
       for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it) {
-        if ((*it).is_val_ && equaler_((*it).key_, k)) {
-          (*it).val_ = v;
+        if ((*it).is_val && equaler_((*it).key, k)) {
+          (*it).val = v;
           is_over = false;
           break;
         }
@@ -369,8 +369,8 @@ namespace zubarev
     auto prev = overflow_bucket_.before_begin();
 
     for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it, ++prev) {
-      if (equaler_(k, (*it).key_) && (*it).is_val_) {
-        Value val = (*it).val_;
+      if (equaler_(k, (*it).key) && (*it).is_val) {
+        Value val = (*it).val;
 
         tmp.overflow_bucket_.erase_after(prev);
         swap(tmp);
@@ -380,11 +380,11 @@ namespace zubarev
 
     for (size_t i = 0; i < tmp.bucket_capacity_; ++i) {
       size_t idx = tmp.bucket_capacity_ * buc_idx + i;
-      if (equaler_(tmp.data_[idx].key_, k) && tmp.data_[idx].is_val_) {
+      if (equaler_(tmp.data_[idx].key, k) && tmp.data_[idx].is_val) {
 
-        tmp.data_[idx].is_val_ = false;
+        tmp.data_[idx].is_val = false;
         tmp.sizes_[buc_idx]--;
-        val = tmp.data_[bucket_capacity_ * buc_idx + i].val_;
+        val = tmp.data_[bucket_capacity_ * buc_idx + i].val;
         swap(tmp);
         return val;
       }
@@ -398,14 +398,14 @@ namespace zubarev
     size_t buc_idx = getBucketIndex(k);
 
     for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-      if (equaler_(k, (*it).key_) && (*it).is_val_) {
+      if (equaler_(k, (*it).key) && (*it).is_val) {
         return true;
       }
     }
 
     for (size_t i = 0; i < bucket_capacity_; ++i) {
       size_t idx = bucket_capacity_ * buc_idx + i;
-      if (equaler_(data_[idx].key_, k) && data_[idx].is_val_) {
+      if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
 
         return true;
       }
@@ -426,15 +426,15 @@ namespace zubarev
     for (size_t i = 0; i < bucket_count_; ++i) {
       for (size_t j = 0; j < bucket_capacity_; ++j) {
         size_t idx = bucket_capacity_ * i + j;
-        if (data_[idx].is_val_) {
-          tmp.add(data_[idx].key_, data_[idx].val_);
+        if (data_[idx].is_val) {
+          tmp.add(data_[idx].key, data_[idx].val);
         }
       }
     }
 
     for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
-      if ((*it).is_val_) {
-        tmp.add((*it).key_, (*it).val_);
+      if ((*it).is_val) {
+        tmp.add((*it).key, (*it).val);
       }
     }
     swap(tmp);
