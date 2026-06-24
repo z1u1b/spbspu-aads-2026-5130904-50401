@@ -62,43 +62,53 @@ namespace zubarev
     Hash hasher_;
     Equal equal_;
 
-    std::pair< size_t, Node* > find_el(const Key& k) noexcept
-    {
-      auto res = const_cast< const Table* >(this)->find_el(k);
-      return {res.first, const_cast< Node* >(res.second)};
-    }
+    Value drop_impl(const Key& k);
 
-    const std::pair< size_t, const Node* > find_el(const Key& k) const noexcept
-    {
-      if (empty()) {
-        return {0, nullptr};
-      }
+    std::pair< size_t, Node* > find_el(const Key& k) noexcept;
 
-      size_t index = hasher_(k) % capacity_;
-      int cur_psl = 0;
-
-      for (size_t i = 0; i < capacity_; ++i) {
-        const Node& cur_node = slots_[index];
-        if (cur_node.psl_ == -1) {
-          return {index, nullptr};
-        }
-
-        if (!cur_node.occupied_) {
-          return {index, nullptr};
-        }
-
-        if (cur_psl > cur_node.psl_) {
-          return {index, nullptr};
-        }
-        if (equal_(k, cur_node.key_)) {
-          return {index, std::addressof(slots_[index])};
-        }
-        index = (index + 1) % capacity_;
-        cur_psl++;
-      }
-      return {capacity_, nullptr};
-    }
+    const std::pair< size_t, const Node* > find_el(const Key& k) const noexcept;
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  std::pair< size_t, RobinNode< Key, Value >* >
+  RobinHashTable< Key, Value, Hash, Equal >::find_el(const Key& k) noexcept
+  {
+    auto res = const_cast< const Table* >(this)->find_el(k);
+    return {res.first, const_cast< Node* >(res.second)};
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const std::pair< size_t, const RobinNode< Key, Value >* >
+  RobinHashTable< Key, Value, Hash, Equal >::find_el(const Key& k) const noexcept
+  {
+    if (empty()) {
+      return {0, nullptr};
+    }
+
+    size_t index = hasher_(k) % capacity_;
+    int cur_psl = 0;
+
+    for (size_t i = 0; i < capacity_; ++i) {
+      const Node& cur_node = slots_[index];
+      if (cur_node.psl_ == -1) {
+        return {index, nullptr};
+      }
+
+      if (!cur_node.occupied_) {
+        return {index, nullptr};
+      }
+
+      if (cur_psl > cur_node.psl_) {
+        return {index, nullptr};
+      }
+      if (equal_(k, cur_node.key_)) {
+        return {index, std::addressof(slots_[index])};
+      }
+      index = (index + 1) % capacity_;
+      cur_psl++;
+    }
+    return {capacity_, nullptr};
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   RobinHashTable< Key, Value, Hash, Equal >::RobinHashTable(size_t capacity):
@@ -297,7 +307,7 @@ namespace zubarev
                              "error");
   }
   template< class Key, class Value, class Hash, class Equal >
-  Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
+  Value RobinHashTable< Key, Value, Hash, Equal >::drop_impl(const Key& k)
   {
     std::pair< size_t, Node* > found_el = find_el(k);
     Node* node_to_del = found_el.second;
@@ -320,6 +330,15 @@ namespace zubarev
       return saved_val;
     }
     throw std::out_of_range("Key not found in drop()");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value RobinHashTable< Key, Value, Hash, Equal >::drop(const Key& k)
+  {
+    Table tmp(*this);
+    Value result = tmp.drop_impl(k);
+    swap(tmp);
+    return result;
   }
   template< class Key, class Value, class Hash, class Equal >
   bool RobinHashTable< Key, Value, Hash, Equal >::has(const Key& k) const
