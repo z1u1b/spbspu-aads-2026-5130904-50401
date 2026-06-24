@@ -15,10 +15,8 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
-    friend class IterHashTable< Key, Value, Hash, Equal >;
-    friend class CIterHashTable< Key, Value, Hash, Equal >;
 
-  private:
+  public:
     using Node = NodeHashTable< Key, Value >;
     using OverflowList = List< Node >;
     using OverflowIter = LIter< Node >;
@@ -26,6 +24,38 @@ namespace zubarev
     using CIter = CIterHashTable< Key, Value, Hash, Equal >;
 
     using Table = HashTable< Key, Value, Hash, Equal >;
+    HashTable();
+    HashTable(size_t, size_t, Node*, size_t*, OverflowList, Hash, Equal);
+    ~HashTable();
+    HashTable(const HashTable& table);
+    HashTable(HashTable&& table) noexcept;
+    HashTable& operator=(const HashTable& other);
+    HashTable& operator=(HashTable&& other) noexcept;
+
+    Value& operator[](Key k);
+    const Value& operator[](Key id) const;
+    Value& at(Key id);
+    const Value& at(Key id) const;
+
+    void swap(Table& rhs) noexcept;
+
+    void add(Key k, Value v);
+    Value drop(Key k);
+    bool has(Key k) const;
+    void rehash(size_t slots);
+
+    Iter begin();
+    Iter end();
+
+    CIter cbegin() const;
+    CIter cend() const;
+
+    CIter begin() const;
+    CIter end() const;
+
+  private:
+    friend class IterHashTable< Key, Value, Hash, Equal >;
+    friend class CIterHashTable< Key, Value, Hash, Equal >;
 
     size_t bucket_count_;
     size_t bucket_capacity_;
@@ -71,41 +101,11 @@ namespace zubarev
         size_t idx = bucket_capacity_ * buc_idx + i;
         if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
 
-          return &data_[idx];
+          return std::addressof(data_[idx]);
         }
       }
       return nullptr;
     }
-
-  public:
-    HashTable();
-    HashTable(size_t, size_t, Node*, size_t*, OverflowList, Hash, Equal);
-    ~HashTable();
-    HashTable(const HashTable& table);
-    HashTable(HashTable&& table) noexcept;
-    HashTable& operator=(const HashTable& other);
-    HashTable& operator=(HashTable&& other) noexcept;
-
-    Value& operator[](Key k);
-    const Value& operator[](Key id) const;
-    Value& at(Key id);
-    const Value& at(Key id) const;
-
-    void swap(Table& rhs) noexcept;
-
-    void add(Key k, Value v);
-    Value drop(Key k);
-    bool has(Key k) const;
-    void rehash(size_t slots);
-
-    Iter begin();
-    Iter end();
-
-    CIter cbegin() const;
-    CIter cend() const;
-
-    CIter begin() const;
-    CIter end() const;
   };
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable():
