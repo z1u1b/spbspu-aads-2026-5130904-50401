@@ -94,6 +94,10 @@ namespace zubarev
     {
       blocks_.clear();
     }
+    void replaceBlocks(topit::Vector< std::shared_ptr< DataBlock > > rhs) noexcept
+    {
+      blocks_.swap(rhs);
+    }
 
   private:
     FileMetaData meta_;

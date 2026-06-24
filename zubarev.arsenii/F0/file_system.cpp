@@ -260,13 +260,15 @@ bool zubarev::FileSystem::append(const std::string& file_path, const std::string
 
 void zubarev::FileSystem::writeToFile(File& file, const std::string& text, WriteMode mode)
 {
-  if (mode == WriteMode::Overwrite) {
-    file.clearBlocks();
+  topit::Vector< std::shared_ptr< DataBlock > > new_blocks;
+  if (mode == WriteMode::Append) {
+    new_blocks = file.getBlocks();
   }
 
   const size_t BLOCK_SIZE = 4096;
   size_t offset = 0;
 
+  topit::Vector< std::pair< BlockKey, std::shared_ptr< DataBlock > > > new_cache;
   while (offset < text.size()) {
 
     size_t cur_size = std::min(BLOCK_SIZE, text.size() - offset);
@@ -294,11 +296,14 @@ void zubarev::FileSystem::writeToFile(File& file, const std::string& text, Write
       block->compressed_data = huffman.compress(bits);
       block->out_dictionary = std::make_shared< BSTree< char, std::string, Comparator< char > > >(huffman.getCodes());
 
-      data_block_.add(key, block);
+      new_cache.pushBack({key, block});
     }
-
-    file.addBlock(block);
+    new_blocks.pushBack(block);
   }
+  for (auto it = new_cache.begin(); it != new_cache.end(); ++it) {
+    data_block_.add(it->first, it->second);
+  }
+  file.replaceBlocks(new_blocks);
 }
 
 bool zubarev::FileSystem::cd(const std::string& path)
@@ -386,8 +391,8 @@ bool zubarev::FileSystem::mv(const std::string& from, const std::string& to)
       throw std::runtime_error("mv: cannot move '" + from + "' to '" + to + "': File exists");
     }
   }
-  src_from->getParent()->removeChild(src_from->getName());
   target_dir->addChild(target_name, src_from);
+  src_from->getParent()->removeChild(src_from->getName());
   return true;
 }
 
@@ -894,8 +899,10 @@ bool zubarev::FileSystem::start_state(const std::string& state_name)
   FileMetaData root_data;
   root_data.date = detail::getCurrentDateTime();
   root_data.owner = detail::getCurrentUser();
-  root_ = std::make_shared< Directory >(root_data);
-  curr_dir_ = root_;
+
+  auto new_root = std::make_shared< Directory >(root_data);
+  auto new_curr = new_root;
+
   std::string line;
   while (std::getline(input, line)) {
     if (line.empty()) {
@@ -937,6 +944,8 @@ bool zubarev::FileSystem::start_state(const std::string& state_name)
     }
   }
   input.close();
+  root_ = new_root;
+  curr_dir_ = new_curr;
   this->cd("~");
   return true;
 }
