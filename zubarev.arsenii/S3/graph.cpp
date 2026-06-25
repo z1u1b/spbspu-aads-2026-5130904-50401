@@ -3,7 +3,7 @@ namespace zubarev
 {
   void GraphTable::graphs(std::ostream& out) const
   {
-    topit::Vector< std::string > names;
+    Vector< std::string > names;
 
     for (auto it = edge_data_.begin(); it != edge_data_.end(); ++it) {
       names.pushBack(it->key_);
@@ -62,11 +62,11 @@ namespace zubarev
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
-    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+    Vector< std::pair< std::string, Vector< size_t > > > results;
 
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       if (eq(it->key_.first, vertex)) {
-        std::pair< std::string, topit::Vector< size_t > > tmp;
+        std::pair< std::string, Vector< size_t > > tmp;
         tmp.first = it->key_.second;
         tmp.second = it->val_;
         results.pushBack(tmp);
@@ -110,11 +110,11 @@ namespace zubarev
       return;
     }
 
-    topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+    Vector< std::pair< std::string, Vector< size_t > > > results;
 
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       if (eq(it->key_.second, vertex)) {
-        std::pair< std::string, topit::Vector< size_t > > tmp;
+        std::pair< std::string, Vector< size_t > > tmp;
         tmp.first = it->key_.first;
         tmp.second = it->val_;
         results.pushBack(tmp);
@@ -205,7 +205,7 @@ namespace zubarev
 
   bool GraphTable::create(const std::string& graph_name,
                           size_t count,
-                          const topit::Vector< std::string >& vertices,
+                          const zubarev::Vector< std::string >& vertices,
                           std::ostream& out)
   {
     if (edge_data_.has(graph_name)) {
@@ -314,7 +314,7 @@ namespace zubarev
   void GraphTable::extract(const std::string& new_name,
                            const std::string& source,
                            size_t count,
-                           const topit::Vector< std::string >& vertices,
+                           const zubarev::Vector< std::string >& vertices,
                            std::ostream& out)
   {
     if (!edge_data_.has(source)) {

@@ -56,7 +56,7 @@ namespace zubarev
       return;
     }
 
-    topit::Vector< std::string > vertexes;
+    Vector< std::string > vertexes;
 
     for (size_t i = 0; i < count; ++i) {
       std::string str;
@@ -76,7 +76,7 @@ namespace zubarev
   {
     std::string name1, name2;
     size_t count;
-    topit::Vector< std::string > vertexes;
+    Vector< std::string > vertexes;
     in >> name1 >> name2 >> count;
     for (size_t i = 0; i < count; ++i) {
       std::string str;
