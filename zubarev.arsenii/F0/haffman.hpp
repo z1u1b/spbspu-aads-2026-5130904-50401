@@ -13,8 +13,8 @@ namespace zubarev
     ~Huffman();
     std::string encode(const std::string& text);
     std::string decode(const std::string& code);
-    topit::Vector< uint8_t > compress(const std::string& text_bit);
-    std::string decompress(const topit::Vector< uint8_t >& compress_bytes, size_t total_bits);
+    Vector< uint8_t > compress(const std::string& text_bit);
+    std::string decompress(const Vector< uint8_t >& compress_bytes, size_t total_bits);
     const BSTree< char, std::string, Comparator< char > >& getCodes() const;
     void buildTreeFromDictionary(const BSTree< char, std::string, Comparator< char > >& dictionary);
 

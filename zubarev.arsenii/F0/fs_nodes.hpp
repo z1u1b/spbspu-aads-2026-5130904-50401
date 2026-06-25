@@ -20,7 +20,7 @@ namespace zubarev
 
   struct DataBlock
   {
-    topit::Vector< uint8_t > compressed_data;
+    Vector< uint8_t > compressed_data;
     std::shared_ptr< BSTree< char, std::string, Comparator< char > > > out_dictionary;
     BlockKey content_hash;
     size_t original_size;
@@ -82,7 +82,7 @@ namespace zubarev
       meta_ = m;
     }
 
-    const topit::Vector< std::shared_ptr< DataBlock > >& getBlocks() const noexcept
+    const Vector< std::shared_ptr< DataBlock > >& getBlocks() const noexcept
     {
       return blocks_;
     }
@@ -94,14 +94,14 @@ namespace zubarev
     {
       blocks_.clear();
     }
-    void replaceBlocks(topit::Vector< std::shared_ptr< DataBlock > > rhs) noexcept
+    void replaceBlocks(Vector< std::shared_ptr< DataBlock > > rhs) noexcept
     {
       blocks_.swap(rhs);
     }
 
   private:
     FileMetaData meta_;
-    topit::Vector< std::shared_ptr< DataBlock > > blocks_;
+    Vector< std::shared_ptr< DataBlock > > blocks_;
   };
 
   class Directory : public FSNode, public std::enable_shared_from_this< Directory >

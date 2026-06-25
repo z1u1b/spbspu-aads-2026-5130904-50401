@@ -88,7 +88,7 @@ zubarev::BSTreeNode< size_t, char >* zubarev::Huffman::treeLetters(BSTree< char,
 {
   using HuffNode = BSTreeNode< size_t, char >;
 
-  topit::Vector< HuffNode* > tree;
+  Vector< HuffNode* > tree;
   for (auto it = frequency.begin(); it != frequency.end(); ++it) {
     tree.pushBack(new HuffNode(it->second, it->first));
   }
@@ -140,10 +140,10 @@ void zubarev::Huffman::generateCodes(const BSTreeNode< size_t, char >* node,
 
   generateCodes(node->right_, code + "1", out_dictionary);
 }
-topit::Vector< uint8_t > zubarev::Huffman::compress(const std::string& text)
+zubarev::Vector< uint8_t > zubarev::Huffman::compress(const std::string& text)
 {
   size_t bit_count = 0;
-  topit::Vector< uint8_t > packed_bytes;
+  Vector< uint8_t > packed_bytes;
   uint8_t cur_byte = 0;
 
   for (auto it = text.begin(); it != text.end(); ++it) {
@@ -171,7 +171,7 @@ topit::Vector< uint8_t > zubarev::Huffman::compress(const std::string& text)
 
   return packed_bytes;
 }
-std::string zubarev::Huffman::decompress(const topit::Vector< uint8_t >& compress_bytes, size_t total_bits)
+std::string zubarev::Huffman::decompress(const Vector< uint8_t >& compress_bytes, size_t total_bits)
 {
   std::string bit_string = "";
   size_t few_bits = 0;

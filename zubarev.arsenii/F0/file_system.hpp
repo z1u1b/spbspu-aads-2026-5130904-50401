@@ -32,9 +32,9 @@ namespace zubarev
 
     std::string cat(const std::string& name) const;
     std::string pwd() const;
-    topit::Vector< std::string > ls(const std::string& path) const;
+    Vector< std::string > ls(const std::string& path) const;
     std::tuple< std::string, size_t, size_t > tree(const std::string& path) const;
-    topit::Vector< std::shared_ptr< FSNode > > search(const std::string& name) const;
+    Vector< std::shared_ptr< FSNode > > search(const std::string& name) const;
 
     bool save(const std::string& name_node);
     bool load(const std::string& name_node);
@@ -44,7 +44,7 @@ namespace zubarev
       size_t size_kb;
       std::string date;
     };
-    topit::Vector< StateInfo > states(const std::string& path = ".") const;
+    Vector< StateInfo > states(const std::string& path = ".") const;
     bool import_file(const std::string& real_path, const std::string& virtual_name);
     bool export_file(const std::string& virtual_name, const std::string& real_path);
 
@@ -73,8 +73,8 @@ namespace zubarev
     uint32_t unpackUint32(const std::string& data, size_t& offset);
 
     void search_impl(const std::shared_ptr< Directory > root,
-                     topit::Vector< std::shared_ptr< FSNode > >& results,
-                     const topit::Vector< std::string >& nodes) const;
+                     Vector< std::shared_ptr< FSNode > >& results,
+                     const Vector< std::string >& nodes) const;
 
     std::shared_ptr< Directory > root_;
     std::shared_ptr< Directory > curr_dir_;

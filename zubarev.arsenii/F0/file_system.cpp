@@ -260,7 +260,7 @@ bool zubarev::FileSystem::append(const std::string& file_path, const std::string
 
 void zubarev::FileSystem::writeToFile(File& file, const std::string& text, WriteMode mode)
 {
-  topit::Vector< std::shared_ptr< DataBlock > > new_blocks;
+  Vector< std::shared_ptr< DataBlock > > new_blocks;
   if (mode == WriteMode::Append) {
     new_blocks = file.getBlocks();
   }
@@ -268,7 +268,7 @@ void zubarev::FileSystem::writeToFile(File& file, const std::string& text, Write
   const size_t BLOCK_SIZE = 4096;
   size_t offset = 0;
 
-  topit::Vector< std::pair< BlockKey, std::shared_ptr< DataBlock > > > new_cache;
+  Vector< std::pair< BlockKey, std::shared_ptr< DataBlock > > > new_cache;
   while (offset < text.size()) {
 
     size_t cur_size = std::min(BLOCK_SIZE, text.size() - offset);
@@ -496,7 +496,7 @@ std::string zubarev::FileSystem::cat(const std::string& name) const
   }
   std::shared_ptr< File > file = std::static_pointer_cast< File >(src);
   std::string output_str = "";
-  const topit::Vector< std::shared_ptr< DataBlock > >& blocks = file->getBlocks();
+  const Vector< std::shared_ptr< DataBlock > >& blocks = file->getBlocks();
   Huffman huffman;
   for (auto it = blocks.begin(); it != blocks.end(); ++it) {
     if (!(*it)) {
@@ -523,7 +523,7 @@ std::string zubarev::FileSystem::pwd() const
   if (curr_dir_ == root_) {
     return "~";
   }
-  topit::Vector< std::string > path_parts;
+  Vector< std::string > path_parts;
   std::shared_ptr< Directory > current = curr_dir_;
   while (current && current != root_) {
     path_parts.pushBack(current->getName());
@@ -537,9 +537,9 @@ std::string zubarev::FileSystem::pwd() const
   return res;
 }
 
-topit::Vector< std::string > zubarev::FileSystem::ls(const std::string& path) const
+zubarev::Vector< std::string > zubarev::FileSystem::ls(const std::string& path) const
 {
-  topit::Vector< std::string > result;
+  Vector< std::string > result;
   std::shared_ptr< Directory > target_dir = nullptr;
 
   if (path.empty()) {
@@ -574,7 +574,7 @@ void zubarev::FileSystem::treeImpl(std::shared_ptr< Directory > dir,
   const std::string COMPOUND = "├";
   const std::string END_COMPOUND = "└";
 
-  topit::Vector< std::pair< std::string, std::shared_ptr< FSNode > > > sorted_children;
+  Vector< std::pair< std::string, std::shared_ptr< FSNode > > > sorted_children;
   for (auto it = dir->children_.begin(); it != dir->children_.end(); ++it) {
     sorted_children.pushBack({it->key_, it->val_});
   }
@@ -635,9 +635,9 @@ std::tuple< std::string, size_t, size_t > zubarev::FileSystem::tree(const std::s
   return {res_str, count_dir, count_files};
 }
 
-topit::Vector< std::string > getNodes(const std::string& name)
+zubarev::Vector< std::string > getNodes(const std::string& name)
 {
-  topit::Vector< std::string > trigrams;
+  zubarev::Vector< std::string > trigrams;
   if (name.size() > 3) {
     for (size_t i = 0; i <= name.size() - 3; ++i) {
       trigrams.pushBack(name.substr(i, 3));
@@ -647,7 +647,7 @@ topit::Vector< std::string > getNodes(const std::string& name)
   }
   return trigrams;
 }
-bool equal_nodes(const topit::Vector< std::string >& node_trigrams, const topit::Vector< std::string >& query_trigrams)
+bool equal_nodes(const zubarev::Vector< std::string >& node_trigrams, const zubarev::Vector< std::string >& query_trigrams)
 {
   if (query_trigrams.isEmpty()) {
     return false;
@@ -665,8 +665,8 @@ bool equal_nodes(const topit::Vector< std::string >& node_trigrams, const topit:
   return matched * 2 >= query_trigrams.getSize();
 }
 void zubarev::FileSystem::search_impl(const std::shared_ptr< Directory > root,
-                                      topit::Vector< std::shared_ptr< FSNode > >& results,
-                                      const topit::Vector< std::string >& nodes) const
+                                      zubarev::Vector< std::shared_ptr< FSNode > >& results,
+                                      const zubarev::Vector< std::string >& nodes) const
 {
   for (auto it = root->children_.begin(); it != root->children_.end(); ++it) {
     if (equal_nodes(getNodes(it->key_), nodes)) {
@@ -678,13 +678,13 @@ void zubarev::FileSystem::search_impl(const std::shared_ptr< Directory > root,
   }
 }
 
-topit::Vector< std::shared_ptr< zubarev::FSNode > > zubarev::FileSystem::search(const std::string& name) const
+zubarev::Vector< std::shared_ptr< zubarev::FSNode > > zubarev::FileSystem::search(const std::string& name) const
 {
   if (name.empty()) {
     throw std::runtime_error("search: Empty name");
   }
 
-  topit::Vector< std::string > nodes;
+  Vector< std::string > nodes;
   if (name.size() > 3) {
     for (size_t i = 0; i <= name.size() - 3; ++i) {
       nodes.pushBack(name.substr(i, 3));
@@ -693,7 +693,7 @@ topit::Vector< std::shared_ptr< zubarev::FSNode > > zubarev::FileSystem::search(
     nodes.pushBack(name);
   }
 
-  topit::Vector< std::shared_ptr< FSNode > > results;
+  Vector< std::shared_ptr< FSNode > > results;
   search_impl(root_, results, nodes);
   return results;
 }
@@ -741,9 +741,9 @@ bool zubarev::FileSystem::load(const std::string& path)
   return true;
 }
 
-topit::Vector< zubarev::FileSystem::StateInfo > zubarev::FileSystem::states(const std::string& path) const
+zubarev::Vector< zubarev::FileSystem::StateInfo > zubarev::FileSystem::states(const std::string& path) const
 {
-  topit::Vector< StateInfo > result;
+  Vector< StateInfo > result;
 
   DIR* dir = opendir(path.c_str());
   if (!dir) {
@@ -981,7 +981,7 @@ void zubarev::FileSystem::archiveImpl(const std::string& base_path,
       auto file = std::static_pointer_cast< File >(node);
       std::string content = "";
 
-      const topit::Vector< std::shared_ptr< DataBlock > >& blocks = file->getBlocks();
+      const Vector< std::shared_ptr< DataBlock > >& blocks = file->getBlocks();
       Huffman huffman;
       for (auto it = blocks.begin(); it != blocks.end(); ++it) {
         huffman.buildTreeFromDictionary(*(*it)->out_dictionary);

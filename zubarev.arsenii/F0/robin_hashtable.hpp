@@ -58,7 +58,7 @@ namespace zubarev
   private:
     size_t size_;
     size_t capacity_;
-    topit::Vector< Node > slots_;
+    Vector< Node > slots_;
     Hash hasher_;
     Equal equal_;
 

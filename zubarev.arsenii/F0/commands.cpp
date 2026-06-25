@@ -208,7 +208,7 @@ void zubarev::cmd_ls(std::istream& in, std::ostream& out, FileSystem& file_sys)
     in >> path;
   }
   try {
-    topit::Vector< std::string > names = file_sys.ls(path);
+    Vector< std::string > names = file_sys.ls(path);
     std::sort(names.begin(), names.end());
     out << detail::formatLsColumns(names);
   } catch (const std::exception& e) {
@@ -237,7 +237,7 @@ void zubarev::cmd_search(std::istream& in, std::ostream& out, FileSystem& file_s
   std::string query;
   std::getline(in >> std::ws, query);
 
-  topit::Vector< std::shared_ptr< FSNode > > results = file_sys.search(query);
+  Vector< std::shared_ptr< FSNode > > results = file_sys.search(query);
 
   if (results.isEmpty()) {
     out << "No matches found.\n";
@@ -349,7 +349,7 @@ void zubarev::cmd_search(std::istream& in, std::ostream& out, FileSystem& file_s
   } catch (const std::out_of_range&) {
   }
 
-  topit::Vector< std::shared_ptr< FSNode > > filtered;
+  Vector< std::shared_ptr< FSNode > > filtered;
   for (size_t i = 0; i < results.getSize(); ++i) {
     const std::string& name = results[i]->getName();
     if (name.size() >= choice.size() && name.substr(0, choice.size()) == choice) {
@@ -430,7 +430,7 @@ void zubarev::cmd_states(std::istream& in, std::ostream& out, FileSystem& file_s
     in >> path;
   }
   try {
-    topit::Vector< FileSystem::StateInfo > states_list = file_sys.states(path);
+    Vector< FileSystem::StateInfo > states_list = file_sys.states(path);
     if (states_list.isEmpty()) {
       out << "<NO STATES FOUND>\n";
     } else {

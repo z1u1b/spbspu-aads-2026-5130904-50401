@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <iterator>
 
-namespace topit
+namespace zubarev
 {
   template< class T >
   struct Vector;
@@ -12,7 +12,7 @@ namespace topit
   template< class T >
   class CVectIter
   {
-    friend struct topit::Vector< T >;
+    friend struct zubarev::Vector< T >;
 
     CVectIter() noexcept:
       ptr_(nullptr)
