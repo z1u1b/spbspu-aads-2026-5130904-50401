@@ -17,8 +17,8 @@ namespace zubarev
     using bst_datasets =
         BSTree< std::string, BSTree< size_t, std::string, Comparator< size_t > >, Comparator< std::string > >;
     bst_datasets datasetsTable;
-    static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-                        const std::pair< std::string, topit::Vector< size_t > >& b)
+    static bool compare(const std::pair< std::string, Vector< size_t > >& a,
+                        const std::pair< std::string, Vector< size_t > >& b)
     {
       return a.first < b.first;
     }
