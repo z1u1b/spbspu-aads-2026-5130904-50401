@@ -26,7 +26,7 @@ namespace zubarev
     using Table = HashTable< Key, Value, Hash, Equal >;
     HashTable();
     HashTable(size_t, size_t, Node*, size_t*, OverflowList, Hash, Equal);
-    ~HashTable();
+    ~HashTable() noexcept;
     HashTable(const HashTable& table);
     HashTable(HashTable&& table) noexcept;
     HashTable& operator=(const HashTable& other);
@@ -39,9 +39,9 @@ namespace zubarev
 
     void swap(Table& rhs) noexcept;
 
-    void add(const Key& k, Value v);
-    Value drop(const Key& k);
-    bool has(const Key& k) const;
+    void insert(const Key& k, const Value& v);
+    size_t erase(const Key& k);
+    bool contains(const Key& k) const;
     void rehash(size_t slots);
 
     Iter begin();
@@ -134,7 +134,7 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashTable< Key, Value, Hash, Equal >::~HashTable()
+  HashTable< Key, Value, Hash, Equal >::~HashTable() noexcept
   {
     delete[] data_;
     delete[] sizes_;
@@ -205,20 +205,15 @@ namespace zubarev
     if (el) {
       return el->val;
     } else {
-      add(k, Value{});
+      insert(k, Value{});
       return find_el(k)->val;
     }
   }
-  template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::operator[](const Key& id) const
-  {
-    return at(id);
-  }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value& HashTable< Key, Value, Hash, Equal >::at(const Key& id)
+  Value& HashTable< Key, Value, Hash, Equal >::at(const Key& k)
   {
-    Node* el = find_el(id);
+    Node* el = find_el(k);
     if (el) {
       return el->val;
     } else {
@@ -226,9 +221,9 @@ namespace zubarev
     }
   }
   template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::at(const Key& id) const
+  const Value& HashTable< Key, Value, Hash, Equal >::at(const Key& k) const
   {
-    const Node* el = find_el(id);
+    const Node* el = find_el(k);
     if (el) {
       return el->val;
     } else {
@@ -320,49 +315,37 @@ namespace zubarev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< Key, Value, Hash, Equal >::add(const Key& k, Value v)
+  void HashTable< Key, Value, Hash, Equal >::insert(const Key& k, const Value& v)
   {
+    if (contains(k)) {
+      return;
+    }
     Table tmp(*this);
     size_t buc_idx = getBucketIndex(k);
-    size_t is_over = true;
     for (size_t i = 0; i < bucket_capacity_; ++i) {
       if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val) {
         tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
         tmp.sizes_[buc_idx]++;
-        is_over = false;
         break;
       }
     }
-    if (is_over) {
-      for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it) {
-        if ((*it).is_val && equaler_((*it).key, k)) {
-          (*it).val = v;
-          is_over = false;
-          break;
-        }
-      }
-    }
-    if (is_over) {
-      tmp.overflow_bucket_.push_back(Node(k, v, true));
-    }
+    tmp.overflow_bucket_.push_back(Node(k, v, true));
     swap(tmp);
   }
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& k)
+  size_t HashTable< Key, Value, Hash, Equal >::erase(const Key& k)
   {
     Table tmp(*this);
-    Value val;
     size_t buc_idx = getBucketIndex(k);
 
-    auto prev = overflow_bucket_.before_begin();
+    auto prev = tmp.overflow_bucket_.before_begin();
 
     for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it, ++prev) {
       if (equaler_(k, (*it).key) && (*it).is_val) {
-        Value val = (*it).val;
 
         tmp.overflow_bucket_.erase_after(prev);
         swap(tmp);
-        return val;
+        return 1;
       }
     }
 
@@ -372,15 +355,14 @@ namespace zubarev
 
         tmp.data_[idx].is_val = false;
         tmp.sizes_[buc_idx]--;
-        val = tmp.data_[bucket_capacity_ * buc_idx + i].val;
         swap(tmp);
-        return val;
+        return 1;
       }
     }
-    throw std::out_of_range("Key not found in drop()");
+    return 0;
   }
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< Key, Value, Hash, Equal >::has(const Key& k) const
+  bool HashTable< Key, Value, Hash, Equal >::contains(const Key& k) const
   {
 
     size_t buc_idx = getBucketIndex(k);
@@ -415,14 +397,14 @@ namespace zubarev
       for (size_t j = 0; j < bucket_capacity_; ++j) {
         size_t idx = bucket_capacity_ * i + j;
         if (data_[idx].is_val) {
-          tmp.add(data_[idx].key, data_[idx].val);
+          tmp.insert(data_[idx].key, data_[idx].val);
         }
       }
     }
 
     for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it) {
       if ((*it).is_val) {
-        tmp.add((*it).key, (*it).val);
+        tmp.insert((*it).key, (*it).val);
       }
     }
     swap(tmp);

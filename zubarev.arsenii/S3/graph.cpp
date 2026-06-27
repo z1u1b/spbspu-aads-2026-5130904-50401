@@ -21,7 +21,7 @@ namespace zubarev
   void GraphTable::vertexes(const std::string& graph_name, std::ostream& out) const
   {
 
-    if (!vertex_data_.has(graph_name)) {
+    if (!vertex_data_.contains(graph_name)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -42,7 +42,7 @@ namespace zubarev
 
   void GraphTable::outbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    if (!edge_data_.has(graph_name)) {
+    if (!edge_data_.contains(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -89,7 +89,7 @@ namespace zubarev
 
   void GraphTable::inbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
   {
-    if (!edge_data_.has(graph_name)) {
+    if (!edge_data_.contains(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -140,7 +140,7 @@ namespace zubarev
                         size_t weight,
                         std::ostream& out)
   {
-    if (!vertex_data_.has(graph_name)) {
+    if (!vertex_data_.contains(graph_name)) {
 
       out << "<INVALID COMMAND>" << "\n";
       return;
@@ -174,13 +174,13 @@ namespace zubarev
                        size_t weight,
                        std::ostream& out)
   {
-    if (!edge_data_.has(graph_name)) {
+    if (!edge_data_.contains(graph_name)) {
 
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
     auto& graph = edge_data_.at(graph_name);
-    if (!graph.has(edge)) {
+    if (!graph.contains(edge)) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -199,7 +199,7 @@ namespace zubarev
       return;
     }
     if (weights.getSize() == 0) {
-      graph.drop(edge);
+      graph.erase(edge);
     }
   }
 
@@ -208,7 +208,7 @@ namespace zubarev
                           const topit::Vector< std::string >& vertices,
                           std::ostream& out)
   {
-    if (edge_data_.has(graph_name)) {
+    if (edge_data_.contains(graph_name)) {
       out << "<INVALID COMMAND>" << "\n";
       return false;
     }
@@ -230,13 +230,13 @@ namespace zubarev
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
     EdgeTable new_table;
 
-    edge_data_.add(graph_name, new_table);
+    edge_data_.insert(graph_name, new_table);
 
     VertexList new_vertices;
     for (size_t i = 0; i < count; ++i) {
       new_vertices.pushBack(vertices[i]);
     }
-    vertex_data_.add(graph_name, new_vertices);
+    vertex_data_.insert(graph_name, new_vertices);
     return true;
   }
 
@@ -246,7 +246,7 @@ namespace zubarev
                          std::ostream& out)
   {
 
-    if (!(edge_data_.has(source1) && edge_data_.has(source2))) {
+    if (!(edge_data_.contains(source1) && edge_data_.contains(source2))) {
       out << "<INVALID COMMAND>" << "\n";
       return;
     }
@@ -317,7 +317,7 @@ namespace zubarev
                            const topit::Vector< std::string >& vertices,
                            std::ostream& out)
   {
-    if (!edge_data_.has(source)) {
+    if (!edge_data_.contains(source)) {
       out << "<INVALID COMMAND>\n";
       return;
     }

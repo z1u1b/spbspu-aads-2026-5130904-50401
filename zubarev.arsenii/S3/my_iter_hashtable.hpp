@@ -1,6 +1,7 @@
 #ifndef MY_ITER_HPP
 #define MY_ITER_HPP
 
+#include <stdexcept>
 #include "../common/iter.hpp"
 #include "my_node_hashtable.hpp"
 

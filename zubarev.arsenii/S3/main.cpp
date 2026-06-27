@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   std::string cmd;
   while (std::cin >> cmd) {
     try {
-      if (!cmds.has(cmd)) {
+      if (!cmds.contains(cmd)) {
         throw std::out_of_range("unknown command");
       }
       cmds.at(cmd)(std::cin, std::cout, graph);
