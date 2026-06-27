@@ -98,12 +98,21 @@ namespace zubarev
   HashTable< Key, Value, Hash, Equal >::HashTable():
     bucket_count_(8),
     bucket_capacity_(8),
-    data_(new Node[8 * 8]()),
-    sizes_(new size_t[8]()),
+    data_(nullptr),
+    sizes_(nullptr),
     overflow_bucket_(),
     hasher_(),
     equaler_()
-  {}
+  {
+    data_ = new Node[bucket_count_ * bucket_capacity_]();
+
+    try {
+      sizes_ = new size_t[bucket_count_]();
+    } catch (...) {
+      delete[] data_;
+      throw;
+    }
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(size_t bucket_count,
@@ -129,7 +138,12 @@ namespace zubarev
     if (sizes) {
       sizes_ = sizes;
     } else {
-      sizes_ = new size_t[bucket_count_]();
+      try {
+        sizes_ = new size_t[bucket_count_]();
+      } catch (...) {
+        delete[] data_;
+        throw;
+      }
     }
   }
 
@@ -149,31 +163,29 @@ namespace zubarev
     hasher_(table.hasher_),
     equaler_(table.equaler_)
   {
-    sizes_ = new size_t[bucket_count_];
-    data_ = new Node[bucket_capacity_ * bucket_count_];
-    for (size_t i = 0; i < bucket_count_; ++i) {
-      sizes_[i] = table.sizes_[i];
-      for (size_t j = 0; j < sizes_[i]; ++j) {
-        data_[i * bucket_capacity_ + j] = table.data_[i * bucket_capacity_ + j];
-      }
+    for (auto it = table.begin(); it != table.end(); ++it) {
+      insert(it->key, it->val);
     }
-    overflow_bucket_ = table.overflow_bucket_;
+    // sizes_ = new size_t[bucket_count_];
+    // data_ = new Node[bucket_capacity_ * bucket_count_];
+    // for (size_t i = 0; i < bucket_count_; ++i) {
+    //   sizes_[i] = table.sizes_[i];
+    //   for (size_t j = 0; j < sizes_[i]; ++j) {
+    //     add() data_[i * bucket_capacity_ + j] = table.data_[i * bucket_capacity_ + j];
+    //   }
+    // }
+    // overflow_bucket_ = table.overflow_bucket_;
   }
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& table) noexcept:
-    bucket_count_(table.bucket_count_),
-    bucket_capacity_(table.bucket_capacity_),
-    data_(table.data_),
-    sizes_(table.sizes_),
+    bucket_count_(std::exchange(table.bucket_count_, 0)),
+    bucket_capacity_(std::exchange(table.bucket_capacity_, 0)),
+    data_(std::exchange(table.data_, nullptr)),
+    sizes_(std::exchange(table.sizes_, nullptr)),
     overflow_bucket_(table.overflow_bucket_),
     hasher_(table.hasher_),
     equaler_(table.equaler_)
-  {
-    table.bucket_count_ = 0;
-    table.bucket_capacity_ = 0;
-    table.data_ = nullptr;
-    table.sizes_ = nullptr;
-  }
+  {}
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs)
   {
@@ -250,8 +262,9 @@ namespace zubarev
     while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
            !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
       ++it;
-      if (it.is_in_overflow())
+      if (it.is_in_overflow()) {
         break;
+      }
     }
 
     if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
