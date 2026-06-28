@@ -657,11 +657,11 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
   out << "\n";
   out << BOLD << YELLOW << "╔════════════════"
       << "════════════════"
-      << "════════════════╗\n";
-  out << "║                     FILE SYSTEM HELP                             ║\n";
+      << "══════════════════════════╗\n";
+  out << "║                     FILE SYSTEM HELP                     ║\n";
   out << "╚════════════════"
       << "════════════════"
-      << "════════════════╝" << RESET << "\n\n";
+      << "══════════════════════════╝" << RESET << "\n\n";
 
   out << BOLD << GREEN << "  [FILES AND DIRECTORIES]" << RESET << "\n";
   out << CYAN << "  mkdir <dir-name>" << RESET << "           Create a new directory\n";
@@ -684,7 +684,6 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
 
   out << BOLD << GREEN << "  [SEARCH]" << RESET << "\n";
   out << CYAN << "  search <name>" << RESET << "              Search files/dirs by exact name\n";
-  out << CYAN << "  ssearch <type> <text>" << RESET << "      Smart search (name/content/ext)\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [SESSIONS AND STATES]" << RESET << "\n";
@@ -698,18 +697,13 @@ void zubarev::cmd_help(std::istream&, std::ostream& out, FileSystem&)
   out << BOLD << GREEN << "  [IMPORT / EXPORT]" << RESET << "\n";
   out << CYAN << "  import <real-path> <virtual-name>" << RESET << "   Import file from real disk to VFS\n";
   out << CYAN << "  export <virtual-name> <real-path>" << RESET << "   Export file from VFS to real disk\n";
-  out << CYAN << "  archive <dir-name>" << RESET << "               Create compressed archive (TODO)\n";
-  out << "\n";
-
-  out << BOLD << GREEN << "  [CACHING (LRU)]" << RESET << "\n";
-  out << CYAN << "  cache_size <size>" << RESET << "         Set cache size (e.g., 512MB)\n";
-  out << CYAN << "  cache_on" << RESET << "                  Enable caching system\n";
-  out << CYAN << "  cache_off" << RESET << "                 Disable caching and flush data\n";
-  out << CYAN << "  cache_stats" << RESET << "               Show cache usage statistics\n";
+  out << CYAN << "  archive <dir-name>" << RESET << "                  Create compressed archive (TODO)\n";
+  out << CYAN << "  extract <archive> [directory]" << RESET << "       Extract archive contents\n";
   out << "\n";
 
   out << BOLD << GREEN << "  [SYSTEM]" << RESET << "\n";
   out << CYAN << "  help" << RESET << "                      Show this help message\n";
+  out << CYAN << "  test <file>" << RESET << "               Execute command script\n";
   out << CYAN << "  exit" << RESET << "                      Exit the file system\n";
   out << "\n";
 
