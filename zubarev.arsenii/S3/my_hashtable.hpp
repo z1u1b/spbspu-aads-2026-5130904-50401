@@ -33,7 +33,6 @@ namespace zubarev
     HashTable& operator=(HashTable&& other) noexcept;
 
     Value& operator[](const Key& k);
-    const Value& operator[](const Key& id) const;
     Value& at(const Key& id);
     const Value& at(const Key& id) const;
 
@@ -163,28 +162,27 @@ namespace zubarev
     hasher_(table.hasher_),
     equaler_(table.equaler_)
   {
+    data_ = new Node[table.bucket_count_ * table.bucket_capacity_]();
+    try {
+      sizes_ = new size_t[bucket_count_]();
+    } catch (...) {
+      delete[] data_;
+      throw;
+    }
     for (auto it = table.begin(); it != table.end(); ++it) {
       insert(it->key, it->val);
     }
-    // sizes_ = new size_t[bucket_count_];
-    // data_ = new Node[bucket_capacity_ * bucket_count_];
-    // for (size_t i = 0; i < bucket_count_; ++i) {
-    //   sizes_[i] = table.sizes_[i];
-    //   for (size_t j = 0; j < sizes_[i]; ++j) {
-    //     add() data_[i * bucket_capacity_ + j] = table.data_[i * bucket_capacity_ + j];
-    //   }
-    // }
-    // overflow_bucket_ = table.overflow_bucket_;
   }
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& table) noexcept:
+
     bucket_count_(std::exchange(table.bucket_count_, 0)),
     bucket_capacity_(std::exchange(table.bucket_capacity_, 0)),
     data_(std::exchange(table.data_, nullptr)),
     sizes_(std::exchange(table.sizes_, nullptr)),
-    overflow_bucket_(table.overflow_bucket_),
-    hasher_(table.hasher_),
-    equaler_(table.equaler_)
+    overflow_bucket_(std::move(table.overflow_bucket_)),
+    hasher_(std::move(table.hasher_)),
+    equaler_(std::move(table.equaler_))
   {}
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs)
@@ -333,42 +331,36 @@ namespace zubarev
     if (contains(k)) {
       return;
     }
-    Table tmp(*this);
+    // Table tmp(*this);
     size_t buc_idx = getBucketIndex(k);
     for (size_t i = 0; i < bucket_capacity_; ++i) {
-      if (!tmp.data_[bucket_capacity_ * buc_idx + i].is_val) {
-        tmp.data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
-        tmp.sizes_[buc_idx]++;
+      if (!data_[bucket_capacity_ * buc_idx + i].is_val) {
+        data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
+        sizes_[buc_idx]++;
         break;
       }
     }
-    tmp.overflow_bucket_.push_back(Node(k, v, true));
-    swap(tmp);
+    overflow_bucket_.push_back(Node(k, v, true));
   }
   template< class Key, class Value, class Hash, class Equal >
   size_t HashTable< Key, Value, Hash, Equal >::erase(const Key& k)
   {
-    Table tmp(*this);
     size_t buc_idx = getBucketIndex(k);
 
-    auto prev = tmp.overflow_bucket_.before_begin();
+    auto prev = overflow_bucket_.before_begin();
 
-    for (auto it = tmp.overflow_bucket_.begin(); it != tmp.overflow_bucket_.end(); ++it, ++prev) {
+    for (auto it = overflow_bucket_.begin(); it != overflow_bucket_.end(); ++it, ++prev) {
       if (equaler_(k, (*it).key) && (*it).is_val) {
-
-        tmp.overflow_bucket_.erase_after(prev);
-        swap(tmp);
+        overflow_bucket_.erase_after(prev);
         return 1;
       }
     }
 
-    for (size_t i = 0; i < tmp.bucket_capacity_; ++i) {
-      size_t idx = tmp.bucket_capacity_ * buc_idx + i;
-      if (equaler_(tmp.data_[idx].key, k) && tmp.data_[idx].is_val) {
-
-        tmp.data_[idx].is_val = false;
-        tmp.sizes_[buc_idx]--;
-        swap(tmp);
+    for (size_t i = 0; i < bucket_capacity_; ++i) {
+      size_t idx = bucket_capacity_ * buc_idx + i;
+      if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
+        data_[idx]=Node{};
+        sizes_[buc_idx]--;
         return 1;
       }
     }
