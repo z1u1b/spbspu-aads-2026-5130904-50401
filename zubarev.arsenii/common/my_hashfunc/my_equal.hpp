@@ -2,10 +2,11 @@
 #define MY_EQUAL_HPP
 namespace zubarev
 {
-  template < class T >
+  template< class T >
   struct Equaler
   {
-    bool operator()(const T& a, const T& b) const noexcept
+    bool
+    operator()(const T& a, const T& b) const noexcept
     {
       return a == b;
     }

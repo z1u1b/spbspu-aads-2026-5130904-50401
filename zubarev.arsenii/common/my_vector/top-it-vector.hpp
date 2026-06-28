@@ -5,18 +5,18 @@
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
-#include <iomanip>
 #include <memory>
 #include <stdexcept>
 #include <limits>
 
-namespace topit
+namespace zubarev
 {
-  template < class T >
+  template< class T >
   struct Vector
   {
     ~Vector();
     Vector();
+    explicit Vector(size_t size);
     Vector(const Vector&);
     Vector(Vector&&) noexcept;
     explicit Vector(std::initializer_list< T > il);
@@ -39,15 +39,23 @@ namespace topit
     VectIter< T > begin();
     VectIter< T > end();
 
-        CVectIter< T > begin() const;
+    CVectIter< T > begin() const;
     CVectIter< T > end() const;
 
     CVectIter< T > cbegin() const;
     CVectIter< T > cend() const;
 
+    T& front();
+    const T& front() const;
+    const T& cfront() const;
+
+    T& back();
+    const T& back() const;
+    const T& cback() const;
+
     void pushBack(const T& v);
     void pushBackCount(size_t k, const T& v);
-    template < class IT >
+    template< class IT >
     void pushBackRange(IT a, size_t count);
     void unsafePushBack(const T& v);
 
@@ -66,10 +74,10 @@ namespace topit
     void erase(CVectIter< T > pos);
     void erase(CVectIter< T > pos, size_t count);
     void erase(CVectIter< T > first, CVectIter< T > last);
-    void erase(VectIter<T> first, VectIter<T> last);
+    void erase(VectIter< T > first, VectIter< T > last);
+    void clear();
 
   private:
-    explicit Vector(size_t size);
     size_t calcCap(size_t curr, size_t needed);
     T* allocate(size_t n);
     void deallocate(T* ptr);
@@ -77,36 +85,36 @@ namespace topit
     T* data_;
     size_t size_, capacity_;
   };
-  template < class T >
+  template< class T >
   bool operator==(const Vector< T >& lhs, const Vector< T >& rhs);
 }
 
-
-template < class T >
-topit::Vector< T >::~Vector()
+template< class T >
+zubarev::Vector< T >::~Vector()
 {
   destroy_range(data_, 0, size_);
   deallocate(data_);
 }
 
-template < class T >
-topit::Vector< T >::Vector():
+template< class T >
+zubarev::Vector< T >::Vector():
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
-template < class T >
-topit::Vector< T >::Vector(const Vector& rhs):
+template< class T >
+zubarev::Vector< T >::Vector(const Vector& rhs):
   Vector(rhs.getSize())
 {
   for (size_t i = 0; i < rhs.getSize(); ++i) {
     new (data_ + i) T(rhs[i]);
+    ++size_;
   }
 }
 
-template < class T >
-topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+template< class T >
+zubarev::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
   data_(rhs.data_),
   size_(rhs.size_),
   capacity_(rhs.capacity_)
@@ -116,8 +124,8 @@ topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
   rhs.capacity_ = 0;
 }
 
-template < class T >
-topit::Vector< T >::Vector(std::initializer_list< T > il):
+template< class T >
+zubarev::Vector< T >::Vector(std::initializer_list< T > il):
   Vector(il.size())
 {
   size_t i = 0;
@@ -128,8 +136,8 @@ topit::Vector< T >::Vector(std::initializer_list< T > il):
   }
 }
 
-template < class T >
-topit::Vector< T >::Vector(size_t size, const T& init):
+template< class T >
+zubarev::Vector< T >::Vector(size_t size, const T& init):
 
   size_(size),
   capacity_(size)
@@ -148,16 +156,15 @@ topit::Vector< T >::Vector(size_t size, const T& init):
   }
 }
 
-template < class T >
-topit::Vector< T >::Vector(size_t size):
-  data_(size ? allocate(size) : nullptr),
-  size_(size),
-  capacity_(size)
+template< class T >
+zubarev::Vector< T >::Vector(size_t capacity):
+  data_(capacity ? allocate(capacity) : nullptr),
+  size_(0),
+  capacity_(capacity)
 {}
 
-
-template < class T >
-topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+template< class T >
+zubarev::Vector< T >& zubarev::Vector< T >::operator=(const Vector< T >& rhs)
 {
   if (this == std::addressof(rhs)) {
     return *this;
@@ -168,8 +175,8 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
   return *this;
 }
 
-template < class T >
-topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+template< class T >
+zubarev::Vector< T >& zubarev::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
   if (this == std::addressof(rhs)) {
     return *this;
@@ -180,28 +187,26 @@ topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
   return *this;
 }
 
-
-template < class T >
-bool topit::Vector< T >::isEmpty() const noexcept
+template< class T >
+bool zubarev::Vector< T >::isEmpty() const noexcept
 {
   return !size_;
 }
 
-template < class T >
-size_t topit::Vector< T >::getSize() const noexcept
+template< class T >
+size_t zubarev::Vector< T >::getSize() const noexcept
 {
   return size_;
 }
 
-template < class T >
-size_t topit::Vector< T >::getCapacity() const noexcept
+template< class T >
+size_t zubarev::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
 
-
-template < class T >
-void topit::Vector< T >::reserve(size_t n)
+template< class T >
+void zubarev::Vector< T >::reserve(size_t n)
 {
   if (n > capacity_) {
 
@@ -210,7 +215,7 @@ void topit::Vector< T >::reserve(size_t n)
     size_t i = 0;
     try {
       for (; i < size_; ++i) {
-        new (newData + i) T(data_[i]);
+        new (newData + i) T(std::move(data_[i]));
       }
     } catch (...) {
       destroy_range(newData, 0, size_);
@@ -228,8 +233,8 @@ void topit::Vector< T >::reserve(size_t n)
   }
 }
 
-template < class T >
-void topit::Vector< T >::shrinkToFit()
+template< class T >
+void zubarev::Vector< T >::shrinkToFit()
 {
   if (size_ < capacity_) {
     T* newData = allocate(size_);
@@ -237,7 +242,7 @@ void topit::Vector< T >::shrinkToFit()
     size_t i = 0;
     try {
       for (; i < size_; ++i) {
-        new (newData + i) T(data_[i]);
+        new (newData + i) T(std::move(data_[i]));
       }
     } catch (...) {
       for (size_t j = 0; j < i; ++j) {
@@ -255,8 +260,8 @@ void topit::Vector< T >::shrinkToFit()
   }
 }
 
-template < class T >
-T* topit::Vector< T >::allocate(size_t n)
+template< class T >
+T* zubarev::Vector< T >::allocate(size_t n)
 {
   if (n > std::numeric_limits< size_t >::max() / sizeof(T)) {
     throw std::bad_alloc();
@@ -264,22 +269,22 @@ T* topit::Vector< T >::allocate(size_t n)
   return static_cast< T* >(::operator new(sizeof(T) * n));
 }
 
-template < class T >
-void topit::Vector< T >::deallocate(T* ptr)
+template< class T >
+void zubarev::Vector< T >::deallocate(T* ptr)
 {
   ::operator delete(ptr);
 }
 
-template < class T >
-void topit::Vector< T >::destroy_range(T* ptr, size_t first, size_t last)
+template< class T >
+void zubarev::Vector< T >::destroy_range(T* ptr, size_t first, size_t last)
 {
   for (size_t j = first; j < last; ++j) {
     ptr[j].~T();
   }
 }
 
-template < class T >
-size_t topit::Vector< T >::calcCap(size_t curr, size_t needed)
+template< class T >
+size_t zubarev::Vector< T >::calcCap(size_t curr, size_t needed)
 {
   if (curr == 0) {
     return 1;
@@ -293,30 +298,29 @@ size_t topit::Vector< T >::calcCap(size_t curr, size_t needed)
   return curr;
 }
 
-
-template < class T >
-T& topit::Vector< T >::operator[](size_t id) noexcept
+template< class T >
+T& zubarev::Vector< T >::operator[](size_t id) noexcept
 {
   const Vector< T >* cthis = this;
 
   return const_cast< T& >((*cthis)[id]);
 }
 
-template < class T >
-const T& topit::Vector< T >::operator[](size_t id) const noexcept
+template< class T >
+const T& zubarev::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
 
-template < class T >
-T& topit::Vector< T >::at(size_t id)
+template< class T >
+T& zubarev::Vector< T >::at(size_t id)
 {
   const Vector< T >* cthis = this;
   return const_cast< T& >(cthis->at(id));
 }
 
-template < class T >
-const T& topit::Vector< T >::at(size_t id) const
+template< class T >
+const T& zubarev::Vector< T >::at(size_t id) const
 {
   if (id < getSize()) {
     return (*this)[id];
@@ -324,55 +328,83 @@ const T& topit::Vector< T >::at(size_t id) const
   throw std::out_of_range("bad id");
 }
 
-
-template < class T >
-void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+template< class T >
+void zubarev::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
   std::swap(capacity_, rhs.capacity_);
 }
 
-template < class T >
-topit::VectIter< T > topit::Vector< T >::begin()
+template< class T >
+zubarev::VectIter< T > zubarev::Vector< T >::begin()
 {
   return VectIter< T >(data_);
 }
 
-template < class T >
-topit::VectIter< T > topit::Vector< T >::end()
+template< class T >
+zubarev::VectIter< T > zubarev::Vector< T >::end()
 {
   return VectIter< T >(data_ + size_);
 }
 
-
-template < class T >
-topit::CVectIter< T > topit::Vector< T >::begin() const
+template< class T >
+zubarev::CVectIter< T > zubarev::Vector< T >::begin() const
 {
   return CVectIter< T >(data_);
 }
 
-template < class T >
-topit::CVectIter< T > topit::Vector< T >::end() const
+template< class T >
+zubarev::CVectIter< T > zubarev::Vector< T >::end() const
 {
   return CVectIter< T >(data_ + size_);
 }
 
-
-template < class T >
-topit::CVectIter< T > topit::Vector< T >::cbegin() const
+template< class T >
+zubarev::CVectIter< T > zubarev::Vector< T >::cbegin() const
 {
   return CVectIter< T >(data_);
 }
-template < class T >
-topit::CVectIter< T > topit::Vector< T >::cend() const
+template< class T >
+zubarev::CVectIter< T > zubarev::Vector< T >::cend() const
 {
   return CVectIter< T >(data_ + size_);
 }
 
+template< class T >
+T& zubarev::Vector< T >::front()
+{
+  return *data_;
+}
+template< class T >
+const T& zubarev::Vector< T >::front() const
+{
+  return *data_;
+}
+template< class T >
+const T& zubarev::Vector< T >::cfront() const
+{
+  return *data_;
+}
 
-template < class T >
-void topit::Vector< T >::pushBack(const T& v)
+template< class T >
+T& zubarev::Vector< T >::back()
+{
+  return *(data_ + size_ - 1);
+}
+template< class T >
+const T& zubarev::Vector< T >::back() const
+{
+  return *(data_ + size_ - 1);
+}
+template< class T >
+const T& zubarev::Vector< T >::cback() const
+{
+  return *(data_ + size_ - 1);
+}
+
+template< class T >
+void zubarev::Vector< T >::pushBack(const T& v)
 {
   if (size_ >= capacity_) {
     Vector< T > tmp(*this);
@@ -385,8 +417,8 @@ void topit::Vector< T >::pushBack(const T& v)
   }
 }
 
-template < class T >
-void topit::Vector< T >::pushBackCount(size_t count, const T& v)
+template< class T >
+void zubarev::Vector< T >::pushBackCount(size_t count, const T& v)
 {
   if (size_ + count >= capacity_) {
     Vector< T > tmp(*this);
@@ -403,9 +435,9 @@ void topit::Vector< T >::pushBackCount(size_t count, const T& v)
   }
 }
 
-template < class T >
-template < class IT >
-void topit::Vector< T >::pushBackRange(IT a, size_t count)
+template< class T >
+template< class IT >
+void zubarev::Vector< T >::pushBackRange(IT a, size_t count)
 {
 
   if (size_ + count >= capacity_) {
@@ -423,16 +455,16 @@ void topit::Vector< T >::pushBackRange(IT a, size_t count)
   }
 }
 
-template < class T >
-void topit::Vector< T >::unsafePushBack(const T& v)
+template< class T >
+void zubarev::Vector< T >::unsafePushBack(const T& v)
 {
   assert(size_ < capacity_);
   new (data_ + size_) T(v);
   ++size_;
 }
 
-template < class T >
-void topit::Vector< T >::popBack()
+template< class T >
+void zubarev::Vector< T >::popBack()
 {
   if (size_ == 0) {
     throw std::out_of_range("popBack to empty vector");
@@ -442,9 +474,8 @@ void topit::Vector< T >::popBack()
   data_[size_].~T();
 }
 
-
-template < class T >
-void topit::Vector< T >::insert(size_t index, const T& v)
+template< class T >
+void zubarev::Vector< T >::insert(size_t index, const T& v)
 {
   Vector< T > tmp;
   tmp.reserve(size_ + 1);
@@ -470,8 +501,8 @@ void topit::Vector< T >::insert(size_t index, const T& v)
   }
 }
 
-template < class T >
-void topit::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, size_t end)
+template< class T >
+void zubarev::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, size_t end)
 {
   size_t count = end - beg;
   Vector< T > tmp;
@@ -500,9 +531,8 @@ void topit::Vector< T >::insert(size_t pos, const Vector< T >& v, size_t beg, si
   }
 }
 
-
-template < class T >
-void topit::Vector< T >::erase(size_t index)
+template< class T >
+void zubarev::Vector< T >::erase(size_t index)
 {
   for (size_t i = index; i < size_ - 1; ++i) {
     data_[i].~T();
@@ -512,8 +542,8 @@ void topit::Vector< T >::erase(size_t index)
   --size_;
 }
 
-template < class T >
-void topit::Vector< T >::erase(size_t beg, size_t end)
+template< class T >
+void zubarev::Vector< T >::erase(size_t beg, size_t end)
 {
   size_t count = end - beg;
   for (size_t i = end; i < size_; ++i) {
@@ -525,17 +555,16 @@ void topit::Vector< T >::erase(size_t beg, size_t end)
   size_ -= count;
 }
 
-
-template < class T >
-topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, const T& v)
+template< class T >
+zubarev::VectIter< T > zubarev::Vector< T >::insert(CVectIter< T > pos, const T& v)
 {
   size_t index = pos - cbegin();
   insert(index, v);
   return begin() + index;
 }
 
-template < class T >
-topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, size_t count, const T& v)
+template< class T >
+zubarev::VectIter< T > zubarev::Vector< T >::insert(CVectIter< T > pos, size_t count, const T& v)
 {
   size_t index = pos - cbegin();
   Vector< T > tmp;
@@ -565,8 +594,8 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, size_t count
   }
 }
 
-template < class T >
-topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, VectIter< T > first, VectIter< T > last)
+template< class T >
+zubarev::VectIter< T > zubarev::Vector< T >::insert(CVectIter< T > pos, VectIter< T > first, VectIter< T > last)
 {
   size_t index = pos - begin();
   size_t count = last - first;
@@ -598,33 +627,38 @@ topit::VectIter< T > topit::Vector< T >::insert(CVectIter< T > pos, VectIter< T 
   }
 }
 
-
-template < class T >
-void topit::Vector< T >::erase(CVectIter< T > pos)
+template< class T >
+void zubarev::Vector< T >::erase(CVectIter< T > pos)
 {
   size_t index = pos - cbegin();
   erase(index);
 }
 
-template < class T >
-void topit::Vector< T >::erase(CVectIter< T > pos, size_t count)
+template< class T >
+void zubarev::Vector< T >::erase(CVectIter< T > pos, size_t count)
 {
   size_t b = pos - cbegin();
   size_t e = b + count;
   erase(b, e);
 }
 
-template < class T >
-void topit::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
+template< class T >
+void zubarev::Vector< T >::erase(CVectIter< T > first, CVectIter< T > last)
 {
   size_t b = first - cbegin();
   size_t e = last - cbegin();
   erase(b, e);
 }
 
+template< class T >
+void zubarev::Vector< T >::clear()
+{
+  destroy_range(data_, 0, size_);
+  size_ = 0;
+}
 
-template < class T >
-bool topit::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
+template< class T >
+bool zubarev::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
 {
 
   bool isEqual = lhs.getSize() == rhs.getSize();

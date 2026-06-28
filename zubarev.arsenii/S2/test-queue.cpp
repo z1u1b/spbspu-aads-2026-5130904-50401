@@ -1,4 +1,5 @@
-#include "queue.hpp"
+#include "../common/my_queue/queue.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(queue_tests)

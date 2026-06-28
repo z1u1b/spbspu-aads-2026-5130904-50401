@@ -1,5 +1,5 @@
-#include "list.hpp"
 #include <boost/test/unit_test.hpp>
+#include "../common/my_list/list.hpp"
 
 BOOST_AUTO_TEST_SUITE(list_tests)
 
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(self_assignment)
   list.push_front(1);
   list.push_front(2);
 
-  list = list;
+  list.operator=(list);
 
   auto it = list.begin();
   BOOST_CHECK(*it == 2);

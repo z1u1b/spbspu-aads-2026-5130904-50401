@@ -6,7 +6,7 @@
 namespace zubarev
 {
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   class BSTIterator
   {
     friend class BSTConstIterator< Key, Value >;
@@ -26,17 +26,17 @@ namespace zubarev
     bool operator==(const BSTIterator&) const;
   };
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTIterator< Key, Value >::BSTIterator() noexcept:
     ptr_(nullptr)
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTIterator< Key, Value >::BSTIterator(Node* node):
     ptr_(node)
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   std::pair< Key, Value >& BSTIterator< Key, Value >::operator*() const
   {
     if (!ptr_) {
@@ -45,7 +45,7 @@ namespace zubarev
     return ptr_->data_;
   }
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   std::pair< Key, Value >* BSTIterator< Key, Value >::operator->() const
   {
     if (!ptr_) {
@@ -53,7 +53,7 @@ namespace zubarev
     }
     return &ptr_->data_;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator++()
   {
     if (!ptr_) {
@@ -61,7 +61,7 @@ namespace zubarev
     }
     if (ptr_->right_) {
       ptr_ = ptr_->right_;
-      while (ptr_->left != nullptr) {
+      while (ptr_->left_ != nullptr) {
         ptr_ = ptr_->left_;
       }
     } else {
@@ -72,17 +72,17 @@ namespace zubarev
     }
     return *this;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   bool BSTIterator< Key, Value >::operator!=(const BSTIterator& rhs) const
   {
     return !(*this == rhs);
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   bool BSTIterator< Key, Value >::operator==(const BSTIterator& rhs) const
   {
     return ptr_ == rhs.ptr_;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   zubarev::BSTConstIterator< Key, Value >::BSTConstIterator(const BSTIterator< Key, Value >& other) noexcept:
     ptr_(other.ptr_)
   {}

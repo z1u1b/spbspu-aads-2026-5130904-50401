@@ -4,7 +4,7 @@
 namespace zubarev
 {
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   struct BSTreeNode
   {
     using Node = BSTreeNode< Key, Value >;
@@ -23,7 +23,7 @@ namespace zubarev
     BSTreeNode< Key, Value >* right_;
     BSTreeNode< Key, Value >* parent_;
   };
-  template < class Key, class Value >
+  template< class Key, class Value >
   void BSTreeNode< Key, Value >::swap(BSTreeNode& other) noexcept
   {
     std::swap(other.data_);
@@ -32,7 +32,7 @@ namespace zubarev
     std::swap(other.parent_);
   }
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode():
     data_(std::make_pair(Key{}, Value{})),
     left_(nullptr),
@@ -40,25 +40,25 @@ namespace zubarev
     parent_(nullptr)
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode(Key key, Value val):
     data_(std::make_pair(key, val)),
     left_(nullptr),
     right_(nullptr),
     parent_(nullptr)
   {}
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >::~BSTreeNode()
   {}
 
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode(const BSTreeNode& node):
     data_(node.data_),
     right_(node.right_),
     left_(node.left_),
     parent_(node.parent_)
   {}
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >::BSTreeNode(BSTreeNode&& node) noexcept:
     data_(std::move(node.data_))
   {
@@ -66,7 +66,7 @@ namespace zubarev
     node.left_ = nullptr;
     node.parent_ = nullptr;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >& BSTreeNode< Key, Value >::operator=(const BSTreeNode& rhs)
   {
     if (this == std::addressof(rhs)) {
@@ -76,7 +76,7 @@ namespace zubarev
     swap(cpy);
     return *this;
   }
-  template < class Key, class Value >
+  template< class Key, class Value >
   BSTreeNode< Key, Value >& BSTreeNode< Key, Value >::operator=(BSTreeNode&& rhs) noexcept
   {
     if (this == std::addressof(rhs)) {

@@ -1,13 +1,13 @@
 #ifndef DATASET_TABLE_HPP
 #define DATASET_TABLE_HPP
 
-#include "my_compare.hpp"
-#include "my_tree.hpp"
+#include "../common/my_tree/my_compare.hpp"
+#include "../common/my_tree/my_tree.hpp"
 
 #include <iostream>
 #include <string>
 
-#include "../common/top-it-vector.hpp"
+#include "../common/my_vector/top-it-vector.hpp"
 namespace zubarev
 {
   class DatasetTable
@@ -17,8 +17,8 @@ namespace zubarev
     using bst_datasets =
         BSTree< std::string, BSTree< size_t, std::string, Comparator< size_t > >, Comparator< std::string > >;
     bst_datasets datasetsTable;
-    static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-                        const std::pair< std::string, topit::Vector< size_t > >& b)
+    static bool compare(const std::pair< std::string, Vector< size_t > >& a,
+                        const std::pair< std::string, Vector< size_t > >& b)
     {
       return a.first < b.first;
     }

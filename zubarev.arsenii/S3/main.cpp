@@ -1,12 +1,10 @@
-#include "../common/top-it-vector.hpp"
 #include "commands.hpp"
 #include "graph.hpp"
 #include "input.hpp"
-#include "my_equal.hpp"
+#include "../common/my_hashfunc/my_equal.hpp"
 #include "my_hashtable.hpp"
-#include "my_siphash.hpp"
+#include "../common/my_hashfunc/my_siphash.hpp"
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>

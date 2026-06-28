@@ -1,12 +1,13 @@
-#include "commands.hpp"
-#include "input.hpp"
-#include "my_compare.hpp"
-#include "my_tree.hpp"
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
+
+#include "commands.hpp"
+#include "input.hpp"
+#include "../common/my_tree/my_compare.hpp"
+#include "../common/my_tree/my_tree.hpp"
+
 
 int main(int argc, char* argv[])
 

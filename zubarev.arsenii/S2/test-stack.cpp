@@ -1,4 +1,5 @@
-#include "stack.hpp"
+
+#include "../common/my_stack/stack.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(stack_tests)
