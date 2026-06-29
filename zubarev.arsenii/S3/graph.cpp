@@ -34,14 +34,16 @@ void zubarev::GraphTable::vertexes(std::ostream& out, const std::string& graph_n
   VertexList verts = vertex_data_.at(graph_name);
 
   if (verts.getSize() == 0) {
-    out << '\n';
     return;
   }
 
   zubarev::sort(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a < b; });
 
   for (auto it = verts.begin(); it != verts.end(); ++it) {
-    out << *it << '\n';
+    out << *it;
+    if (it != verts.end() - 1) {
+      out << '\n';
+    }
   }
 }
 

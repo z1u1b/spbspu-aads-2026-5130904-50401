@@ -14,6 +14,7 @@ void zubarev::cmd_vertexes(std::istream& in, std::ostream& out, GraphTable& grap
   std::string name;
   in >> name;
   graph.vertexes(out, name);
+  out << '\n';
 }
 void zubarev::cmd_outbound(std::istream& in, std::ostream& out, GraphTable& graph)
 {
