@@ -20,11 +20,10 @@ namespace zubarev
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
     using GraphEdgeTable = HashTable< std::string, EdgeTable, SipHash, std::equal_to< std::string > >;
 
-    GraphEdgeTable edge_data_;
-
     using VertexList = topit::Vector< std::string >;
     using GraphVertexTable = HashTable< std::string, VertexList, SipHash, std::equal_to< std::string > >;
 
+    GraphEdgeTable edge_data_;
     GraphVertexTable vertex_data_;
 
     static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
@@ -32,14 +31,19 @@ namespace zubarev
 
   public:
     void graphs(std::ostream&) const;
-    void vertexes(const std::string&, std::ostream&) const;
-    void outbound(const std::string&, const std::string&, std::ostream&) const;
-    void inbound(const std::string&, const std::string&, std::ostream&) const;
-    void bind(const std::string&, const std::pair< std::string, std::string >&, size_t, std::ostream&);
-    void cut(const std::string&, const std::pair< std::string, std::string >&, size_t, std::ostream&);
-    bool create(const std::string&, size_t, const topit::Vector< std::string >&, std::ostream&);
-    void merge(const std::string&, const std::string&, const std::string&, std::ostream&);
-    void extract(const std::string&, const std::string&, size_t, const topit::Vector< std::string >&, std::ostream&);
+    void vertexes(std::ostream&, const std::string&) const;
+    void outbound(std::ostream&, const std::string&, const std::string&) const;
+    void inbound(std::ostream&, const std::string&, const std::string&) const;
+
+    void bind(std::ostream&, const std::string&, const std::pair< std::string, std::string >&, size_t);
+
+    void cut(std::ostream&, const std::string&, const std::pair< std::string, std::string >&, size_t);
+
+    bool create(std::ostream&, const std::string&, size_t, const topit::Vector< std::string >&);
+
+    void merge(std::ostream&, const std::string&, const std::string&, const std::string&);
+
+    void extract(std::ostream&, const std::string&, const std::string&, size_t, const topit::Vector< std::string >&);
   };
 
   template< class T, class Compare >

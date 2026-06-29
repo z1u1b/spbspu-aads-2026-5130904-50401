@@ -23,7 +23,7 @@ void zubarev::GraphTable::graphs(std::ostream& out) const
   }
 }
 
-void zubarev::GraphTable::vertexes(const std::string& graph_name, std::ostream& out) const
+void zubarev::GraphTable::vertexes(std::ostream& out, const std::string& graph_name) const
 {
 
   if (!vertex_data_.contains(graph_name)) {
@@ -45,7 +45,7 @@ void zubarev::GraphTable::vertexes(const std::string& graph_name, std::ostream& 
   }
 }
 
-void zubarev::GraphTable::outbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
+void zubarev::GraphTable::outbound(std::ostream& out, const std::string& graph_name, const std::string& vertex) const
 {
   if (!edge_data_.contains(graph_name)) {
     out << "<INVALID COMMAND>" << "\n";
@@ -92,7 +92,7 @@ void zubarev::GraphTable::outbound(const std::string& graph_name, const std::str
   }
 }
 
-void zubarev::GraphTable::inbound(const std::string& graph_name, const std::string& vertex, std::ostream& out) const
+void zubarev::GraphTable::inbound(std::ostream& out, const std::string& graph_name, const std::string& vertex) const
 {
   if (!edge_data_.contains(graph_name)) {
     out << "<INVALID COMMAND>" << "\n";
@@ -140,10 +140,10 @@ void zubarev::GraphTable::inbound(const std::string& graph_name, const std::stri
   }
 }
 
-void zubarev::GraphTable::bind(const std::string& graph_name,
+void zubarev::GraphTable::bind(std::ostream& out,
+                               const std::string& graph_name,
                                const std::pair< std::string, std::string >& edge,
-                               size_t weight,
-                               std::ostream& out)
+                               size_t weight)
 {
   if (!vertex_data_.contains(graph_name)) {
 
@@ -174,10 +174,10 @@ void zubarev::GraphTable::bind(const std::string& graph_name,
   edges[edge].pushBack(weight);
 }
 
-void zubarev::GraphTable::cut(const std::string& graph_name,
+void zubarev::GraphTable::cut(std::ostream& out,
+                              const std::string& graph_name,
                               const std::pair< std::string, std::string >& edge,
-                              size_t weight,
-                              std::ostream& out)
+                              size_t weight)
 {
   if (!edge_data_.contains(graph_name)) {
 
@@ -208,16 +208,16 @@ void zubarev::GraphTable::cut(const std::string& graph_name,
   }
 }
 
-bool zubarev::GraphTable::create(const std::string& graph_name,
+bool zubarev::GraphTable::create(std::ostream& out,
+                                 const std::string& graph_name,
                                  size_t count,
-                                 const topit::Vector< std::string >& vertices,
-                                 std::ostream& out)
+                                 const topit::Vector< std::string >& vertexes)
 {
   if (edge_data_.contains(graph_name)) {
     out << "<INVALID COMMAND>" << "\n";
     return false;
   }
-  if (count != vertices.getSize()) {
+  if (count != vertexes.getSize()) {
     out << "<INVALID COMMAND>" << "\n";
     return false;
   }
@@ -225,7 +225,7 @@ bool zubarev::GraphTable::create(const std::string& graph_name,
   std::equal_to< std::string > eq;
   for (size_t i = 0; i < count; ++i) {
     for (size_t j = i + 1; j < count; ++j) {
-      if (eq(vertices[i], vertices[j])) {
+      if (eq(vertexes[i], vertexes[j])) {
         out << "<INVALID COMMAND>\n";
         return false;
       }
@@ -239,23 +239,23 @@ bool zubarev::GraphTable::create(const std::string& graph_name,
 
   VertexList new_vertices;
   for (size_t i = 0; i < count; ++i) {
-    new_vertices.pushBack(vertices[i]);
+    new_vertices.pushBack(vertexes[i]);
   }
   vertex_data_.insert(graph_name, new_vertices);
   return true;
 }
 
-void zubarev::GraphTable::merge(const std::string& new_name,
+void zubarev::GraphTable::merge(std::ostream& out,
+                                const std::string& new_name,
                                 const std::string& source1,
-                                const std::string& source2,
-                                std::ostream& out)
+                                const std::string& source2)
 {
 
   if (!(edge_data_.contains(source1) && edge_data_.contains(source2))) {
     out << "<INVALID COMMAND>" << "\n";
     return;
   }
-  if (!create(new_name, 0, {}, out)) {
+  if (!create(out, new_name, 0, {})) {
     return;
   }
   using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
@@ -316,18 +316,18 @@ void zubarev::GraphTable::merge(const std::string& new_name,
   }
 }
 
-void zubarev::GraphTable::extract(const std::string& new_name,
+void zubarev::GraphTable::extract(std::ostream& out,
+                                  const std::string& new_name,
                                   const std::string& source,
                                   size_t count,
-                                  const topit::Vector< std::string >& vertices,
-                                  std::ostream& out)
+                                  const topit::Vector< std::string >& vertexes)
 {
   if (!edge_data_.contains(source)) {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
-  if (count != vertices.getSize()) {
+  if (count != vertexes.getSize()) {
     out << "<INVALID COMMAND>\n";
     return;
   }
@@ -340,7 +340,7 @@ void zubarev::GraphTable::extract(const std::string& new_name,
     bool find = false;
 
     for (auto it = source_verts.begin(); it != source_verts.end(); ++it) {
-      if (eq_(*it, vertices[i])) {
+      if (eq_(*it, vertexes[i])) {
         find = true;
         break;
       }
@@ -352,7 +352,7 @@ void zubarev::GraphTable::extract(const std::string& new_name,
     }
   }
 
-  if (!create(new_name, count, vertices, out)) {
+  if (!create(out, new_name, count, vertexes)) {
     return;
   }
 
@@ -366,11 +366,11 @@ void zubarev::GraphTable::extract(const std::string& new_name,
     bool flag_to = false;
 
     for (size_t i = 0; i < count; ++i) {
-      if (eq_(from, vertices[i])) {
+      if (eq_(from, vertexes[i])) {
         flag_from = true;
       }
 
-      if (eq_(to, vertices[i])) {
+      if (eq_(to, vertexes[i])) {
         flag_to = true;
       }
     }
