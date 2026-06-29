@@ -156,7 +156,6 @@ void zubarev::GraphTable::bind(std::ostream& out,
     out << "<INVALID COMMAND>" << "\n";
     return;
   }
-  std::equal_to< std::string > eq_;
   auto& edges = edge_data_.at(graph_name);
   auto& verts = vertex_data_.at(graph_name);
 
