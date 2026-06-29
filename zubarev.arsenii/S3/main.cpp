@@ -55,16 +55,15 @@ int main(int argc, char* argv[])
   std::string cmd;
   while (std::cin >> cmd) {
     try {
-      if (!cmds.contains(cmd)) {
-        throw std::out_of_range("unknown command");
-      }
       cmds.at(cmd)(std::cin, std::cout, graph);
-    } catch (const std::out_of_range&) {
-      std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error& e) {
-      std::cout << "<INVALID COMMAND: " << e.what() << '\n';
+    } catch (const std::exception& e) {
+      std::cout << "<INVALID COMMAND";
+      if (e.what() && std::string(e.what()).size() > 0) {
+        std::cout << ": " << e.what();
+      }
+      std::cout << ">\n";
+
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   std::cin.clear();
