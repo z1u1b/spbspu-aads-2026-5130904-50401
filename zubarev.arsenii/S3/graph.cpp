@@ -1,3 +1,4 @@
+#include <functional>
 #include "graph.hpp"
 
 bool zubarev::GraphTable::compare(const std::pair< std::string, zubarev::Vector< size_t > >& a,
@@ -17,7 +18,7 @@ void zubarev::GraphTable::graphs(std::ostream& out) const
     out << '\n';
     return;
   }
-  zubarev::sort(names.begin(), names.end(), [](const std::string& a, const std::string& b) { return a < b; });
+  zubarev::sort(names.begin(), names.end(), std::less<>{});
   for (auto it = names.begin(); it != names.end(); ++it) {
     out << *it << '\n';
   }
