@@ -56,7 +56,7 @@ void zubarev::cmd_create(std::istream& in, std::ostream& out, GraphTable& graph)
     return;
   }
 
-  topit::Vector< std::string > vertexes;
+  zubarev::Vector< std::string > vertexes;
 
   for (size_t i = 0; i < count; ++i) {
     std::string str;
@@ -76,7 +76,7 @@ void zubarev::cmd_extract(std::istream& in, std::ostream& out, GraphTable& graph
 {
   std::string name1, name2;
   size_t count;
-  topit::Vector< std::string > vertexes;
+  zubarev::Vector< std::string > vertexes;
   in >> name1 >> name2 >> count;
   for (size_t i = 0; i < count; ++i) {
     std::string str;

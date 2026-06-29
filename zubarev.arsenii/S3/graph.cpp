@@ -1,14 +1,14 @@
 #include "graph.hpp"
 
-bool zubarev::GraphTable::compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-                                  const std::pair< std::string, topit::Vector< size_t > >& b)
+bool zubarev::GraphTable::compare(const std::pair< std::string, zubarev::Vector< size_t > >& a,
+                                  const std::pair< std::string, zubarev::Vector< size_t > >& b)
 {
   return a.first < b.first;
 }
 
 void zubarev::GraphTable::graphs(std::ostream& out) const
 {
-  topit::Vector< std::string > names;
+  zubarev::Vector< std::string > names;
 
   for (auto it = edge_data_.begin(); it != edge_data_.end(); ++it) {
     names.pushBack(it->key);
@@ -67,11 +67,11 @@ void zubarev::GraphTable::outbound(std::ostream& out, const std::string& graph_n
     out << "<INVALID COMMAND>" << "\n";
     return;
   }
-  topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+  zubarev::Vector< std::pair< std::string, zubarev::Vector< size_t > > > results;
 
   for (auto it = graph.begin(); it != graph.end(); ++it) {
     if (eq(it->key.first, vertex)) {
-      std::pair< std::string, topit::Vector< size_t > > tmp;
+      std::pair< std::string, zubarev::Vector< size_t > > tmp;
       tmp.first = it->key.second;
       tmp.second = it->val;
       results.pushBack(tmp);
@@ -115,11 +115,11 @@ void zubarev::GraphTable::inbound(std::ostream& out, const std::string& graph_na
     return;
   }
 
-  topit::Vector< std::pair< std::string, topit::Vector< size_t > > > results;
+  zubarev::Vector< std::pair< std::string, zubarev::Vector< size_t > > > results;
 
   for (auto it = graph.begin(); it != graph.end(); ++it) {
     if (eq(it->key.second, vertex)) {
-      std::pair< std::string, topit::Vector< size_t > > tmp;
+      std::pair< std::string, zubarev::Vector< size_t > > tmp;
       tmp.first = it->key.first;
       tmp.second = it->val;
       results.pushBack(tmp);
@@ -211,7 +211,7 @@ void zubarev::GraphTable::cut(std::ostream& out,
 bool zubarev::GraphTable::create(std::ostream& out,
                                  const std::string& graph_name,
                                  size_t count,
-                                 const topit::Vector< std::string >& vertexes)
+                                 const zubarev::Vector< std::string >& vertexes)
 {
   if (edge_data_.contains(graph_name)) {
     out << "<INVALID COMMAND>" << "\n";
@@ -320,7 +320,7 @@ void zubarev::GraphTable::extract(std::ostream& out,
                                   const std::string& new_name,
                                   const std::string& source,
                                   size_t count,
-                                  const topit::Vector< std::string >& vertexes)
+                                  const zubarev::Vector< std::string >& vertexes)
 {
   if (!edge_data_.contains(source)) {
     out << "<INVALID COMMAND>\n";

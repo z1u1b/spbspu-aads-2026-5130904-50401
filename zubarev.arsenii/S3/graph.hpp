@@ -15,19 +15,19 @@ namespace zubarev
 
   private:
     using EdgeKey = std::pair< std::string, std::string >;
-    using Weights = topit::Vector< size_t >;
+    using Weights = zubarev::Vector< size_t >;
 
     using EdgeTable = HashTable< EdgeKey, Weights, SipHash, std::equal_to< EdgeKey > >;
     using GraphEdgeTable = HashTable< std::string, EdgeTable, SipHash, std::equal_to< std::string > >;
 
-    using VertexList = topit::Vector< std::string >;
+    using VertexList = zubarev::Vector< std::string >;
     using GraphVertexTable = HashTable< std::string, VertexList, SipHash, std::equal_to< std::string > >;
 
     GraphEdgeTable edge_data_;
     GraphVertexTable vertex_data_;
 
-    static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-                        const std::pair< std::string, topit::Vector< size_t > >& b);
+    static bool compare(const std::pair< std::string, zubarev::Vector< size_t > >& a,
+                        const std::pair< std::string, zubarev::Vector< size_t > >& b);
 
   public:
     void graphs(std::ostream&) const;
@@ -39,21 +39,21 @@ namespace zubarev
 
     void cut(std::ostream&, const std::string&, const std::pair< std::string, std::string >&, size_t);
 
-    bool create(std::ostream&, const std::string&, size_t, const topit::Vector< std::string >&);
+    bool create(std::ostream&, const std::string&, size_t, const zubarev::Vector< std::string >&);
 
     void merge(std::ostream&, const std::string&, const std::string&, const std::string&);
 
-    void extract(std::ostream&, const std::string&, const std::string&, size_t, const topit::Vector< std::string >&);
+    void extract(std::ostream&, const std::string&, const std::string&, size_t, const zubarev::Vector< std::string >&);
   };
 
   template< class T, class Compare >
-  void sort(topit::VectIter< T > beg, topit::VectIter< T > end, Compare comp)
+  void sort(zubarev::VectIter< T > beg, zubarev::VectIter< T > end, Compare comp)
   {
     if (beg == end) {
       return;
     }
     while (true) {
-      topit::VectIter< T > last_swap = beg;
+      zubarev::VectIter< T > last_swap = beg;
       for (auto it = beg; it != end; ++it) {
         auto next = it;
         ++next;
@@ -76,13 +76,13 @@ namespace zubarev
     }
   }
   template< class T, class Equal >
-  topit::VectIter< T > unique(topit::VectIter< T > begin, topit::VectIter< T > end, std::equal_to< T > eq)
+  zubarev::VectIter< T > unique(zubarev::VectIter< T > begin, zubarev::VectIter< T > end, std::equal_to< T > eq)
   {
     if (begin == end) {
       return end;
     }
 
-    topit::VectIter< T > result = begin;
+    zubarev::VectIter< T > result = begin;
     for (auto it = begin; it != end; ++it) {
       if (result == begin || !eq(*it, *(result - 1))) {
         if (result != it) {
