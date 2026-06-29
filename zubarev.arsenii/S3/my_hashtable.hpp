@@ -252,21 +252,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin()
   {
-    Iter it(0, 0, overflow_bucket_.begin(), this);
-
-    while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
-      ++it;
-      if (it.is_in_overflow()) {
-        break;
-      }
-    }
-
-    if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
-      return end();
-    }
-
-    return it;
+    return const_cast< HashTable* >(this)->cbegin();
   }
   template< class Key, class Value, class Hash, class Equal >
   IterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
@@ -301,20 +287,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin() const
   {
-    CIter it(0, 0, overflow_bucket_.begin(), this);
-
-    while (it.bucket_index_ < bucket_count_ && it.element_index_ < bucket_capacity_ &&
-           !data_[it.bucket_index_ * bucket_capacity_ + it.element_index_].is_val) {
-      ++it;
-      if (it.is_in_overflow())
-        break;
-    }
-
-    if (it.is_in_overflow() && it.overflow_el_ == overflow_bucket_.end()) {
-      return cend();
-    }
-
-    return it;
+    return cbegin();
   }
   template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end() const
@@ -328,7 +301,6 @@ namespace zubarev
     if (contains(k)) {
       return;
     }
-    // Table tmp(*this);
     size_t buc_idx = getBucketIndex(k);
     for (size_t i = 0; i < bucket_capacity_; ++i) {
       if (!data_[bucket_capacity_ * buc_idx + i].is_val) {
