@@ -10,6 +10,9 @@ namespace zubarev
   class HashTable;
 
   template< class Key, class Value, class Hash, class Equal >
+  class IterHashTable;
+
+  template< class Key, class Value, class Hash, class Equal >
   class CIterHashTable
   {
 
@@ -19,6 +22,7 @@ namespace zubarev
                    size_t,
                    LCIter< detail::NodeHashTable< Key, Value > >,
                    const HashTable< Key, Value, Hash, Equal >*);
+    CIterHashTable(const IterHashTable< Key, Value, Hash, Equal >&);
 
     const detail::NodeHashTable< Key, Value >& operator*() const;
     const detail::NodeHashTable< Key, Value >* operator->() const noexcept;
@@ -50,6 +54,13 @@ namespace zubarev
     bucket_index_(buc_idx),
     overflow_el_(over_it),
     table_(table)
+  {}
+  template< class Key, class Value, class Hash, class Equal >
+  CIterHashTable< Key, Value, Hash, Equal >::CIterHashTable(const IterHashTable< Key, Value, Hash, Equal >& iter):
+    element_index_(iter.element_index_),
+    bucket_index_(iter.bucket_index_),
+    overflow_el_(iter.overflow_el_),
+    table_(iter.table_)
   {}
 
   template< class Key, class Value, class Hash, class Equal >

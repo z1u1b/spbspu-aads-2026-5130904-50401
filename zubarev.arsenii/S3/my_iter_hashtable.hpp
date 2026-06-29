@@ -9,11 +9,14 @@ namespace zubarev
 {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable;
+  template< class Key, class Value, class Hash, class Equal >
+  class CIterHashTable;
 
   template< class Key, class Value, class Hash, class Equal >
   class IterHashTable
   {
     friend class HashTable< Key, Value, Hash, Equal >;
+    friend class CIterHashTable< Key, Value, Hash, Equal >;
 
   public:
     IterHashTable() = default;

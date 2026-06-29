@@ -50,7 +50,6 @@ namespace zubarev
     void pop_front() noexcept;
     void pop_back() noexcept;
 
-
     void push_front(const T& val);
     void push_front(T&& val);
     void push_back(const T&);
@@ -319,7 +318,7 @@ namespace zubarev
     delete toDel;
   }
 
-    template< class T >
+  template< class T >
   void List< T >::pop_back() noexcept
   {
     if (empty() || !tail_) {
@@ -327,17 +326,16 @@ namespace zubarev
     }
     if (head_ == tail_) {
       rmFake();
-      head_=nullptr;
-      tail_=nullptr;
+      head_ = nullptr;
+      tail_ = nullptr;
     }
-    detail::Node< T >* prev=head_;
-    while (prev->next!=tail_) {
-      prev=prev->next;
+    detail::Node< T >* prev = head_;
+    while (prev->next != tail_) {
+      prev = prev->next;
     }
-    prev->next=nullptr;
+    prev->next = nullptr;
     delete tail_;
-    tail_=prev;
-
+    tail_ = prev;
   }
 
   template< class T >

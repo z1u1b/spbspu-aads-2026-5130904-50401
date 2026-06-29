@@ -3,9 +3,9 @@
 #include <cstddef>
 namespace topit
 {
-  template < class T >
+  template< class T >
   struct Vector;
-  template < class T >
+  template< class T >
   class CVectIter
   {
     friend struct topit::Vector< T >;
@@ -31,49 +31,49 @@ namespace topit
     const T* ptr_;
   };
 
-  template < class T >
+  template< class T >
   const T& topit::CVectIter< T >::operator*() const
   {
     return *ptr_;
   }
 
-  template < class T >
+  template< class T >
   CVectIter< T >& topit::CVectIter< T >::operator++()
   {
     ++ptr_;
     return *this;
   }
 
-  template < class T >
+  template< class T >
   CVectIter< T > topit::CVectIter< T >::operator++(int)
   {
     CVectIter< T > tmp = *this;
     ++ptr_;
     return tmp;
   }
-  template < class T >
+  template< class T >
   CVectIter< T > topit::CVectIter< T >::operator+(int n)
   {
     return CVectIter(ptr_ + n);
   }
 
-  template < class T >
+  template< class T >
   size_t topit::CVectIter< T >::operator-(const CVectIter< T >& other) const
   {
     return static_cast< size_t >(ptr_ - other.ptr_);
   }
-    template < class T >
-    CVectIter< T > topit::CVectIter< T >::operator-(const size_t& other) const
+  template< class T >
+  CVectIter< T > topit::CVectIter< T >::operator-(const size_t& other) const
   {
 
     return (ptr_ - other);
   }
-  template < class T >
+  template< class T >
   bool topit::CVectIter< T >::operator!=(const CVectIter< T >& other) const
   {
     return ptr_ != other.ptr_;
   }
-  template < class T >
+  template< class T >
   bool topit::CVectIter< T >::operator==(const CVectIter< T >& other) const
   {
     return ptr_ == other.ptr_;
