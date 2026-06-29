@@ -6,6 +6,10 @@ namespace zubarev
 {
   template< class T >
   class List;
+
+  template< class U >
+  class LCIter;
+
   namespace detail
   {
     template< class T >
@@ -14,7 +18,6 @@ namespace zubarev
   template< class T >
   class LIter
   {
-
   public:
     T& operator*();
     T* operator->();
@@ -26,6 +29,7 @@ namespace zubarev
 
   private:
     friend class List< T >;
+    friend class LCIter< T >;
     detail::Node< T >* ptr_;
     LIter(detail::Node< T >* p);
   };

@@ -5,6 +5,8 @@ namespace zubarev
 {
   template< class T >
   class List;
+  template< class T >
+  class LIter;
   namespace detail
   {
     template< class T >
@@ -16,6 +18,7 @@ namespace zubarev
   {
 
   public:
+    LCIter(const LIter< T >& other);
     const T& operator*() const;
     const T* operator->() const;
     LCIter< T >& operator++();
@@ -29,6 +32,10 @@ namespace zubarev
     LCIter(const detail::Node< T >* p);
   };
 
+  template< typename T >
+  LCIter< T >::LCIter(const LIter< T >& other):
+    ptr_(other.ptr_)
+  {}
   template< class T >
   LCIter< T >::LCIter(const detail::Node< T >* p):
     ptr_(p)
