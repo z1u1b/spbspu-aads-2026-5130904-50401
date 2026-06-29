@@ -35,6 +35,7 @@ namespace zubarev
     T& at(size_t id);
     const T& at(size_t id) const;
     void swap(Vector< T >& rhs) noexcept;
+    bool contains(const T& value) const;
     VectIter< T > begin();
     VectIter< T > end();
 
@@ -616,6 +617,16 @@ bool zubarev::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
   for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i)
     ;
   return isEqual;
+}
+template< class T >
+bool zubarev::Vector< T >::contains(const T& value) const
+{
+  for (auto it = cbegin(); it != cend(); ++it) {
+    if (*it == value) {
+      return true;
+    }
+  }
+  return false;
 }
 
 #endif

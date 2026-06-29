@@ -157,20 +157,14 @@ void zubarev::GraphTable::bind(std::ostream& out,
   auto& edges = edge_data_.at(graph_name);
   auto& verts = vertex_data_.at(graph_name);
 
-  bool flag_from = false;
-  bool flag_to = false;
-  for (auto it = verts.begin(); it != verts.end(); ++it) {
-    if (eq_(*it, edge.first)) {
-      flag_from = true;
-    }
-    if (eq_(*it, edge.second)) {
-      flag_to = true;
-    }
-  }
-  if (!flag_from) {
+  bool need_from = !verts.contains(edge.first);
+  bool need_to = !verts.contains(edge.second);
+
+  if (need_from) {
     verts.pushBack(edge.first);
   }
-  if (!flag_to) {
+
+  if (need_to) {
     verts.pushBack(edge.second);
   }
 
