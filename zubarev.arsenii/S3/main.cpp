@@ -11,7 +11,6 @@
 #include "my_siphash.hpp"
 
 int main(int argc, char* argv[])
-
 {
 
   namespace zub = zubarev;
@@ -48,9 +47,7 @@ int main(int argc, char* argv[])
   try {
 
     zub::inputGraphs(input, std::cout, graph);
-  }
-
-  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;
   }
