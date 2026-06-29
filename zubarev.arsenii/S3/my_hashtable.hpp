@@ -276,11 +276,8 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   CIterHashTable< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::cbegin() const
   {
-    // 1. Снимаем константность с этого объекта
     auto* non_const_this = const_cast< HashTable* >(this);
 
-    // 2. Вызываем неконстантный begin() для поиска первого элемента
-    // 3. Возвращаем результат (сработает ваш конструктор копирования из Iter в CIter)
     return non_const_this->begin();
   }
   template< class Key, class Value, class Hash, class Equal >
