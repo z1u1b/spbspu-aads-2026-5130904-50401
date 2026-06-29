@@ -199,12 +199,9 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& rhs) noexcept
   {
-    if (this == std::addressof(rhs)) {
-      return *this;
+    if (this != &rhs) {
+      swap(rhs);
     }
-
-    Table cpy(std::move(rhs));
-    swap(cpy);
     return *this;
   }
 
@@ -337,7 +334,7 @@ namespace zubarev
       if (!data_[bucket_capacity_ * buc_idx + i].is_val) {
         data_[bucket_capacity_ * buc_idx + i] = Node(k, v, true);
         sizes_[buc_idx]++;
-        break;
+        return;
       }
     }
     overflow_bucket_.push_back(Node(k, v, true));
@@ -359,7 +356,7 @@ namespace zubarev
     for (size_t i = 0; i < bucket_capacity_; ++i) {
       size_t idx = bucket_capacity_ * buc_idx + i;
       if (equaler_(data_[idx].key, k) && data_[idx].is_val) {
-        data_[idx]=Node{};
+        data_[idx] = Node{};
         sizes_[buc_idx]--;
         return 1;
       }
@@ -391,13 +388,7 @@ namespace zubarev
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   {
-    Table tmp(slots,
-              bucket_capacity_,
-              new Node[slots * bucket_capacity_],
-              new size_t[slots],
-              OverflowList(),
-              hasher_,
-              equaler_);
+    Table tmp(slots, bucket_capacity_, nullptr, nullptr, OverflowList(), hasher_, equaler_);
     for (size_t i = 0; i < bucket_count_; ++i) {
       for (size_t j = 0; j < bucket_capacity_; ++j) {
         size_t idx = bucket_capacity_ * i + j;
