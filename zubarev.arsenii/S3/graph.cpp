@@ -26,25 +26,28 @@ void zubarev::GraphTable::graphs(std::ostream& out) const
 
 void zubarev::GraphTable::vertexes(std::ostream& out, const std::string& graph_name) const
 {
-
   if (!vertex_data_.contains(graph_name)) {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
-  VertexList verts = vertex_data_.at(graph_name);
+  const VertexList& verts = vertex_data_.at(graph_name);
 
   if (verts.getSize() == 0) {
+    out << "<INVALID COMMAND>\n";
     return;
   }
 
-  zubarev::sort(verts.begin(), verts.end(), [](const std::string& a, const std::string& b) { return a < b; });
+  VertexList sorted = verts;
+  zubarev::sort(sorted.begin(), sorted.end(), std::less< std::string >{});
 
-  for (auto it = verts.begin(); it != verts.end(); ++it) {
-    out << *it;
-    if (it != verts.end() - 1) {
+  bool first = true;
+  for (auto it = sorted.begin(); it != sorted.end(); ++it) {
+    if (!first) {
       out << '\n';
     }
+    out << *it;
+    first = false;
   }
 }
 
