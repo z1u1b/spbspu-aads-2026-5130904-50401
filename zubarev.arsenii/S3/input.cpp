@@ -10,7 +10,7 @@ void zubarev::inputGraphs(std::istream& in, std::ostream& out, GraphTable& graph
 
     size_t edges = 0;
     in >> edges;
-    graphs.create(graphName, 0, {}, out);
+    graphs.create(out, graphName, 0, {});
     for (size_t i = 0; i < edges; ++i) {
       std::string from;
       std::string to;
@@ -20,7 +20,7 @@ void zubarev::inputGraphs(std::istream& in, std::ostream& out, GraphTable& graph
 
       const std::pair< std::string, std::string > edge(from, to);
 
-      graphs.bind(graphName, edge, weight, out);
+      graphs.bind(out, graphName, edge, weight);
     }
   }
 }
