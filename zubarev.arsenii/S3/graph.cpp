@@ -1,6 +1,12 @@
 #include "graph.hpp"
 namespace zubarev
 {
+  bool zubarev::GraphTable::compare(const std::pair< std::string, topit::Vector< size_t > >& a,
+                                    const std::pair< std::string, topit::Vector< size_t > >& b)
+  {
+    return a.first < b.first;
+  }
+
   void GraphTable::graphs(std::ostream& out) const
   {
     topit::Vector< std::string > names;

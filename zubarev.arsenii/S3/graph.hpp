@@ -28,10 +28,7 @@ namespace zubarev
     GraphVertexTable vertex_data_;
 
     static bool compare(const std::pair< std::string, topit::Vector< size_t > >& a,
-                        const std::pair< std::string, topit::Vector< size_t > >& b)
-    {
-      return a.first < b.first;
-    }
+                        const std::pair< std::string, topit::Vector< size_t > >& b);
 
   public:
     void graphs(std::ostream&) const;
